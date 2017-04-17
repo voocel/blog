@@ -6,7 +6,7 @@
 
 <p align="center">🎈 PJ Blog is an open source blog built with Laravel and Vue.js. <a href="https://pigjian.com">https://pigjian.com</a></p>
 
-# PJ Blog
+# iceny
 
 This is a powerful blog, I try to build the blog more beautiful, more convenient. 
 

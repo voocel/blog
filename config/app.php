@@ -12,7 +12,7 @@ return [
     | any other location as required by the application or its packages.
     */
 
-    'name' => env('APPLICATION_NAME') ?: 'PJ Blog',
+    'name' => env('APPLICATION_NAME') ?: 'iceny',
 
     /*
     |--------------------------------------------------------------------------
@@ -64,7 +64,7 @@ return [
     |
     */
 
-    'timezone' => env('TIMEZONE') ?: 'UTC',
+    'timezone' => env('TIMEZONE') ?: 'Asia/Shanghai',
 
     /*
     |--------------------------------------------------------------------------

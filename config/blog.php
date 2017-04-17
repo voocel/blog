@@ -6,7 +6,7 @@ return [
     'default_avatar' => env('DEFAULT_AVATAR') ?: '/images/default.png',
 
     // Default Icon
-    'default_icon' => env('DEFAULT_ICON') ?: '/images/favicon.ico',
+    'default_icon' => env('DEFAULT_ICON') ?: '/images/favicon1.ico',
 
     // Social Share
     'social_share' => [
@@ -24,8 +24,8 @@ return [
 
     // Article Page
     'article' => [
-        'title'       => 'Nothing is impossible.',
-        'description' => 'https://pigjian.com',
+        'title'       => '没有什么是不可能的',
+        'description' => 'https://www.iceny.cn',
         'number'      => 15,
         'sort'        => 'desc',
         'sortColumn'  => 'published_at',
@@ -42,15 +42,15 @@ return [
     'footer' => [
         'github' => [
             'open' => true,
-            'url'  => 'https://github.com/jcc',
+            'url'  => 'https://github.com/iceny',
         ],
         'twitter' => [
             'open' => true,
-            'url'  => 'https://twitter.com/pigjian'
+            'url'  => 'https://twitter.com/#'
         ],
-        'meta' => '© PJ Blog 2016. Powered By Jiajian Chan',
+        'meta' => '© iceny Blog 2016. Powered By iceny',
     ],
 
-    'license' => 'Powered By Jiajian Chan.<br/>This article is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.',
+    'license' => 'Powered By iceny<br/>This article is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.',
 
 ];

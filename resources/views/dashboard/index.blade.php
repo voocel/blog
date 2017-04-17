@@ -8,7 +8,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name') }} Dashboard</title>
+    <title>{{ config('app.name') }} 后台管理</title>
 
     <!-- Icon -->
     <link rel="shortcut icon" href="{{ config('blog.default_icon') }}">
