@@ -5,6 +5,7 @@ import (
 	"blog/pkg/util"
 	"context"
 	"errors"
+	"fmt"
 	"golang.org/x/sync/singleflight"
 	"time"
 )
@@ -50,4 +51,17 @@ func (u *UserUseCase) UserRegister(ctx context.Context, req entity.UserRegisterR
 	userInfo.LastLoginTime = time.Now()
 	_, err = u.repo.AddUserRepo(ctx, userInfo)
 	return err
+}
+
+func (u *UserUseCase) GetUserById(ctx context.Context, uid int64) (*entity.User, error) {
+	v, err, _ := u.sf.Do("key1", func() (interface{}, error) {
+		userInfo, err := u.repo.GetUserByIdRepo(ctx, uid)
+		if err != nil {
+			return nil, fmt.Errorf("GetUserByIdRepo err: %w", err)
+		}
+		// todo set cache
+		return userInfo, err
+	})
+
+	return v.(*entity.User), err
 }

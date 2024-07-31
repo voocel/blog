@@ -6,6 +6,8 @@ import (
 	"blog/internal/http/middleware"
 	"blog/internal/http/router"
 	"blog/internal/repository/mysql"
+	"blog/internal/usecase"
+	"blog/internal/usecase/repo"
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -36,10 +38,13 @@ func (s *Server) Run() {
 	g := gin.New()
 	gin.SetMode(gin.DebugMode)
 
+	userUseCase := usecase.NewUserUseCase(repo.NewUserRepo(dbRepo.GetDbW()))
+
 	g.Use(
 		gin.Logger(),
 		gin.Recovery(),
 		middleware.CorsMiddleware(),
+		middleware.JWTMiddleware(userUseCase),
 	)
 	g.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, "404 not found!")
