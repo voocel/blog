@@ -1,6 +1,13 @@
 package usecase
 
-import "golang.org/x/sync/singleflight"
+import (
+	"blog/internal/entity"
+	"blog/pkg/util"
+	"context"
+	"errors"
+	"golang.org/x/sync/singleflight"
+	"time"
+)
 
 type UserUseCase struct {
 	repo UserRepo
@@ -9,4 +16,38 @@ type UserUseCase struct {
 
 func NewUserUseCase(r UserRepo) *UserUseCase {
 	return &UserUseCase{repo: r}
+}
+
+func (u *UserUseCase) UserLogin(ctx context.Context, req entity.UserLoginReq) (*entity.User, error) {
+	user, err := u.repo.GetUserByNameRepo(ctx, req.Username)
+	if err != nil {
+		return nil, err
+	}
+	if user.Status != 1 {
+		return nil, errors.New("this user is disable")
+	}
+	if !util.VerifyPassword(req.Password, user.Password) {
+		return nil, errors.New("password incorrect")
+	}
+	return user, nil
+}
+
+func (u *UserUseCase) UserRegister(ctx context.Context, req entity.UserRegisterReq) error {
+	exist, err := u.repo.GetUserByNameExistRepo(ctx, req.Username)
+	if err != nil {
+		return err
+	}
+	if exist {
+		return errors.New("username already exists")
+	}
+	userInfo := &entity.User{}
+	userInfo.Password, err = util.EncryptPassword(req.Password)
+	if err != nil {
+		return err
+	}
+	userInfo.Username = req.Username
+	userInfo.Nickname = "unknown"
+	userInfo.LastLoginTime = time.Now()
+	_, err = u.repo.AddUserRepo(ctx, userInfo)
+	return err
 }

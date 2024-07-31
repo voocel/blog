@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/viper"
 	"log"
 	"strings"
+	"time"
 )
 
 var Conf = new(config)
@@ -46,8 +47,9 @@ type MysqlConfig struct {
 	Dbname          string
 	Username        string
 	Password        string
-	MaximumPoolSize int `mapstructure:"maximum_pool_size"`
-	MaximumIdleSize int `mapstructure:"maximum_idle_size"`
+	MaxOpenConns    int           `mapstructure:"max_open_conns"`
+	MaxIdleConns    int           `mapstructure:"max_idle_conns"`
+	ConnMaxLifeTime time.Duration `mapstructure:"conn_max_life_time"`
 }
 
 func LoadConfig(paths ...string) {

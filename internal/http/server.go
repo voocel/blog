@@ -5,6 +5,7 @@ import (
 	"blog/internal/http/handler"
 	"blog/internal/http/middleware"
 	"blog/internal/http/router"
+	"blog/internal/repository/mysql"
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -27,6 +28,11 @@ func (s *Server) routerLoad(g *gin.Engine, rs ...router.Router) {
 
 func (s *Server) Run() {
 	var err error
+	var dbRepo mysql.Repo
+	dbRepo, err = mysql.New()
+	if err != nil {
+		panic(err)
+	}
 	g := gin.New()
 	gin.SetMode(gin.DebugMode)
 
@@ -42,7 +48,7 @@ func (s *Server) Run() {
 	g.GET("/ping", handler.Ping())
 	g.StaticFS("/static", gin.Dir("static", false))
 	g.StaticFile("/favicon.ico", "./static/favicon.ico")
-	s.routerLoad(g, router.GetRouters()...)
+	s.routerLoad(g, router.GetRouters(dbRepo.GetDbW())...)
 
 	srv := http.Server{
 		Addr:    config.Conf.Http.Addr,
