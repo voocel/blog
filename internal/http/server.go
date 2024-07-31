@@ -43,6 +43,7 @@ func (s *Server) Run() {
 	g.Use(
 		gin.Logger(),
 		gin.Recovery(),
+		middleware.Logger,
 		middleware.CorsMiddleware(),
 		middleware.JWTMiddleware(userUseCase),
 	)
