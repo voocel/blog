@@ -15,4 +15,10 @@ type (
 		UpdateAvatarUserRepo(ctx context.Context, uid int64, avatar string) (int, error)
 		UpdateAddressUserRepo(ctx context.Context, uid int64, address string) (int, error)
 	}
+
+	ArticleRepo interface {
+		AddArticleRepo(ctx context.Context, article *entity.Article) (*entity.Article, error)
+		GetArticleByIdRepo(ctx context.Context, aid int64) (*entity.Article, error)
+		GetArticlesRepo(ctx context.Context) ([]*entity.Article, int, error)
+	}
 )

@@ -14,9 +14,13 @@ type Router interface {
 
 func GetRouters(db *gorm.DB) (routers []Router) {
 	u := usecase.NewUserUseCase(repo.NewUserRepo(db))
+	a := usecase.NewArticleUseCase(repo.NewArticleRepo(db))
 
 	userHandler := handler.NewUserHandler(u)
 	ur := newUserRouter(userHandler)
+
+	articleHandler := handler.NewArticleHandler(a)
+	ar := newArticleRouter(articleHandler)
 
 	routers = append(routers, ur)
 	return
