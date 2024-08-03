@@ -2,6 +2,7 @@ package handler
 
 import (
 	"blog/internal/entity"
+	"blog/internal/repository/redis"
 	"blog/internal/usecase"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 
 type ArticleHandler struct {
 	articleUsecase *usecase.ArticleUseCase
+	redis          *redis.Redis
 }
 
 type IdListReq struct {
@@ -19,6 +21,7 @@ type IdListReq struct {
 func NewArticleHandler(u *usecase.ArticleUseCase) *ArticleHandler {
 	return &ArticleHandler{
 		articleUsecase: u,
+		redis:          redis.GetClient(),
 	}
 }
 
@@ -115,6 +118,24 @@ func (h *ArticleHandler) DeleteArticlesBatch(c *gin.Context) {
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
+	}
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
+func (h *ArticleHandler) Like(c *gin.Context) {
+	resp := new(ApiResponse)
+	aid := c.Param("aid")
+	articleId, err := strconv.Atoi(aid)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = "params invalid"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	if err := h.redis.Hincrby(c, "article_like", strconv.Itoa(articleId), 1); err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
 	}
 	c.JSON(http.StatusOK, resp)
 	return

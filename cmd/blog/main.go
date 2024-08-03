@@ -3,6 +3,7 @@ package main
 import (
 	"blog/config"
 	"blog/internal/http"
+	"blog/internal/repository/redis"
 	"blog/pkg/log"
 	"context"
 	"os"
@@ -14,6 +15,7 @@ import (
 func main() {
 	config.LoadConfig()
 	log.Init("http", "debug")
+	redis.Init()
 	srv := http.NewServer()
 	srv.Run()
 

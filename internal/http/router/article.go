@@ -20,5 +20,6 @@ func (r *articleRouter) Load(g *gin.Engine) {
 		group.POST("/list", r.h.List)
 		group.GET("/detail/:aid", r.h.Detail)
 		group.POST("/delete", r.h.DeleteArticlesBatch)
+		group.PUT("/delete/:aid", r.h.Like)
 	}
 }
