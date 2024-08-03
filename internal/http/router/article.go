@@ -18,6 +18,6 @@ func (r *articleRouter) Load(g *gin.Engine) {
 	{
 		ur.POST("/create", r.h.Create)
 		ur.POST("/list", r.h.List)
-		ur.GET("/info", r.h.Detail)
+		ur.GET("/detail/:aid", r.h.Detail)
 	}
 }
