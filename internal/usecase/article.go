@@ -3,7 +3,6 @@ package usecase
 import (
 	"blog/internal/entity"
 	"context"
-	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 	"golang.org/x/sync/singleflight"
 )
@@ -24,10 +23,18 @@ func (c *ArticleUseCase) CreateArticle(ctx context.Context, req entity.ArticleRe
 	return err
 }
 
-func (c *ArticleUseCase) GetDetailById(ctx context.Context, id int) (*entity.Article, error) {
-	return c.repo.GetArticleByIdRepo(ctx, int64(id))
+func (c *ArticleUseCase) GetDetailById(ctx context.Context, aid int64) (*entity.Article, error) {
+	return c.repo.GetArticleByIdRepo(ctx, aid)
 }
 
-func (c *ArticleUseCase) GetList(ctx *gin.Context) ([]*entity.Article, error) {
+func (c *ArticleUseCase) GetList(ctx context.Context) ([]*entity.Article, error) {
 	return c.repo.GetArticlesRepo(ctx)
+}
+
+func (c *ArticleUseCase) DeleteArticle(ctx context.Context, aid int64) error {
+	return c.repo.DeleteArticleRepo(ctx, aid)
+}
+
+func (c *ArticleUseCase) DeleteArticles(ctx context.Context, aids []int64) error {
+	return c.repo.DeleteArticleListRepo(ctx, aids)
 }

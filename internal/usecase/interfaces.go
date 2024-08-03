@@ -20,6 +20,8 @@ type (
 		AddArticleRepo(ctx context.Context, article *entity.Article) error
 		GetArticleByIdRepo(ctx context.Context, aid int64) (*entity.Article, error)
 		GetArticlesRepo(ctx context.Context) ([]*entity.Article, error)
+		DeleteArticleRepo(ctx context.Context, aid int64) error
+		DeleteArticleListRepo(ctx context.Context, aids []int64) error
 	}
 
 	CategoryRepo interface {
@@ -35,5 +37,13 @@ type (
 		DeleteStarRepo(ctx context.Context, uid, articleId int64) error
 		GetStarsByUidRepo(ctx context.Context, uid int64) ([]*entity.Star, error)
 		GetStarsByArticleIdRepo(ctx context.Context, articleId int64) ([]*entity.Star, error)
+	}
+
+	AdvertRepo interface {
+		AddAdvertRepo(ctx context.Context, advert *entity.Advert) error
+		DetailRepo(ctx context.Context, id int64) (*entity.Advert, error)
+		GetAdvertListRepo(ctx context.Context) ([]*entity.Advert, error)
+		UpdateAdvertRepo(ctx context.Context, advert *entity.Advert) error
+		DeleteAdvertRepo(ctx context.Context, id int64) error
 	}
 )

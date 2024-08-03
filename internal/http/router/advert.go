@@ -5,15 +5,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type articleRouter struct {
-	h *handler.ArticleHandler
+type advertRouter struct {
+	h *handler.AdvertHandler
 }
 
-func newArticleRouter(h *handler.ArticleHandler) *articleRouter {
-	return &articleRouter{h: h}
+func newAdvertRouter(h *handler.AdvertHandler) *advertRouter {
+	return &advertRouter{h: h}
 }
 
-func (r *articleRouter) Load(g *gin.Engine) {
+func (r *advertRouter) Load(g *gin.Engine) {
 	group := g.Group("/v1/article")
 	{
 		group.POST("/create", r.h.Create)

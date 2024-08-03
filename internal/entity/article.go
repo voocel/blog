@@ -3,7 +3,7 @@ package entity
 import "blog/internal/entity/ctype"
 
 type Article struct {
-	ID        string `json:"id" structs:"id"`
+	ID        int64  `json:"id" structs:"id"`
 	CreatedAt string `json:"created_at" structs:"created_at"`
 	UpdatedAt string `json:"updated_at" structs:"updated_at"`
 

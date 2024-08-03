@@ -14,10 +14,10 @@ func newUserRouter(h *handler.UserHandler) *userRouter {
 }
 
 func (r *userRouter) Load(g *gin.Engine) {
-	ur := g.Group("/v1/user")
+	group := g.Group("/v1/user")
 	{
-		ur.POST("/login", r.h.Login)
-		ur.POST("/register", r.h.Register)
-		ur.GET("/info", r.h.Info)
+		group.POST("/login", r.h.Login)
+		group.POST("/register", r.h.Register)
+		group.GET("/info", r.h.Info)
 	}
 }

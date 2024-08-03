@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"blog/internal/entity"
-	"github.com/gin-gonic/gin"
+	"context"
 )
 
 type CategoryUseCase struct {
@@ -13,6 +13,6 @@ func NewCategoryUseCase(repo CategoryRepo) *CategoryUseCase {
 	return &CategoryUseCase{repo: repo}
 }
 
-func (c *CategoryUseCase) List(ctx *gin.Context) ([]*entity.Category, error) {
+func (c *CategoryUseCase) List(ctx context.Context) ([]*entity.Category, error) {
 	return c.repo.GetCategoriesRepo(ctx)
 }

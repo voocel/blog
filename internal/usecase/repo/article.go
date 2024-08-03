@@ -29,3 +29,11 @@ func (a ArticleRepo) GetArticlesRepo(ctx context.Context) ([]*entity.Article, er
 	err := a.db.Find(&articles).Error
 	return articles, err
 }
+
+func (a ArticleRepo) DeleteArticleRepo(ctx context.Context, aid int64) error {
+	return a.db.Delete(&entity.Article{}, aid).Error
+}
+
+func (a ArticleRepo) DeleteArticleListRepo(ctx context.Context, aids []int64) error {
+	return a.db.Where("id in (?)", aids).Delete(&entity.Article{}).Error
+}

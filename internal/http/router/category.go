@@ -1,7 +1,21 @@
 package router
 
-import "blog/internal/http/handler"
+import (
+	"blog/internal/http/handler"
+	"github.com/gin-gonic/gin"
+)
 
 type categoryRouter struct {
 	h *handler.CategoryHandler
+}
+
+func newCategoryRouter(h *handler.CategoryHandler) *categoryRouter {
+	return &categoryRouter{h: h}
+}
+
+func (r *categoryRouter) Load(g *gin.Engine) {
+	ur := g.Group("/v1/category")
+	{
+		ur.POST("/list", r.h.List)
+	}
 }

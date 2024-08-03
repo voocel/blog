@@ -12,6 +12,10 @@ type ArticleHandler struct {
 	articleUsecase *usecase.ArticleUseCase
 }
 
+type IdListReq struct {
+	IDList []int64 `json:"id_list"`
+}
+
 func NewArticleHandler(u *usecase.ArticleUseCase) *ArticleHandler {
 	return &ArticleHandler{
 		articleUsecase: u,
@@ -44,6 +48,7 @@ func (h *ArticleHandler) List(c *gin.Context) {
 		resp.Code = 1
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
+		return
 	}
 	resp.Data = articles
 	c.JSON(http.StatusOK, resp)
@@ -61,13 +66,56 @@ func (h *ArticleHandler) Detail(c *gin.Context) {
 		return
 	}
 
-	article, err := h.articleUsecase.GetDetailById(c, articleId)
+	article, err := h.articleUsecase.GetDetailById(c, int64(articleId))
 	if err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
+		return
 	}
 	resp.Data = article
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
+func (h *ArticleHandler) DeleteArticleById(c *gin.Context) {
+	resp := new(ApiResponse)
+	aid := c.Param("aid")
+	articleId, err := strconv.Atoi(aid)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = "params invalid"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	if err := h.articleUsecase.DeleteArticle(c, int64(articleId)); err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
+func (h *ArticleHandler) DeleteArticlesBatch(c *gin.Context) {
+	resp := new(ApiResponse)
+	var req IdListReq
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = "params invalid"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	if err := h.articleUsecase.DeleteArticles(c, req.IDList); err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
 	c.JSON(http.StatusOK, resp)
 	return
 }
