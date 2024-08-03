@@ -30,6 +30,7 @@ func main() {
 			if err := srv.Stop(ctx); err != nil {
 				panic(err)
 			}
+			redis.Close()
 			log.Sync()
 			cancel()
 			return

@@ -45,5 +45,15 @@ type (
 		GetAdvertListRepo(ctx context.Context) ([]*entity.Advert, error)
 		UpdateAdvertRepo(ctx context.Context, advert *entity.Advert) error
 		DeleteAdvertRepo(ctx context.Context, id int64) error
+		DeleteAdvertBatchRepo(ctx context.Context, ids []int64) error
+	}
+
+	MenuRepo interface {
+		AddMenuRepo(ctx context.Context, menu *entity.Menu) error
+		GetMenuByIdRepo(ctx context.Context, id int64) (*entity.Menu, error)
+		GetMenusRepo(ctx context.Context) ([]*entity.Menu, error)
+		UpdateMenuRepo(ctx context.Context, menu *entity.Menu) error
+		DeleteMenuRepo(ctx context.Context, id int64) error
+		DeleteMenusBatchRepo(ctx context.Context, ids []int64) error
 	}
 )

@@ -18,6 +18,7 @@ func GetRouters(db *gorm.DB) (routers []Router) {
 	c := usecase.NewCategoryUseCase(repo.NewCategoryRepo(db))
 	s := usecase.NewStarUseCase(repo.NewStarRepo(db))
 	ad := usecase.NewAdvertUseCase(repo.NewAdvertRepo(db))
+	m := usecase.NewMenuUseCase(repo.NewMenuRepo(db))
 
 	userHandler := handler.NewUserHandler(u)
 	ur := newUserRouter(userHandler)
@@ -34,6 +35,9 @@ func GetRouters(db *gorm.DB) (routers []Router) {
 	advertHandler := handler.NewAdvertHandler(ad)
 	adr := newAdvertRouter(advertHandler)
 
-	routers = append(routers, ur, ar, cr, sr, adr)
+	menuHandler := handler.NewMenuHandler(m)
+	mr := newMenuRouter(menuHandler)
+
+	routers = append(routers, ur, ar, cr, sr, adr, mr)
 	return
 }

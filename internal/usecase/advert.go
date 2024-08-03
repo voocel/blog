@@ -21,7 +21,7 @@ func (c *AdvertUseCase) AddAdvert(ctx context.Context, req *entity.AdvertReq) er
 }
 
 func (c *AdvertUseCase) Detail(ctx context.Context, id int64) (*entity.Advert, error) {
-	return c.repo.AddAdvertRepo()
+	return c.repo.DetailRepo(ctx, id)
 }
 
 func (c *AdvertUseCase) List(ctx context.Context) ([]*entity.Advert, error) {
@@ -36,4 +36,8 @@ func (c *AdvertUseCase) UpdateAdvert(ctx context.Context, req *entity.AdvertReq)
 
 func (c *AdvertUseCase) DeleteAdvert(ctx context.Context, id int64) error {
 	return c.repo.DeleteAdvertRepo(ctx, id)
+}
+
+func (c *AdvertUseCase) DeleteAdvertBatch(ctx context.Context, ids []int64) error {
+	return c.repo.DeleteAdvertBatchRepo(ctx, ids)
 }

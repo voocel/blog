@@ -14,8 +14,8 @@ func newCategoryRouter(h *handler.CategoryHandler) *categoryRouter {
 }
 
 func (r *categoryRouter) Load(g *gin.Engine) {
-	ur := g.Group("/v1/category")
+	group := g.Group("/v1/category")
 	{
-		ur.POST("/list", r.h.List)
+		group.POST("/list", r.h.List)
 	}
 }

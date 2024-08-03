@@ -8,101 +8,91 @@ import (
 	"strconv"
 )
 
-type AdvertHandler struct {
-	AdvertUseCase *usecase.AdvertUseCase
+type MenuHandler struct {
+	menuUseCase *usecase.MenuUseCase
 }
 
-func NewAdvertHandler(u *usecase.AdvertUseCase) *AdvertHandler {
-	return &AdvertHandler{AdvertUseCase: u}
+func NewMenuHandler(u *usecase.MenuUseCase) *MenuHandler {
+	return &MenuHandler{menuUseCase: u}
 }
 
-func (h *AdvertHandler) Create(c *gin.Context) {
-	req := entity.AdvertReq{}
+func (h *MenuHandler) AddMenu(c *gin.Context) {
+	req := entity.MenuReq{}
 	resp := new(ApiResponse)
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		resp.Code = 1
 		resp.Message = "params invalid"
 		c.JSON(http.StatusOK, resp)
 		return
 	}
 
-	if err := h.AdvertUseCase.AddAdvert(c, &req); err != nil {
+	if err := h.menuUseCase.AddMenu(c, req); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
-		c.JSON(http.StatusOK, resp)
-		return
 	}
 	c.JSON(http.StatusOK, resp)
 	return
 }
-
-func (h *AdvertHandler) Detail(c *gin.Context) {
+func (h *MenuHandler) Detail(c *gin.Context) {
 	resp := new(ApiResponse)
-	aid := c.Param("id")
-	advertId, err := strconv.Atoi(aid)
+	mid := c.Param("mid")
+	menuId, err := strconv.Atoi(mid)
 	if err != nil {
 		resp.Code = 1
 		resp.Message = "params invalid"
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-
-	advert, err := h.AdvertUseCase.Detail(c, int64(advertId))
-	if err != nil {
-		resp.Code = 1
-		resp.Message = err.Error()
-	}
-	resp.Data = advert
-	c.JSON(http.StatusOK, resp)
-	return
-}
-
-func (h *AdvertHandler) List(c *gin.Context) {
-	resp := new(ApiResponse)
-	result, err := h.AdvertUseCase.List(c)
+	result, err := h.menuUseCase.Detail(c, int64(menuId))
 	if err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
+		return
 	}
 	resp.Data = result
 	c.JSON(http.StatusOK, resp)
 	return
 }
 
-func (h *AdvertHandler) Update(c *gin.Context) {
-	req := entity.AdvertReq{}
+func (h *MenuHandler) List(c *gin.Context) {
 	resp := new(ApiResponse)
+	menus, err := h.menuUseCase.List(c)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+	}
+	resp.Data = menus
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
+func (h *MenuHandler) UpdateMenu(c *gin.Context) {
+	resp := new(ApiResponse)
+	var req entity.MenuReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		resp.Code = 1
 		resp.Message = "params invalid"
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-
-	if err := h.AdvertUseCase.UpdateAdvert(c, &req); err != nil {
+	if err := h.menuUseCase.UpdateMenu(c, req); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
-		c.JSON(http.StatusOK, resp)
-		return
 	}
-	c.JSON(http.StatusOK, resp)
-	return
 }
 
-func (h *AdvertHandler) DeleteById(c *gin.Context) {
+func (h *MenuHandler) DeleteMenuById(c *gin.Context) {
 	resp := new(ApiResponse)
-	aid := c.Param("id")
-	advertId, err := strconv.Atoi(aid)
+	mid := c.Param("mid")
+	menuId, err := strconv.Atoi(mid)
 	if err != nil {
 		resp.Code = 1
 		resp.Message = "params invalid"
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-
-	err = h.AdvertUseCase.DeleteAdvert(c, int64(advertId))
-	if err != nil {
+	if err := h.menuUseCase.DeleteMenu(c, int64(menuId)); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
 	}
@@ -110,7 +100,7 @@ func (h *AdvertHandler) DeleteById(c *gin.Context) {
 	return
 }
 
-func (h *AdvertHandler) DeleteBatch(c *gin.Context) {
+func (h *MenuHandler) DeleteMenuBatch(c *gin.Context) {
 	resp := new(ApiResponse)
 	var req IdListReq
 	err := c.ShouldBindJSON(&req)
@@ -120,8 +110,7 @@ func (h *AdvertHandler) DeleteBatch(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-
-	if err = h.AdvertUseCase.DeleteAdvertBatch(c, req.IDList); err != nil {
+	if err := h.menuUseCase.DeleteMenusBatch(c, req.IDList); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
 	}

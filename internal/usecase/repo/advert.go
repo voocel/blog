@@ -38,3 +38,8 @@ func (a AdvertRepo) DeleteAdvertRepo(ctx context.Context, id int64) error {
 	//TODO implement me
 	panic("implement me")
 }
+
+func (a AdvertRepo) DeleteAdvertBatchRepo(ctx context.Context, ids []int64) error {
+	//TODO implement me
+	panic("implement me")
+}
