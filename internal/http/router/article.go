@@ -17,9 +17,9 @@ func (r *articleRouter) Load(g *gin.Engine) {
 	group := g.Group("/v1/article")
 	{
 		group.POST("/create", r.h.Create)
-		group.POST("/list", r.h.List)
-		group.GET("/detail/:aid", r.h.Detail)
-		group.POST("/delete", r.h.DeleteArticlesBatch)
+		group.GET("/list", r.h.List)
+		group.PUT("/detail/:aid", r.h.Detail)
+		group.PUT("/delete", r.h.DeleteArticlesBatch)
 		group.PUT("/delete/:aid", r.h.Like)
 	}
 }

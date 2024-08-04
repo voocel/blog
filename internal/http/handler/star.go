@@ -44,8 +44,6 @@ func (h *StarHandler) AddStar(c *gin.Context) {
 	if err := h.starUsecase.AddStar(c, 1, int64(articleId)); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
-		c.JSON(http.StatusOK, resp)
-		return
 	}
 	c.JSON(http.StatusOK, resp)
 	return
@@ -66,8 +64,6 @@ func (h *StarHandler) RemoveStar(c *gin.Context) {
 	if err := h.starUsecase.DeleteStar(c, 1, int64(articleId)); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
-		c.JSON(http.StatusOK, resp)
-		return
 	}
 	c.JSON(http.StatusOK, resp)
 	return

@@ -29,8 +29,6 @@ func (h *AdvertHandler) Create(c *gin.Context) {
 	if err := h.AdvertUseCase.AddAdvert(c, &req); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
-		c.JSON(http.StatusOK, resp)
-		return
 	}
 	c.JSON(http.StatusOK, resp)
 	return
@@ -63,7 +61,6 @@ func (h *AdvertHandler) List(c *gin.Context) {
 	if err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
-		c.JSON(http.StatusOK, resp)
 	}
 	resp.Data = result
 	c.JSON(http.StatusOK, resp)
@@ -83,8 +80,6 @@ func (h *AdvertHandler) Update(c *gin.Context) {
 	if err := h.AdvertUseCase.UpdateAdvert(c, &req); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
-		c.JSON(http.StatusOK, resp)
-		return
 	}
 	c.JSON(http.StatusOK, resp)
 	return

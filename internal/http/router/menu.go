@@ -18,9 +18,9 @@ func (r *nenuRouter) Load(g *gin.Engine) {
 	{
 		group.POST("/add", r.h.AddMenu)
 		group.GET("/list", r.h.List)
-		group.POST("/detail", r.h.Detail)
+		group.POST("/detail/:mid", r.h.Detail)
 		group.POST("/update", r.h.UpdateMenu)
-		group.POST("/delete", r.h.DeleteMenuById)
+		group.POST("/delete/:mid", r.h.DeleteMenuById)
 		group.POST("/delete_batch", r.h.DeleteMenuBatch)
 	}
 }

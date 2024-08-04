@@ -56,4 +56,13 @@ type (
 		DeleteMenuRepo(ctx context.Context, id int64) error
 		DeleteMenusBatchRepo(ctx context.Context, ids []int64) error
 	}
+
+	BannerRepo interface {
+		AddBannerRepo(ctx context.Context, banner *entity.Banner) error
+		GetBannerByIdRepo(ctx context.Context, id int64) (*entity.Banner, error)
+		GetBannersRepo(ctx context.Context) ([]*entity.Banner, error)
+		UpdateBannerRepo(ctx context.Context, banner *entity.Banner) error
+		DeleteBannerRepo(ctx context.Context, id int64) error
+		DeleteBannersBatchRepo(ctx context.Context, ids []int64) error
+	}
 )

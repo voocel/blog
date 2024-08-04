@@ -8,89 +8,29 @@ import (
 	"strconv"
 )
 
-type MenuHandler struct {
-	menuUseCase *usecase.MenuUseCase
+type BannerHandler struct {
+	bannerUseCase *usecase.BannerUseCase
 }
 
-func NewMenuHandler(u *usecase.MenuUseCase) *MenuHandler {
-	return &MenuHandler{menuUseCase: u}
-}
-
-func (h *MenuHandler) AddMenu(c *gin.Context) {
-	req := entity.MenuReq{}
-	resp := new(ApiResponse)
-	if err := c.ShouldBind(&req); err != nil {
-		resp.Code = 1
-		resp.Message = "params invalid"
-		c.JSON(http.StatusOK, resp)
-		return
+func NewBannerHandler(u *usecase.BannerUseCase) *BannerHandler {
+	return &BannerHandler{
+		bannerUseCase: u,
 	}
-
-	if err := h.menuUseCase.AddMenu(c, req); err != nil {
-		resp.Code = 1
-		resp.Message = err.Error()
-	}
-	c.JSON(http.StatusOK, resp)
-	return
 }
-func (h *MenuHandler) Detail(c *gin.Context) {
+
+func (h *BannerHandler) Create(c *gin.Context) {
 	resp := new(ApiResponse)
-	mid := c.Param("mid")
-	menuId, err := strconv.Atoi(mid)
+	var req entity.BannerReq
+	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		resp.Code = 1
 		resp.Message = "params invalid"
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	result, err := h.menuUseCase.Detail(c, int64(menuId))
-	if err != nil {
-		resp.Code = 1
-		resp.Message = err.Error()
-	}
-	resp.Data = result
-	c.JSON(http.StatusOK, resp)
-	return
-}
 
-func (h *MenuHandler) List(c *gin.Context) {
-	resp := new(ApiResponse)
-	menus, err := h.menuUseCase.List(c)
+	err = h.bannerUseCase.AddBanner(c, &req)
 	if err != nil {
-		resp.Code = 1
-		resp.Message = err.Error()
-	}
-	resp.Data = menus
-	c.JSON(http.StatusOK, resp)
-	return
-}
-
-func (h *MenuHandler) UpdateMenu(c *gin.Context) {
-	resp := new(ApiResponse)
-	var req entity.MenuReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		resp.Code = 1
-		resp.Message = "params invalid"
-		c.JSON(http.StatusOK, resp)
-		return
-	}
-	if err := h.menuUseCase.UpdateMenu(c, req); err != nil {
-		resp.Code = 1
-		resp.Message = err.Error()
-	}
-}
-
-func (h *MenuHandler) DeleteMenuById(c *gin.Context) {
-	resp := new(ApiResponse)
-	mid := c.Param("mid")
-	menuId, err := strconv.Atoi(mid)
-	if err != nil {
-		resp.Code = 1
-		resp.Message = "params invalid"
-		c.JSON(http.StatusOK, resp)
-		return
-	}
-	if err := h.menuUseCase.DeleteMenu(c, int64(menuId)); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
 	}
@@ -98,7 +38,84 @@ func (h *MenuHandler) DeleteMenuById(c *gin.Context) {
 	return
 }
 
-func (h *MenuHandler) DeleteMenuBatch(c *gin.Context) {
+func (h *BannerHandler) Detail(c *gin.Context) {
+	resp := new(ApiResponse)
+	bid := c.Param("bid")
+	bannerId, err := strconv.Atoi(bid)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = "params invalid"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	banner, err := h.bannerUseCase.Detail(c, int64(bannerId))
+	if err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	resp.Data = banner
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
+func (h *BannerHandler) List(c *gin.Context) {
+	resp := new(ApiResponse)
+	banners, err := h.bannerUseCase.List(c)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	resp.Data = banners
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
+func (h *BannerHandler) Update(c *gin.Context) {
+	resp := new(ApiResponse)
+	var req entity.BannerReq
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = "params invalid"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	err = h.bannerUseCase.UpdateBanner(c, &req)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+	}
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
+func (h *BannerHandler) DeleteById(c *gin.Context) {
+	resp := new(ApiResponse)
+	bid := c.Param("bid")
+	bannerId, err := strconv.Atoi(bid)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = "params invalid"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	err = h.bannerUseCase.DeleteBanner(c, int64(bannerId))
+	if err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+	}
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
+func (h *BannerHandler) DeleteBatch(c *gin.Context) {
 	resp := new(ApiResponse)
 	var req IdListReq
 	err := c.ShouldBindJSON(&req)
@@ -108,7 +125,9 @@ func (h *MenuHandler) DeleteMenuBatch(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	if err := h.menuUseCase.DeleteMenusBatch(c, req.IDList); err != nil {
+
+	err = h.bannerUseCase.DeleteBannerBatch(c, req.IDList)
+	if err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
 	}

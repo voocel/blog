@@ -18,7 +18,7 @@ func (r *advertRouter) Load(g *gin.Engine) {
 	{
 		group.POST("/create", r.h.Create)
 		group.POST("/list", r.h.List)
-		group.GET("/detail/:aid", r.h.Detail)
-		group.POST("/delete", r.h.DeleteBatch)
+		group.PUT("/detail/:aid", r.h.Detail)
+		group.PUT("/delete", r.h.DeleteBatch)
 	}
 }
