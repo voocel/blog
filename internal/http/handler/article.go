@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type ArticleHandler struct {
@@ -16,6 +17,11 @@ type ArticleHandler struct {
 
 type IdListReq struct {
 	IDList []int64 `json:"id_list"`
+}
+
+type CalendarResponse struct {
+	Date  string `json:"date"`
+	Count int    `json:"count"`
 }
 
 func NewArticleHandler(u *usecase.ArticleUseCase) *ArticleHandler {
@@ -139,4 +145,21 @@ func (h *ArticleHandler) Like(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, resp)
 	return
+}
+
+func (h *ArticleHandler) Calendar(c *gin.Context) {
+	resp := new(ApiResponse)
+	var data = make([]CalendarResponse, 0)
+	now := time.Now()
+	aYearAgo := now.AddDate(-1, 0, 0)
+	days := int(now.Sub(aYearAgo).Hours() / 24)
+	for i := 0; i < days; i++ {
+		day := aYearAgo.AddDate(0, 0, i).Format("2006-01-02")
+		data = append(data, CalendarResponse{
+			Date:  day,
+			Count: 1,
+		})
+	}
+	resp.Data = data
+	c.JSON(http.StatusOK, resp)
 }

@@ -53,6 +53,9 @@ func GetRouters(db *gorm.DB) (routers []Router) {
 	otherHandler := handler.NewOtherHandler()
 	or := newOtherRouter(otherHandler)
 
-	routers = append(routers, ur, ar, cr, sr, adr, mr, br, cmr, tr, or)
+	statHandler := handler.NewStatHandler()
+	statR := newStatRouter(statHandler)
+
+	routers = append(routers, ur, ar, cr, sr, adr, mr, br, cmr, tr, or, statR)
 	return
 }
