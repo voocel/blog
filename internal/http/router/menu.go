@@ -22,8 +22,8 @@ func (r *nenuRouter) Load(g *gin.Engine) {
 		group.POST("/add", middleware.JWTMiddleware(r.userUseCase), r.h.AddMenu)
 		group.GET("/list", r.h.List)
 		group.GET("/detail/:path", r.h.Detail)
-		group.PUT("/update", r.h.UpdateMenu)
-		group.POST("/delete/:mid", r.h.DeleteMenuById)
-		group.POST("/delete_batch", r.h.DeleteMenuBatch)
+		group.PUT("/update", middleware.JWTMiddleware(r.userUseCase), r.h.UpdateMenu)
+		group.POST("/delete/:mid", middleware.JWTMiddleware(r.userUseCase), r.h.DeleteMenuById)
+		group.POST("/delete_batch", middleware.JWTMiddleware(r.userUseCase), r.h.DeleteMenuBatch)
 	}
 }

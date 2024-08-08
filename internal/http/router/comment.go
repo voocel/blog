@@ -2,6 +2,7 @@ package router
 
 import (
 	"blog/internal/http/handler"
+	"blog/internal/http/middleware"
 	"blog/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -18,8 +19,8 @@ func newCommentRouter(h *handler.CommentHandler, userUseCase *usecase.UserUseCas
 func (r *commentRouter) Load(g *gin.Engine) {
 	group := g.Group("/v1/comment")
 	{
-		group.POST("/create", r.h.Create)
+		group.POST("/create", middleware.JWTMiddleware(r.userUseCase), r.h.Create)
 		group.GET("/list/:aid", r.h.GetArticleCommentList)
-		group.POST("/delete/:cid", r.h.Delete)
+		group.POST("/delete/:cid", middleware.JWTMiddleware(r.userUseCase), r.h.Delete)
 	}
 }

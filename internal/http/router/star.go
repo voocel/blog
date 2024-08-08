@@ -2,6 +2,7 @@ package router
 
 import (
 	"blog/internal/http/handler"
+	"blog/internal/http/middleware"
 	"blog/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -18,8 +19,8 @@ func newStarRouter(h *handler.StarHandler, userUseCase *usecase.UserUseCase) *st
 func (r *starRouter) Load(g *gin.Engine) {
 	group := g.Group("/v1/star")
 	{
-		group.PUT("/add/:aid", r.h.AddStar)
-		group.PUT("/remove/:aid", r.h.RemoveStar)
+		group.PUT("/add/:aid", middleware.JWTMiddleware(r.userUseCase), r.h.AddStar)
+		group.PUT("/remove/:aid", middleware.JWTMiddleware(r.userUseCase), r.h.RemoveStar)
 		group.GET("/list", r.h.List)
 	}
 }

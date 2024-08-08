@@ -12,3 +12,8 @@ type Tag struct {
 	UpdatedAt time.Time
 	DeletedAt sql.NullTime `gorm:"index"`
 }
+
+type TagReq struct {
+	ID   int64  `json:"id"`
+	Name string `json:"title" binding:"required" msg:"请输入标题"`
+}

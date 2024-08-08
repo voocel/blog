@@ -15,36 +15,35 @@ func NewMenuRepo(db *gorm.DB) *MenuRepo {
 }
 
 func (m MenuRepo) AddMenuRepo(ctx context.Context, menu *entity.Menu) error {
-	//TODO implement me
-	panic("implement me")
+	return m.db.WithContext(ctx).Create(menu).Error
 }
 
 func (m MenuRepo) GetMenuByIdRepo(ctx context.Context, id int64) (*entity.Menu, error) {
-	//TODO implement me
-	panic("implement me")
+	menu := new(entity.Menu)
+	err := m.db.WithContext(ctx).Where("id = ?", id).First(menu).Error
+	return menu, err
 }
 
 func (m MenuRepo) GetMenuByPathRepo(ctx context.Context, path string) (*entity.Menu, error) {
-	//TODO implement me
-	panic("implement me")
+	menu := new(entity.Menu)
+	err := m.db.WithContext(ctx).Where("path = ?", path).First(menu).Error
+	return menu, err
 }
 
 func (m MenuRepo) GetMenusRepo(ctx context.Context) ([]*entity.Menu, error) {
-	//TODO implement me
-	panic("implement me")
+	menus := make([]*entity.Menu, 0)
+	err := m.db.WithContext(ctx).Find(&menus).Error
+	return menus, err
 }
 
 func (m MenuRepo) UpdateMenuRepo(ctx context.Context, menu *entity.Menu) error {
-	//TODO implement me
-	panic("implement me")
+	return m.db.WithContext(ctx).Updates(menu).Error
 }
 
 func (m MenuRepo) DeleteMenuRepo(ctx context.Context, id int64) error {
-	//TODO implement me
-	panic("implement me")
+	return m.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Menu{}).Error
 }
 
 func (m MenuRepo) DeleteMenusBatchRepo(ctx context.Context, ids []int64) error {
-	//TODO implement me
-	panic("implement me")
+	return m.db.WithContext(ctx).Where("id in (?)", ids).Delete(&entity.Menu{}).Error
 }

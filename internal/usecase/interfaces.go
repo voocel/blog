@@ -74,4 +74,15 @@ type (
 		GetCommentsRepo(ctx context.Context) ([]*entity.Comment, error)
 		DeleteCommentRepo(ctx context.Context, id int64) error
 	}
+
+	TagRepo interface {
+		AddTagRepo(ctx context.Context, tag *entity.Tag) error
+		GetTagByIdRepo(ctx context.Context, id int64) (*entity.Tag, error)
+		GetTagByNameRepo(ctx context.Context, name string) (*entity.Tag, error)
+		GetTagByNameExistRepo(ctx context.Context, name string) (bool, error)
+		GetTagsRepo(ctx context.Context) ([]*entity.Tag, error)
+		UpdateTagRepo(ctx context.Context, tag *entity.Tag) error
+		DeleteTagRepo(ctx context.Context, id int64) error
+		DeleteTagsBatchRepo(ctx context.Context, ids []int64) error
+	}
 )
