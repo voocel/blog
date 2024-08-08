@@ -21,6 +21,6 @@ func detail(id string) (*entity.Article, error) {
 	if err != nil {
 		return nil, err
 	}
-	model.ID = resp.Id_
+	//model.ID = resp.Id_
 	return model, nil
 }

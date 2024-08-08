@@ -16,7 +16,7 @@ app:
   jwt_secret: social-key
 
 http:
-  addr: :8100
+  addr: :8080
 
 mysql:
   host: 127.0.0.1

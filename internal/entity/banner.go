@@ -1,19 +1,19 @@
 package entity
 
 import (
-	"blog/internal/entity/ctype"
+	"database/sql"
 	"time"
 )
 
 type Banner struct {
-	ID        int64           `gorm:"primarykey" json:"id"`
-	Path      string          `json:"path"`
-	Hash      string          `json:"hash"`
-	Name      string          `gorm:"size:38" json:"name"`
-	ImageType ctype.ImageType `gorm:"default:1" json:"image_type"`
-	CreatedAt time.Time       `json:"-"`
-	UpdatedAt time.Time       `json:"-"`
-	DeletedAt time.Time       `json:"-"`
+	ID            int64  `gorm:"primarykey" json:"id"`
+	Path          string `gorm:"size:256;not null;default:''" json:"path"` // 存储路径
+	Hash          string `gorm:"size:256;not null;default:''" json:"hash"` // 图片hash,用于判重
+	Name          string `gorm:"size:64;not null;default:''" json:"name"`  // 图片名称
+	StorageMethod int8   `gorm:"default:0" json:"storage_method"`          // 存储类型 0 本地
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	DeletedAt     sql.NullTime `gorm:"index"`
 }
 
 type PageInfo struct {

@@ -109,3 +109,17 @@ func (h *UserHandler) Info(c *gin.Context) {
 	resp.Data = user
 	c.JSON(http.StatusOK, resp)
 }
+
+func (h *UserHandler) Logout(c *gin.Context) {
+	resp := new(ApiResponse)
+	// Get userinfo from token
+	_, exists := c.Get("jwt-user")
+	if !exists {
+		resp.Code = 1
+		resp.Message = "user not exists"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	resp.Message = "ok"
+	c.JSON(http.StatusOK, resp)
+}

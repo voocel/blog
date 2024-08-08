@@ -47,6 +47,7 @@ type MysqlConfig struct {
 	Dbname          string
 	Username        string
 	Password        string
+	Migrate         bool
 	MaxOpenConns    int           `mapstructure:"max_open_conns"`
 	MaxIdleConns    int           `mapstructure:"max_idle_conns"`
 	ConnMaxLifeTime time.Duration `mapstructure:"conn_max_life_time"`

@@ -2,15 +2,17 @@ package router
 
 import (
 	"blog/internal/http/handler"
+	"blog/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
 
 type articleRouter struct {
-	h *handler.ArticleHandler
+	h           *handler.ArticleHandler
+	userUseCase *usecase.UserUseCase
 }
 
-func newArticleRouter(h *handler.ArticleHandler) *articleRouter {
-	return &articleRouter{h: h}
+func newArticleRouter(h *handler.ArticleHandler, userUseCase *usecase.UserUseCase) *articleRouter {
+	return &articleRouter{h: h, userUseCase: userUseCase}
 }
 
 func (r *articleRouter) Load(g *gin.Engine) {
@@ -20,6 +22,6 @@ func (r *articleRouter) Load(g *gin.Engine) {
 		group.GET("/list", r.h.List)
 		group.PUT("/detail/:aid", r.h.Detail)
 		group.PUT("/delete", r.h.DeleteArticlesBatch)
-		group.PUT("/delete/:aid", r.h.Like)
+		group.PUT("/like/:aid", r.h.Like)
 	}
 }

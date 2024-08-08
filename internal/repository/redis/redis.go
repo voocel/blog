@@ -25,7 +25,9 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-	redisClient.client = c
+	redisClient = &Redis{
+		client: c,
+	}
 }
 
 func GetClient() *Redis {

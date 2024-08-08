@@ -2,6 +2,8 @@ package mysql
 
 import (
 	"blog/config"
+	"blog/internal/entity"
+	"context"
 	"fmt"
 	"github.com/pkg/errors"
 	"time"
@@ -117,5 +119,33 @@ func dbConnect(user, pass, addr, dbName string) (*gorm.DB, error) {
 
 	sqlDB.SetConnMaxLifetime(time.Second * cfg.ConnMaxLifeTime)
 
+	if cfg.Migrate {
+		err = db.AutoMigrate(&entity.Advert{}, &entity.Article{}, &entity.Banner{}, &entity.Category{}, &entity.Comment{}, &entity.User{}, &entity.Menu{}, &entity.Star{}, &entity.Tag{})
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return db, nil
+}
+
+type Transaction interface {
+	ExecTx(ctx context.Context, fn func(ctx context.Context) error) error
+}
+
+type contextTxKey struct{}
+
+func (d *dbRepo) ExecTx(ctx context.Context, fn func(ctx context.Context) error) error {
+	return d.DbW.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		ctx = context.WithValue(ctx, contextTxKey{}, tx)
+		return fn(ctx)
+	})
+}
+
+func (d *dbRepo) DB(ctx context.Context) *gorm.DB {
+	tx, ok := ctx.Value(contextTxKey{}).(*gorm.DB)
+	if ok {
+		return tx
+	}
+	return d.DbW
 }

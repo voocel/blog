@@ -2,15 +2,17 @@ package router
 
 import (
 	"blog/internal/http/handler"
+	"blog/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
 
 type starRouter struct {
-	h *handler.StarHandler
+	h           *handler.StarHandler
+	userUseCase *usecase.UserUseCase
 }
 
-func newStarRouter(h *handler.StarHandler) *starRouter {
-	return &starRouter{h: h}
+func newStarRouter(h *handler.StarHandler, userUseCase *usecase.UserUseCase) *starRouter {
+	return &starRouter{h: h, userUseCase: userUseCase}
 }
 
 func (r *starRouter) Load(g *gin.Engine) {

@@ -24,6 +24,10 @@ func (c *MenuUseCase) Detail(ctx context.Context, id int64) (*entity.Menu, error
 	return c.repo.GetMenuByIdRepo(ctx, id)
 }
 
+func (c *MenuUseCase) DetailByPath(ctx context.Context, path string) (*entity.Menu, error) {
+	return c.repo.GetMenuByPathRepo(ctx, path)
+}
+
 func (c *MenuUseCase) List(ctx context.Context) ([]*entity.Menu, error) {
 	return c.repo.GetMenusRepo(ctx)
 }

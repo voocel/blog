@@ -16,6 +16,12 @@ func NewMenuHandler(u *usecase.MenuUseCase) *MenuHandler {
 	return &MenuHandler{menuUseCase: u}
 }
 
+type MenuNameResponse struct {
+	ID    uint   `json:"id"`
+	Title string `json:"title"`
+	Path  string `json:"path"`
+}
+
 func (h *MenuHandler) AddMenu(c *gin.Context) {
 	req := entity.MenuReq{}
 	resp := new(ApiResponse)
@@ -35,15 +41,8 @@ func (h *MenuHandler) AddMenu(c *gin.Context) {
 }
 func (h *MenuHandler) Detail(c *gin.Context) {
 	resp := new(ApiResponse)
-	mid := c.Param("mid")
-	menuId, err := strconv.Atoi(mid)
-	if err != nil {
-		resp.Code = 1
-		resp.Message = "params invalid"
-		c.JSON(http.StatusOK, resp)
-		return
-	}
-	result, err := h.menuUseCase.Detail(c, int64(menuId))
+	path := c.Param("path")
+	result, err := h.menuUseCase.DetailByPath(c, path)
 	if err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
@@ -67,6 +66,15 @@ func (h *MenuHandler) List(c *gin.Context) {
 
 func (h *MenuHandler) UpdateMenu(c *gin.Context) {
 	resp := new(ApiResponse)
+	mid := c.Param("mid")
+	menuId, err := strconv.Atoi(mid)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = "params invalid"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
 	var req entity.MenuReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		resp.Code = 1
@@ -74,6 +82,7 @@ func (h *MenuHandler) UpdateMenu(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
+	req.ID = int64(menuId)
 	if err := h.menuUseCase.UpdateMenu(c, req); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()

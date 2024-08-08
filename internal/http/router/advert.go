@@ -2,19 +2,21 @@ package router
 
 import (
 	"blog/internal/http/handler"
+	"blog/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
 
 type advertRouter struct {
-	h *handler.AdvertHandler
+	h           *handler.AdvertHandler
+	userUseCase *usecase.UserUseCase
 }
 
-func newAdvertRouter(h *handler.AdvertHandler) *advertRouter {
-	return &advertRouter{h: h}
+func newAdvertRouter(h *handler.AdvertHandler, userUseCase *usecase.UserUseCase) *advertRouter {
+	return &advertRouter{h: h, userUseCase: userUseCase}
 }
 
 func (r *advertRouter) Load(g *gin.Engine) {
-	group := g.Group("/v1/article")
+	group := g.Group("/v1/advert")
 	{
 		group.POST("/create", r.h.Create)
 		group.POST("/list", r.h.List)

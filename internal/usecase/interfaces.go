@@ -10,10 +10,10 @@ type (
 		GetUserByIdRepo(ctx context.Context, uid int64) (*entity.User, error)
 		GetUserByNameRepo(ctx context.Context, name string) (*entity.User, error)
 		GetUserByNameExistRepo(ctx context.Context, name string) (bool, error)
-		GetUsersRepo(ctx context.Context) ([]*entity.User, int, error)
-		AddUserRepo(ctx context.Context, user *entity.User) (*entity.User, error)
-		UpdateAvatarUserRepo(ctx context.Context, uid int64, avatar string) (int, error)
-		UpdateAddressUserRepo(ctx context.Context, uid int64, address string) (int, error)
+		GetUsersRepo(ctx context.Context) ([]*entity.User, error)
+		AddUserRepo(ctx context.Context, user *entity.User) error
+		UpdateAvatarUserRepo(ctx context.Context, uid int64, avatar string) error
+		UpdateAddressUserRepo(ctx context.Context, uid int64, address string) error
 	}
 
 	ArticleRepo interface {
@@ -51,6 +51,7 @@ type (
 	MenuRepo interface {
 		AddMenuRepo(ctx context.Context, menu *entity.Menu) error
 		GetMenuByIdRepo(ctx context.Context, id int64) (*entity.Menu, error)
+		GetMenuByPathRepo(ctx context.Context, path string) (*entity.Menu, error)
 		GetMenusRepo(ctx context.Context) ([]*entity.Menu, error)
 		UpdateMenuRepo(ctx context.Context, menu *entity.Menu) error
 		DeleteMenuRepo(ctx context.Context, id int64) error
@@ -64,5 +65,13 @@ type (
 		UpdateBannerRepo(ctx context.Context, banner *entity.Banner) error
 		DeleteBannerRepo(ctx context.Context, id int64) error
 		DeleteBannersBatchRepo(ctx context.Context, ids []int64) error
+	}
+
+	CommentRepo interface {
+		AddCommentRepo(ctx context.Context, comment *entity.Comment) error
+		GetCommentByIdRepo(ctx context.Context, id int64) (*entity.Comment, error)
+		GetCommentsByArticleIdRepo(ctx context.Context, aid int64) ([]*entity.Comment, error)
+		GetCommentsRepo(ctx context.Context) ([]*entity.Comment, error)
+		DeleteCommentRepo(ctx context.Context, id int64) error
 	}
 )

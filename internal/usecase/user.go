@@ -48,9 +48,11 @@ func (u *UserUseCase) UserRegister(ctx context.Context, req entity.UserRegisterR
 	}
 	userInfo.Username = req.Username
 	userInfo.Nickname = "unknown"
+	userInfo.Role = 1
+	userInfo.Status = 1
+	userInfo.Birthday = time.Now()
 	userInfo.LastLoginTime = time.Now()
-	_, err = u.repo.AddUserRepo(ctx, userInfo)
-	return err
+	return u.repo.AddUserRepo(ctx, userInfo)
 }
 
 func (u *UserUseCase) GetUserById(ctx context.Context, uid int64) (*entity.User, error) {

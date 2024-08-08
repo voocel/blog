@@ -5,10 +5,9 @@ import (
 	"time"
 )
 
-type Star struct {
-	ID        int64 `gorm:"primarykey"`
-	UserID    int64 `json:"user_id"`
-	ArticleID int64 `json:"article_id"`
+type Tag struct {
+	ID        int64  `gorm:"primarykey"`
+	Name      string `gorm:"size:32;uniqueIndex" json:"name"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt sql.NullTime `gorm:"index"`

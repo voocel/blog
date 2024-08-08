@@ -20,28 +20,32 @@ func GetRouters(db *gorm.DB) (routers []Router) {
 	ad := usecase.NewAdvertUseCase(repo.NewAdvertRepo(db))
 	m := usecase.NewMenuUseCase(repo.NewMenuRepo(db))
 	b := usecase.NewBannerUseCase(repo.NewBannerRepo(db))
+	cm := usecase.NewCommentUseCase(repo.NewCommentRepo(db))
 
 	userHandler := handler.NewUserHandler(u)
-	ur := newUserRouter(userHandler)
+	ur := newUserRouter(userHandler, u)
 
 	articleHandler := handler.NewArticleHandler(a)
-	ar := newArticleRouter(articleHandler)
+	ar := newArticleRouter(articleHandler, u)
 
 	categoryHandler := handler.NewCategoryHandler(c)
-	cr := newCategoryRouter(categoryHandler)
+	cr := newCategoryRouter(categoryHandler, u)
 
 	starHandler := handler.NewStarHandler(s)
-	sr := newStarRouter(starHandler)
+	sr := newStarRouter(starHandler, u)
 
 	advertHandler := handler.NewAdvertHandler(ad)
-	adr := newAdvertRouter(advertHandler)
+	adr := newAdvertRouter(advertHandler, u)
 
 	menuHandler := handler.NewMenuHandler(m)
-	mr := newMenuRouter(menuHandler)
+	mr := newMenuRouter(menuHandler, u)
 
 	bannerHandler := handler.NewBannerHandler(b)
-	br := newBannerRouter(bannerHandler)
+	br := newBannerRouter(bannerHandler, u)
 
-	routers = append(routers, ur, ar, cr, sr, adr, mr, br)
+	commentHandler := handler.NewCommentHandler(cm)
+	cmr := newCommentRouter(commentHandler, u)
+
+	routers = append(routers, ur, ar, cr, sr, adr, mr, br, cmr)
 	return
 }

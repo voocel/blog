@@ -24,6 +24,11 @@ func (m MenuRepo) GetMenuByIdRepo(ctx context.Context, id int64) (*entity.Menu, 
 	panic("implement me")
 }
 
+func (m MenuRepo) GetMenuByPathRepo(ctx context.Context, path string) (*entity.Menu, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m MenuRepo) GetMenusRepo(ctx context.Context) ([]*entity.Menu, error) {
 	//TODO implement me
 	panic("implement me")

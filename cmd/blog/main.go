@@ -6,6 +6,7 @@ import (
 	"blog/internal/repository/redis"
 	"blog/pkg/log"
 	"context"
+	"flag"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,6 +15,8 @@ import (
 
 func main() {
 	config.LoadConfig()
+	flag.BoolVar(&config.Conf.Mysql.Migrate, "migrate", true, "是否自动创建表")
+	flag.Parse()
 	log.Init("http", "debug")
 	redis.Init()
 	srv := http.NewServer()

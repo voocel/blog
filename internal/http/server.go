@@ -45,7 +45,6 @@ func (s *Server) Run() {
 		gin.Recovery(),
 		middleware.Logger,
 		middleware.CorsMiddleware(),
-		middleware.JWTMiddleware(userUseCase),
 	)
 	g.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, "404 not found!")

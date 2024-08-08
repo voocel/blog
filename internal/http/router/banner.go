@@ -2,15 +2,17 @@ package router
 
 import (
 	"blog/internal/http/handler"
+	"blog/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
 
 type bannerRouter struct {
-	h *handler.BannerHandler
+	h           *handler.BannerHandler
+	userUseCase *usecase.UserUseCase
 }
 
-func newBannerRouter(h *handler.BannerHandler) *bannerRouter {
-	return &bannerRouter{h: h}
+func newBannerRouter(h *handler.BannerHandler, userUseCase *usecase.UserUseCase) *bannerRouter {
+	return &bannerRouter{h: h, userUseCase: userUseCase}
 }
 
 func (r *bannerRouter) Load(g *gin.Engine) {

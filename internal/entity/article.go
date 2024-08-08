@@ -1,42 +1,42 @@
 package entity
 
 import (
-	"blog/internal/entity/ctype"
+	"database/sql"
 	"time"
 )
 
 type Article struct {
-	ID            int64       `json:"id" structs:"id"`
-	Title         string      `json:"title" structs:"title"`
-	Keyword       string      `json:"keyword,omit(list)" structs:"keyword"`
-	Abstract      string      `json:"abstract" structs:"abstract"`
-	Content       string      `json:"content,omit(list)" structs:"content"`
-	LookCount     int         `json:"look_count" structs:"look_count"`
-	CommentCount  int         `json:"comment_count" structs:"comment_count"`
-	DiggCount     int         `json:"digg_count" structs:"digg_count"`
-	CollectsCount int         `json:"collects_count" structs:"collects_count"`
-	UserID        uint        `json:"user_id" structs:"user_id"`
-	UserNickName  string      `json:"user_nick_name" structs:"user_nick_name"`
-	UserAvatar    string      `json:"user_avatar" structs:"user_avatar"`
-	Category      string      `json:"category" structs:"category"`
-	Source        string      `json:"source" structs:"source"`
-	Link          string      `json:"link" structs:"link"`
-	BannerID      uint        `json:"banner_id" structs:"banner_id"`
-	BannerUrl     string      `json:"banner_url" structs:"banner_url"`
-	Tags          ctype.Array `json:"tags" structs:"tags"`
+	ID            int64  `gorm:"primarykey"`
+	Title         string `gorm:"size:32" json:"title"`                    // 标题
+	Keyword       string `gorm:"size:32" json:"keyword"`                  // 关键字
+	Abstract      string `gorm:"size:32" json:"abstract"`                 // 文章摘要
+	Content       string `gorm:"size:32" json:"content"`                  // 文章内容
+	ViewCounts    int    `gorm:"size:8;default:0;" json:"view_counts"`    // 浏览量
+	CommentCounts int    `gorm:"size:8;default:0;" json:"comment_counts"` // 评论数
+	LikeCounts    int    `gorm:"size:8;default:0;" json:"like_counts"`    // 点赞数
+	StarCount     int    `gorm:"size:8;default:0;" json:"collects_count"` // 收藏量
+	UserID        uint   `json:"user_id"`
+	UserNickname  string `gorm:"size:32" json:"user_nickname"`
+	UserAvatar    string `gorm:"size:256" json:"user_avatar"`
+	Category      string `gorm:"size:32" json:"category"` // 分类
+	Source        string `gorm:"size:32" json:"source"`   // 来源
+	Link          string `gorm:"size:256" json:"link"`    // 原文链接
+	BannerID      int64  `json:"banner_id"`               // 封面id
+	BannerUrl     string `json:"banner_url"`              // 封面链接
+	Tags          Array  `json:"tags"`                    // 标签
 
-	CreatedAt time.Time `json:"-" structs:"created_at"`
-	UpdatedAt time.Time `json:"-" structs:"updated_at"`
-	DeletedAt time.Time `json:"-" structs:"deleted_at"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt sql.NullTime `gorm:"index"`
 }
 
 type ArticleReq struct {
-	Title    string      `json:"title" binding:"required" msg:"文章标题必填"`
-	Abstract string      `json:"abstract"`
-	Content  string      `json:"content" binding:"required" msg:"文章内容必填"`
-	Category string      `json:"category"`
-	Source   string      `json:"source"`
-	Link     string      `json:"link"`
-	BannerID uint        `json:"banner_id"`
-	Tags     ctype.Array `json:"tags"`
+	Title    string `json:"title" binding:"required" msg:"文章标题必填"`
+	Abstract string `json:"abstract"`
+	Content  string `json:"content" binding:"required" msg:"文章内容必填"`
+	Category string `json:"category"`
+	Source   string `json:"source"`
+	Link     string `json:"link"`
+	BannerID uint   `json:"banner_id"`
+	Tags     Array  `json:"tags"`
 }
