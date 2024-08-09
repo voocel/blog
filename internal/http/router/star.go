@@ -17,7 +17,7 @@ func newStarRouter(h *handler.StarHandler, userUseCase *usecase.UserUseCase) *st
 }
 
 func (r *starRouter) Load(g *gin.Engine) {
-	group := g.Group("/v1/star")
+	group := g.Group("/api/star")
 	{
 		group.PUT("/add/:aid", middleware.JWTMiddleware(r.userUseCase), r.h.AddStar)
 		group.PUT("/remove/:aid", middleware.JWTMiddleware(r.userUseCase), r.h.RemoveStar)

@@ -15,26 +15,24 @@ func NewCommentRepo(db *gorm.DB) *CommentRepo {
 }
 
 func (c CommentRepo) AddCommentRepo(ctx context.Context, comment *entity.Comment) error {
-	//TODO implement me
-	panic("implement me")
+	return c.db.WithContext(ctx).Create(comment).Error
 }
 
 func (c CommentRepo) GetCommentByIdRepo(ctx context.Context, id int64) (*entity.Comment, error) {
-	//TODO implement me
-	panic("implement me")
+	var comment = new(entity.Comment)
+	return comment, c.db.WithContext(ctx).Where("id = ?", id).First(comment).Error
 }
 
 func (c CommentRepo) GetCommentsByArticleIdRepo(ctx context.Context, aid int64) ([]*entity.Comment, error) {
-	//TODO implement me
-	panic("implement me")
+	var comments []*entity.Comment
+	return comments, c.db.WithContext(ctx).Where("article_id = ?", aid).Find(&comments).Error
 }
 
 func (c CommentRepo) GetCommentsRepo(ctx context.Context) ([]*entity.Comment, error) {
-	//TODO implement me
-	panic("implement me")
+	var comments []*entity.Comment
+	return comments, c.db.WithContext(ctx).Find(&comments).Error
 }
 
 func (c CommentRepo) DeleteCommentRepo(ctx context.Context, id int64) error {
-	//TODO implement me
-	panic("implement me")
+	return c.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Comment{}).Error
 }

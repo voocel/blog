@@ -17,7 +17,7 @@ func newTagRouter(h *handler.TagHandler, userUseCase *usecase.UserUseCase) *TagR
 }
 
 func (r *TagRouter) Load(g *gin.Engine) {
-	group := g.Group("/v1/tag")
+	group := g.Group("/api/tag")
 	{
 		group.POST("/add", middleware.JWTMiddleware(r.userUseCase), r.h.Create)
 		group.GET("/list", r.h.List)

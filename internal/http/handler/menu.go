@@ -39,9 +39,9 @@ func (h *MenuHandler) AddMenu(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 	return
 }
-func (h *MenuHandler) Detail(c *gin.Context) {
+func (h *MenuHandler) DetailByPath(c *gin.Context) {
 	resp := new(ApiResponse)
-	path := c.Param("path")
+	path := c.Query("path")
 	result, err := h.menuUseCase.DetailByPath(c, path)
 	if err != nil {
 		resp.Code = 1
@@ -50,6 +50,27 @@ func (h *MenuHandler) Detail(c *gin.Context) {
 	resp.Data = result
 	c.JSON(http.StatusOK, resp)
 	return
+}
+
+func (h *MenuHandler) DetailById(c *gin.Context) {
+	resp := new(ApiResponse)
+	mid := c.Param("mid")
+	menuId, err := strconv.Atoi(mid)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = "params invalid"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	menu, err := h.menuUseCase.Detail(c, int64(menuId))
+	if err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	resp.Data = menu
+	c.JSON(http.StatusOK, resp)
 }
 
 func (h *MenuHandler) List(c *gin.Context) {

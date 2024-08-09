@@ -17,7 +17,7 @@ func newArticleRouter(h *handler.ArticleHandler, userUseCase *usecase.UserUseCas
 }
 
 func (r *articleRouter) Load(g *gin.Engine) {
-	group := g.Group("/v1/article")
+	group := g.Group("/api/article")
 	{
 		group.POST("/create", middleware.JWTMiddleware(r.userUseCase), r.h.Create)
 		group.GET("/list", r.h.List)

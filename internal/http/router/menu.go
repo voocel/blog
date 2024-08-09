@@ -17,11 +17,12 @@ func newMenuRouter(h *handler.MenuHandler, userUseCase *usecase.UserUseCase) *ne
 }
 
 func (r *nenuRouter) Load(g *gin.Engine) {
-	group := g.Group("/v1/menu")
+	group := g.Group("/api/menu")
 	{
 		group.POST("/add", middleware.JWTMiddleware(r.userUseCase), r.h.AddMenu)
 		group.GET("/list", r.h.List)
-		group.GET("/detail/:path", r.h.Detail)
+		group.GET("/detail", r.h.DetailByPath)
+		group.GET("/detail/:mid", r.h.DetailById)
 		group.PUT("/update", middleware.JWTMiddleware(r.userUseCase), r.h.UpdateMenu)
 		group.POST("/delete/:mid", middleware.JWTMiddleware(r.userUseCase), r.h.DeleteMenuById)
 		group.POST("/delete_batch", middleware.JWTMiddleware(r.userUseCase), r.h.DeleteMenuBatch)

@@ -123,3 +123,18 @@ func (h *UserHandler) Logout(c *gin.Context) {
 	resp.Message = "ok"
 	c.JSON(http.StatusOK, resp)
 }
+
+func (h *UserHandler) List(c *gin.Context) {
+	resp := new(ApiResponse)
+	users, err := h.userUsecase.UserList(c)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	resp.Message = "ok"
+	resp.Data = users
+	c.JSON(http.StatusOK, resp)
+	return
+}

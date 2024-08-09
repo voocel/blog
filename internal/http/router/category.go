@@ -16,7 +16,7 @@ func newCategoryRouter(h *handler.CategoryHandler, userUseCase *usecase.UserUseC
 }
 
 func (r *categoryRouter) Load(g *gin.Engine) {
-	group := g.Group("/v1/category")
+	group := g.Group("/api/category")
 	{
 		group.GET("/list", r.h.List)
 	}

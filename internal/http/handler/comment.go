@@ -65,6 +65,20 @@ func (h *CommentHandler) GetArticleCommentList(c *gin.Context) {
 	return
 }
 
+func (h *CommentHandler) GetAllCommentList(c *gin.Context) {
+	resp := new(ApiResponse)
+	comments, err := h.CommentUseCase.GetComments(c)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	resp.Data = comments
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
 // Delete 删除评论及子评论
 func (h *CommentHandler) Delete(c *gin.Context) {
 	resp := new(ApiResponse)

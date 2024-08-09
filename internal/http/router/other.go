@@ -14,8 +14,10 @@ func newOtherRouter(h *handler.OtherHandler) *otherRouter {
 }
 
 func (r *otherRouter) Load(g *gin.Engine) {
-	group := g.Group("/v1/other")
+	group := g.Group("/api/other")
 	{
 		group.POST("/news", r.h.News)
+		group.GET("/get_site_setting", r.h.GetSiteSetting)
+		group.POST("/update_site_setting", r.h.UpdateSiteSetting)
 	}
 }

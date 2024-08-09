@@ -17,7 +17,7 @@ func newBannerRouter(h *handler.BannerHandler, userUseCase *usecase.UserUseCase)
 }
 
 func (r *bannerRouter) Load(g *gin.Engine) {
-	group := g.Group("/v1/banner")
+	group := g.Group("/api/banner")
 	{
 		group.POST("/create", middleware.JWTMiddleware(r.userUseCase), r.h.Create)
 		group.GET("/detail/:bid", r.h.Detail)

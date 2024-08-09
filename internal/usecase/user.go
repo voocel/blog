@@ -67,3 +67,7 @@ func (u *UserUseCase) GetUserById(ctx context.Context, uid int64) (*entity.User,
 
 	return v.(*entity.User), err
 }
+
+func (u *UserUseCase) UserList(ctx context.Context) ([]*entity.User, error) {
+	return u.repo.GetUsersRepo(ctx)
+}

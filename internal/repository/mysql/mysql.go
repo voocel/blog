@@ -99,28 +99,24 @@ func dbConnect(user, pass, addr, dbName string) (*gorm.DB, error) {
 		},
 		//Logger: logger.Default.LogMode(logger.Info),
 	})
-
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("[db connection failed] Database name: %s", dbName))
 	}
 
 	db.Set("gorm:table_options", "CHARSET=utf8mb4")
-
-	cfg := config.Conf.Mysql
-
 	sqlDB, err := db.DB()
 	if err != nil {
 		return nil, err
 	}
 
+	cfg := config.Conf.Mysql
 	sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
-
 	sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
-
 	sqlDB.SetConnMaxLifetime(time.Second * cfg.ConnMaxLifeTime)
 
 	if cfg.Migrate {
-		err = db.AutoMigrate(&entity.Advert{}, &entity.Article{}, &entity.Banner{}, &entity.Category{}, &entity.Comment{}, &entity.User{}, &entity.Menu{}, &entity.Star{}, &entity.Tag{})
+		err = db.AutoMigrate(&entity.Advert{}, &entity.Article{}, &entity.Banner{}, &entity.Category{}, &entity.Comment{},
+			&entity.User{}, &entity.Menu{}, &entity.Star{}, &entity.Tag{}, &entity.Logstash{})
 		if err != nil {
 			return nil, err
 		}

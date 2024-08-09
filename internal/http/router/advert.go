@@ -16,7 +16,7 @@ func newAdvertRouter(h *handler.AdvertHandler, userUseCase *usecase.UserUseCase)
 }
 
 func (r *advertRouter) Load(g *gin.Engine) {
-	group := g.Group("/v1/advert")
+	group := g.Group("/api/advert")
 	{
 		group.POST("/create", r.h.Create)
 		group.GET("/list", r.h.List)

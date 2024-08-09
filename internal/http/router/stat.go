@@ -14,5 +14,6 @@ func newStatRouter(h *handler.StatHandler) *statRouter {
 }
 
 func (r *statRouter) Load(g *gin.Engine) {
-	g.GET("/v1/stat/visit", r.h.Visit)
+	g.GET("/api/stat/visit_sum", r.h.VisitSum)
+	g.GET("/api/stat/visit_week_login", r.h.VisitWeekLogin)
 }

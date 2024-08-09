@@ -33,7 +33,7 @@ func (u UserRepo) GetUserByNameExistRepo(ctx context.Context, name string) (bool
 
 func (u UserRepo) GetUsersRepo(ctx context.Context) ([]*entity.User, error) {
 	var users []*entity.User
-	err := u.db.Find(users).Error
+	err := u.db.Find(&users).Error
 	return users, err
 }
 
