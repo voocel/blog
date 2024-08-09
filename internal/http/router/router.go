@@ -22,6 +22,7 @@ func GetRouters(db *gorm.DB) (routers []Router) {
 	b := usecase.NewBannerUseCase(repo.NewBannerRepo(db))
 	cm := usecase.NewCommentUseCase(repo.NewCommentRepo(db))
 	t := usecase.NewTagUseCase(repo.NewTagRepo(db))
+	l := usecase.NewLogstashUseCase(repo.NewLogstashRepo(db))
 
 	userHandler := handler.NewUserHandler(u)
 	ur := newUserRouter(userHandler, u)
@@ -54,8 +55,11 @@ func GetRouters(db *gorm.DB) (routers []Router) {
 	or := newOtherRouter(otherHandler)
 
 	statHandler := handler.NewStatHandler()
-	statR := newStatRouter(statHandler)
+	statr := newStatRouter(statHandler)
 
-	routers = append(routers, ur, ar, cr, sr, adr, mr, br, cmr, tr, or, statR)
+	logstashHandler := handler.NewLogstashHandler(l)
+	lr := newLogstashRouter(logstashHandler)
+
+	routers = append(routers, ur, ar, cr, sr, adr, mr, br, cmr, tr, or, statr, lr)
 	return
 }

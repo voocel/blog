@@ -85,4 +85,12 @@ type (
 		DeleteTagRepo(ctx context.Context, id int64) error
 		DeleteTagsBatchRepo(ctx context.Context, ids []int64) error
 	}
+
+	LogstashRepo interface {
+		AddLogstashRepo(ctx context.Context, logstash *entity.Logstash) error
+		GetLogstashByIdRepo(ctx context.Context, id int64) (*entity.Logstash, error)
+		GetLogstashRepo(ctx context.Context) ([]*entity.Logstash, error)
+		DeleteLogstashRepo(ctx context.Context, id int64) error
+		DeleteLogstashBatchRepo(ctx context.Context, ids []int64) error
+	}
 )
