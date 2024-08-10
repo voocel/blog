@@ -6,18 +6,18 @@ import (
 )
 
 type Menu struct {
-	ID           int64  `gorm:"primarykey"`
-	Title        string `gorm:"size:32" json:"title"`        // 标题
-	Path         string `gorm:"size:256" json:"path"`        // 路径
-	Slogan       string `gorm:"size:64" json:"slogan"`       // 标语
-	Abstract     Array  `gorm:"type:string" json:"abstract"` // 简介
-	AbstractTime int    `json:"abstract_time"`               // 简介的切换时间
-	Banners      Array  `gorm:"type:string" json:"banners"`  // 菜单的图片列表
-	BannerTime   int    `json:"banner_time"`                 // 菜单图片的切换时间 为 0 表示不切换
-	Sort         int    `gorm:"size:10" json:"sort"`
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeletedAt    sql.NullTime `gorm:"index"`
+	ID           int64        `gorm:"primarykey"`
+	Title        string       `gorm:"size:32" json:"title"`        // 标题
+	Path         string       `gorm:"size:256" json:"path"`        // 路径
+	Slogan       string       `gorm:"size:64" json:"slogan"`       // 标语
+	Abstract     Array        `gorm:"type:string" json:"abstract"` // 简介
+	AbstractTime int          `json:"abstract_time"`               // 简介的切换时间
+	Banners      Array        `gorm:"type:string" json:"banners"`  // 菜单的图片列表
+	BannerTime   int          `json:"banner_time"`                 // 菜单图片的切换时间 为 0 表示不切换
+	Sort         int          `gorm:"size:10" json:"sort"`
+	CreatedAt    time.Time    `json:"created_at"`
+	UpdatedAt    time.Time    `json:"updated_at"`
+	DeletedAt    sql.NullTime `gorm:"index" json:"-"`
 }
 
 type ImageSort struct {

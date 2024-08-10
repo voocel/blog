@@ -24,7 +24,7 @@ type User struct {
 	LastLoginTime time.Time    `json:"last_login_time"`
 	CreatedAt     time.Time    `json:"created_at"`
 	UpdatedAt     time.Time    `json:"updated_at"`
-	DeletedAt     sql.NullTime `gorm:"index" json:"deleted_at"`
+	DeletedAt     sql.NullTime `gorm:"index" json:"-"`
 }
 
 type UserLoginReq struct {

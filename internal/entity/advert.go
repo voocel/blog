@@ -6,14 +6,14 @@ import (
 )
 
 type Advert struct {
-	ID        int64  `gorm:"primarykey"`
-	Title     string `gorm:"size:64" json:"title"`       // 标题
-	Href      string `gorm:"size:128" json:"href"`       // 跳转链接
-	ImagesUrl string `gorm:"size:128" json:"images_url"` // 广告图片地址
-	IsShow    bool   `json:"is_show"`                    // 是否展示
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt sql.NullTime `gorm:"index"`
+	ID        int64        `gorm:"primarykey"`
+	Title     string       `gorm:"size:64" json:"title"`       // 标题
+	Href      string       `gorm:"size:128" json:"href"`       // 跳转链接
+	ImagesUrl string       `gorm:"size:128" json:"images_url"` // 广告图片地址
+	IsShow    bool         `json:"is_show"`                    // 是否展示
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
+	DeletedAt sql.NullTime `gorm:"index" json:"-"`
 }
 
 type AdvertReq struct {

@@ -25,9 +25,9 @@ type Article struct {
 	BannerUrl     string `json:"banner_url"`              // 封面链接
 	Tags          Array  `json:"tags"`                    // 标签
 
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt sql.NullTime `gorm:"index"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
+	DeletedAt sql.NullTime `gorm:"index" json:"-"`
 }
 
 type ArticleReq struct {

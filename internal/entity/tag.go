@@ -6,11 +6,11 @@ import (
 )
 
 type Tag struct {
-	ID        int64  `gorm:"primarykey"`
-	Name      string `gorm:"size:32;uniqueIndex" json:"name"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt sql.NullTime `gorm:"index"`
+	ID        int64        `gorm:"primarykey"`
+	Name      string       `gorm:"size:32;uniqueIndex" json:"name"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
+	DeletedAt sql.NullTime `gorm:"index" json:"-"`
 }
 
 type TagReq struct {
