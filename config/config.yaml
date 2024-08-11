@@ -28,3 +28,10 @@ mysql:
   max_idle_conns: 10
   # seconds
   max_life_time: 24*60*60
+
+redis:
+  addr: 127.0.0.1
+  port: 6379
+  password:
+  pool_size: 5
+  min_idle_conn: 2
