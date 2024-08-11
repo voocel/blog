@@ -24,7 +24,7 @@ func (r *articleRouter) Load(g *gin.Engine) {
 		group.GET("/detail/:aid", r.h.Detail)
 		group.PUT("/update", r.h.Update)
 		group.PUT("/delete", middleware.JWTMiddleware(r.userUseCase), r.h.DeleteArticlesBatch)
-		group.PUT("/like/:aid", r.h.Like)
+		group.POST("/like/:aid", r.h.Like)
 		group.GET("/calendar", r.h.Calendar)
 	}
 }

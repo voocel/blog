@@ -178,6 +178,7 @@ func (h *ArticleHandler) Like(c *gin.Context) {
 		resp.Code = 1
 		resp.Message = err.Error()
 	}
+	resp.Message = "点赞成功!"
 	c.JSON(http.StatusOK, resp)
 	return
 }
