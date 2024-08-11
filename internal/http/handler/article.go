@@ -12,6 +12,7 @@ import (
 
 type ArticleHandler struct {
 	articleUsecase *usecase.ArticleUseCase
+	bannerUsecase  *usecase.BannerUseCase
 	redis          *redis.Redis
 }
 
@@ -24,9 +25,10 @@ type CalendarResponse struct {
 	Count int    `json:"count"`
 }
 
-func NewArticleHandler(u *usecase.ArticleUseCase) *ArticleHandler {
+func NewArticleHandler(u *usecase.ArticleUseCase, b *usecase.BannerUseCase) *ArticleHandler {
 	return &ArticleHandler{
 		articleUsecase: u,
+		bannerUsecase:  b,
 		redis:          redis.GetClient(),
 	}
 }
@@ -95,14 +97,24 @@ func (h *ArticleHandler) Detail(c *gin.Context) {
 }
 
 func (h *ArticleHandler) Update(c *gin.Context) {
-	//req := entity.ArticleUpdateReq{}
-	req := entity.ArticleReq{}
+	req := entity.ArticleUpdateReq{}
 	resp := new(ApiResponse)
 	if err := c.ShouldBind(&req); err != nil {
 		resp.Code = 1
-		resp.Message = "params invalid"
+		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
+	}
+
+	if req.BannerID > 0 {
+		banner, err := h.bannerUsecase.Detail(c, req.BannerID)
+		if err != nil {
+			resp.Code = 1
+			resp.Message = err.Error()
+			c.JSON(http.StatusOK, resp)
+			return
+		}
+		req.BannerUrl = banner.Path
 	}
 	if err := h.articleUsecase.UpdateArticle(c, req); err != nil {
 		resp.Code = 1

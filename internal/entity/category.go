@@ -6,7 +6,7 @@ import (
 )
 
 type Category struct {
-	ID        int64        `gorm:"primarykey"`
+	ID        int64        `gorm:"primarykey" json:"id"`
 	Name      string       `gorm:"size:64" json:"name"`
 	Status    int8         `json:"status"`
 	CreatedAt time.Time    `json:"created_at"`

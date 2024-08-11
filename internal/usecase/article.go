@@ -31,7 +31,7 @@ func (c *ArticleUseCase) GetList(ctx context.Context, page, pageSize int) ([]*en
 	return c.repo.GetArticlesRepo(ctx, page, pageSize)
 }
 
-func (c *ArticleUseCase) UpdateArticle(ctx context.Context, req entity.ArticleReq) error {
+func (c *ArticleUseCase) UpdateArticle(ctx context.Context, req entity.ArticleUpdateReq) error {
 	article := new(entity.Article)
 	copier.Copy(article, req)
 	err := c.repo.UpdateArticleRepo(ctx, article)

@@ -6,7 +6,7 @@ import (
 )
 
 type Comment struct {
-	ID              int64        `gorm:"primarykey"`
+	ID              int64        `gorm:"primarykey" json:"id"`
 	ParentCommentID int64        `json:"parent_comment_id"`                       // 父评论id
 	Content         string       `gorm:"size:256"`                                // 评论内容
 	LikeCounts      int          `gorm:"size:8;default:0;" json:"like_counts"`    // 点赞数

@@ -6,15 +6,15 @@ import (
 )
 
 type Article struct {
-	ID            int64  `gorm:"primarykey"`
-	Title         string `gorm:"size:32" json:"title"`                    // 标题
-	Keyword       string `gorm:"size:32" json:"keyword"`                  // 关键字
-	Abstract      string `gorm:"size:32" json:"abstract"`                 // 文章摘要
-	Content       string `gorm:"size:32" json:"content"`                  // 文章内容
-	ViewCounts    int    `gorm:"size:8;default:0;" json:"view_counts"`    // 浏览量
-	CommentCounts int    `gorm:"size:8;default:0;" json:"comment_counts"` // 评论数
-	LikeCounts    int    `gorm:"size:8;default:0;" json:"like_counts"`    // 点赞数
-	StarCount     int    `gorm:"size:8;default:0;" json:"collects_count"` // 收藏量
+	ID            int64  `gorm:"primarykey" json:"id"`
+	Title         string `gorm:"size:32" json:"title"`                     // 标题
+	Keyword       string `gorm:"size:32" json:"keyword"`                   // 关键字
+	Abstract      string `gorm:"size:32" json:"abstract"`                  // 文章摘要
+	Content       string `gorm:"size:32" json:"content"`                   // 文章内容
+	ViewCounts    int    `gorm:"size:8;default:0;" json:"view_counts"`     // 浏览量
+	CommentCounts int    `gorm:"size:8;default:0;" json:"comment_counts"`  // 评论数
+	LikeCounts    int    `gorm:"size:8;default:0;" json:"like_counts"`     // 点赞数
+	StarCounts    int    `gorm:"size:8;default:0;" json:"collects_counts"` // 收藏量
 	UserID        uint   `json:"user_id"`
 	UserNickname  string `gorm:"size:32" json:"user_nickname"`
 	UserAvatar    string `gorm:"size:256" json:"user_avatar"`
@@ -42,13 +42,14 @@ type ArticleReq struct {
 }
 
 type ArticleUpdateReq struct {
-	Title    string `json:"title"`
-	Abstract string `json:"abstract"`
-	Content  string `json:"content"`
-	Category string `json:"category"`
-	Source   string `json:"source"`
-	Link     string `json:"link"`
-	BannerID uint   `json:"banner_id"`
-	Tags     Array  `json:"tags"`
-	ID       string `json:"id"`
+	ID        int64  `json:"id"`
+	Title     string `json:"title"`
+	Abstract  string `json:"abstract"`
+	Content   string `json:"content"`
+	Category  string `json:"category"`
+	Source    string `json:"source"`
+	Link      string `json:"link"`
+	BannerID  int64  `json:"banner_id"`
+	BannerUrl string `json:"banner_url"`
+	Tags      Array  `json:"tags"`
 }

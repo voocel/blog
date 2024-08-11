@@ -6,7 +6,7 @@ import (
 )
 
 type Menu struct {
-	ID           int64        `gorm:"primarykey"`
+	ID           int64        `gorm:"primarykey" json:"id"`
 	Title        string       `gorm:"size:32" json:"title"`        // 标题
 	Path         string       `gorm:"size:256" json:"path"`        // 路径
 	Slogan       string       `gorm:"size:64" json:"slogan"`       // 标语

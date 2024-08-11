@@ -6,7 +6,7 @@ import (
 )
 
 type Tag struct {
-	ID        int64        `gorm:"primarykey"`
+	ID        int64        `gorm:"primarykey" json:"id"`
 	Name      string       `gorm:"size:32;uniqueIndex" json:"name"`
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`

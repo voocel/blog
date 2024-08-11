@@ -6,7 +6,7 @@ import (
 )
 
 type Logstash struct {
-	ID        int64     `gorm:"primarykey"`
+	ID        int64     `gorm:"primarykey" json:"id"`
 	IP        string    `gorm:"size:32" json:"ip"`
 	Addr      string    `gorm:"size:64" json:"addr"`
 	Level     Level     `gorm:"size:4" json:"level"`
