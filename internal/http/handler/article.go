@@ -11,6 +11,7 @@ import (
 )
 
 type ArticleHandler struct {
+	logUsecase     *usecase.LogstashUseCase
 	articleUsecase *usecase.ArticleUseCase
 	bannerUsecase  *usecase.BannerUseCase
 	redis          *redis.Redis
@@ -25,8 +26,9 @@ type CalendarResponse struct {
 	Count int    `json:"count"`
 }
 
-func NewArticleHandler(u *usecase.ArticleUseCase, b *usecase.BannerUseCase) *ArticleHandler {
+func NewArticleHandler(u *usecase.ArticleUseCase, b *usecase.BannerUseCase, log *usecase.LogstashUseCase) *ArticleHandler {
 	return &ArticleHandler{
+		logUsecase:     log,
 		articleUsecase: u,
 		bannerUsecase:  b,
 		redis:          redis.GetClient(),
@@ -40,12 +42,22 @@ func (h *ArticleHandler) Create(c *gin.Context) {
 		resp.Code = 1
 		resp.Message = "params invalid"
 		c.JSON(http.StatusOK, resp)
+		h.logUsecase.AddLogstash(c, &entity.Logstash{
+			Level:     entity.ErrorLevel,
+			Content:   err.Error(),
+			CreatedAt: time.Now(),
+		})
 		return
 	}
 	if err := h.articleUsecase.CreateArticle(c, req); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
+		h.logUsecase.AddLogstash(c, &entity.Logstash{
+			Level:     entity.ErrorLevel,
+			Content:   err.Error(),
+			CreatedAt: time.Now(),
+		})
 		return
 	}
 	c.JSON(http.StatusOK, resp)
@@ -61,6 +73,11 @@ func (h *ArticleHandler) List(c *gin.Context) {
 		resp.Code = 1
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
+		h.logUsecase.AddLogstash(c, &entity.Logstash{
+			Level:     entity.ErrorLevel,
+			Content:   err.Error(),
+			CreatedAt: time.Now(),
+		})
 		return
 	}
 	resp.Data = articles
@@ -81,6 +98,11 @@ func (h *ArticleHandler) Detail(c *gin.Context) {
 		resp.Code = 1
 		resp.Message = "params invalid"
 		c.JSON(http.StatusOK, resp)
+		h.logUsecase.AddLogstash(c, &entity.Logstash{
+			Level:     entity.ErrorLevel,
+			Content:   err.Error(),
+			CreatedAt: time.Now(),
+		})
 		return
 	}
 
@@ -89,6 +111,11 @@ func (h *ArticleHandler) Detail(c *gin.Context) {
 		resp.Code = 1
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
+		h.logUsecase.AddLogstash(c, &entity.Logstash{
+			Level:     entity.ErrorLevel,
+			Content:   err.Error(),
+			CreatedAt: time.Now(),
+		})
 		return
 	}
 	resp.Data = article
@@ -103,6 +130,11 @@ func (h *ArticleHandler) Update(c *gin.Context) {
 		resp.Code = 1
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
+		h.logUsecase.AddLogstash(c, &entity.Logstash{
+			Level:     entity.ErrorLevel,
+			Content:   err.Error(),
+			CreatedAt: time.Now(),
+		})
 		return
 	}
 
@@ -112,6 +144,11 @@ func (h *ArticleHandler) Update(c *gin.Context) {
 			resp.Code = 1
 			resp.Message = err.Error()
 			c.JSON(http.StatusOK, resp)
+			h.logUsecase.AddLogstash(c, &entity.Logstash{
+				Level:     entity.ErrorLevel,
+				Content:   err.Error(),
+				CreatedAt: time.Now(),
+			})
 			return
 		}
 		req.BannerUrl = banner.Path
@@ -132,12 +169,22 @@ func (h *ArticleHandler) DeleteArticleById(c *gin.Context) {
 		resp.Code = 1
 		resp.Message = "params invalid"
 		c.JSON(http.StatusOK, resp)
+		h.logUsecase.AddLogstash(c, &entity.Logstash{
+			Level:     entity.ErrorLevel,
+			Content:   err.Error(),
+			CreatedAt: time.Now(),
+		})
 		return
 	}
 
 	if err := h.articleUsecase.DeleteArticle(c, int64(articleId)); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
+		h.logUsecase.AddLogstash(c, &entity.Logstash{
+			Level:     entity.ErrorLevel,
+			Content:   err.Error(),
+			CreatedAt: time.Now(),
+		})
 	}
 	c.JSON(http.StatusOK, resp)
 	return
@@ -151,6 +198,11 @@ func (h *ArticleHandler) DeleteArticlesBatch(c *gin.Context) {
 		resp.Code = 1
 		resp.Message = "params invalid"
 		c.JSON(http.StatusOK, resp)
+		h.logUsecase.AddLogstash(c, &entity.Logstash{
+			Level:     entity.ErrorLevel,
+			Content:   err.Error(),
+			CreatedAt: time.Now(),
+		})
 		return
 	}
 
@@ -158,6 +210,11 @@ func (h *ArticleHandler) DeleteArticlesBatch(c *gin.Context) {
 		resp.Code = 1
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
+		h.logUsecase.AddLogstash(c, &entity.Logstash{
+			Level:     entity.ErrorLevel,
+			Content:   err.Error(),
+			CreatedAt: time.Now(),
+		})
 		return
 	}
 	c.JSON(http.StatusOK, resp)
@@ -172,11 +229,21 @@ func (h *ArticleHandler) Like(c *gin.Context) {
 		resp.Code = 1
 		resp.Message = "params invalid"
 		c.JSON(http.StatusOK, resp)
+		h.logUsecase.AddLogstash(c, &entity.Logstash{
+			Level:     entity.ErrorLevel,
+			Content:   err.Error(),
+			CreatedAt: time.Now(),
+		})
 		return
 	}
 	if err := h.redis.Hincrby(c, "article_like", strconv.Itoa(articleId), 1); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
+		h.logUsecase.AddLogstash(c, &entity.Logstash{
+			Level:     entity.ErrorLevel,
+			Content:   err.Error(),
+			CreatedAt: time.Now(),
+		})
 	}
 	resp.Message = "点赞成功!"
 	c.JSON(http.StatusOK, resp)

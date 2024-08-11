@@ -27,7 +27,7 @@ func GetRouters(db *gorm.DB) (routers []Router) {
 	userHandler := handler.NewUserHandler(u)
 	ur := newUserRouter(userHandler, u)
 
-	articleHandler := handler.NewArticleHandler(a, b)
+	articleHandler := handler.NewArticleHandler(a, b, l)
 	ar := newArticleRouter(articleHandler, u)
 
 	categoryHandler := handler.NewCategoryHandler(c)
