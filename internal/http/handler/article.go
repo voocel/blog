@@ -52,7 +52,9 @@ func (h *ArticleHandler) Create(c *gin.Context) {
 
 func (h *ArticleHandler) List(c *gin.Context) {
 	resp := new(ApiResponse)
-	articles, err := h.articleUsecase.GetList(c)
+	page, _ := strconv.Atoi(c.Query("page"))
+	pageSize, _ := strconv.Atoi(c.Query("pageSize"))
+	articles, total, err := h.articleUsecase.GetList(c, page, pageSize)
 	if err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
@@ -60,6 +62,11 @@ func (h *ArticleHandler) List(c *gin.Context) {
 		return
 	}
 	resp.Data = articles
+	resp.Paging = &PagingInformation{
+		Total:    total,
+		Page:     page,
+		PageSize: pageSize,
+	}
 	c.JSON(http.StatusOK, resp)
 	return
 }
@@ -87,6 +94,24 @@ func (h *ArticleHandler) Detail(c *gin.Context) {
 	return
 }
 
+func (h *ArticleHandler) Update(c *gin.Context) {
+	//req := entity.ArticleUpdateReq{}
+	req := entity.ArticleReq{}
+	resp := new(ApiResponse)
+	if err := c.ShouldBind(&req); err != nil {
+		resp.Code = 1
+		resp.Message = "params invalid"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	if err := h.articleUsecase.UpdateArticle(c, req); err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+	}
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
 func (h *ArticleHandler) DeleteArticleById(c *gin.Context) {
 	resp := new(ApiResponse)
 	aid := c.Param("aid")
@@ -101,8 +126,6 @@ func (h *ArticleHandler) DeleteArticleById(c *gin.Context) {
 	if err := h.articleUsecase.DeleteArticle(c, int64(articleId)); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
-		c.JSON(http.StatusOK, resp)
-		return
 	}
 	c.JSON(http.StatusOK, resp)
 	return

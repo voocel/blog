@@ -21,10 +21,10 @@ func (r *bannerRouter) Load(g *gin.Engine) {
 	{
 		group.POST("/create", middleware.JWTMiddleware(r.userUseCase), r.h.Create)
 		group.GET("/detail/:bid", r.h.Detail)
-		group.GET("/list", r.h.List)
-		group.PUT("/update", middleware.JWTMiddleware(r.userUseCase), r.h.Update)
-		group.PUT("/delete/:bid", middleware.JWTMiddleware(r.userUseCase), r.h.DeleteById)
-		group.PUT("/delete_batch", middleware.JWTMiddleware(r.userUseCase), r.h.DeleteBatch)
+		group.GET("/images", r.h.List)
+		group.DELETE("/images", r.h.DeleteBatch)
+		group.POST("/images", r.h.CreateBanner)
+		group.PUT("/images", middleware.JWTMiddleware(r.userUseCase), r.h.UpdateBanner)
 	}
 
 }

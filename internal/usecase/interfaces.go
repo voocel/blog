@@ -18,8 +18,9 @@ type (
 
 	ArticleRepo interface {
 		AddArticleRepo(ctx context.Context, article *entity.Article) error
+		UpdateArticleRepo(ctx context.Context, article *entity.Article) error
 		GetArticleByIdRepo(ctx context.Context, aid int64) (*entity.Article, error)
-		GetArticlesRepo(ctx context.Context) ([]*entity.Article, error)
+		GetArticlesRepo(ctx context.Context, page, pageSize int) ([]*entity.Article, int64, error)
 		DeleteArticleRepo(ctx context.Context, aid int64) error
 		DeleteArticleListRepo(ctx context.Context, aids []int64) error
 	}

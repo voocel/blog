@@ -27,8 +27,15 @@ func (c *ArticleUseCase) GetDetailById(ctx context.Context, aid int64) (*entity.
 	return c.repo.GetArticleByIdRepo(ctx, aid)
 }
 
-func (c *ArticleUseCase) GetList(ctx context.Context) ([]*entity.Article, error) {
-	return c.repo.GetArticlesRepo(ctx)
+func (c *ArticleUseCase) GetList(ctx context.Context, page, pageSize int) ([]*entity.Article, int64, error) {
+	return c.repo.GetArticlesRepo(ctx, page, pageSize)
+}
+
+func (c *ArticleUseCase) UpdateArticle(ctx context.Context, req entity.ArticleReq) error {
+	article := new(entity.Article)
+	copier.Copy(article, req)
+	err := c.repo.UpdateArticleRepo(ctx, article)
+	return err
 }
 
 func (c *ArticleUseCase) DeleteArticle(ctx context.Context, aid int64) error {

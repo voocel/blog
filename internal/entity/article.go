@@ -40,3 +40,15 @@ type ArticleReq struct {
 	BannerID uint   `json:"banner_id"`
 	Tags     Array  `json:"tags"`
 }
+
+type ArticleUpdateReq struct {
+	Title    string `json:"title"`
+	Abstract string `json:"abstract"`
+	Content  string `json:"content"`
+	Category string `json:"category"`
+	Source   string `json:"source"`
+	Link     string `json:"link"`
+	BannerID uint   `json:"banner_id"`
+	Tags     Array  `json:"tags"`
+	ID       string `json:"id"`
+}

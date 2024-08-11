@@ -6,6 +6,22 @@ import (
 	"gorm.io/gorm"
 )
 
+func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if page == 0 {
+			page = 1
+		}
+		switch {
+		case pageSize > 100:
+			pageSize = 100
+		case pageSize <= 0:
+			pageSize = 10
+		}
+		offset := (page - 1) * pageSize
+		return db.Offset(offset).Limit(pageSize)
+	}
+}
+
 type ArticleRepo struct {
 	db *gorm.DB
 }
@@ -24,10 +40,15 @@ func (a ArticleRepo) GetArticleByIdRepo(ctx context.Context, aid int64) (*entity
 	return model, err
 }
 
-func (a ArticleRepo) GetArticlesRepo(ctx context.Context) ([]*entity.Article, error) {
+func (a ArticleRepo) GetArticlesRepo(ctx context.Context, page, pageSize int) ([]*entity.Article, int64, error) {
+	var total int64
 	var articles []*entity.Article
-	err := a.db.Find(&articles).Error
-	return articles, err
+	err := a.db.WithContext(ctx).Scopes(Paginate(page, pageSize)).Find(&articles).Count(&total).Error
+	return articles, total, err
+}
+
+func (a ArticleRepo) UpdateArticleRepo(ctx context.Context, article *entity.Article) error {
+	return a.db.Updates(article).Error
 }
 
 func (a ArticleRepo) DeleteArticleRepo(ctx context.Context, aid int64) error {

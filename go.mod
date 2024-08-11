@@ -3,6 +3,7 @@ module blog
 go 1.22.5
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gin-gonic/gin v1.10.0

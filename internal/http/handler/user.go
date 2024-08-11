@@ -22,9 +22,17 @@ func NewUserHandler(userUsecase *usecase.UserUseCase) *UserHandler {
 }
 
 type ApiResponse struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
+	Code    int                `json:"code"`
+	Message string             `json:"message"`
+	Data    interface{}        `json:"data,omitempty"`
+	Paging  *PagingInformation `json:"paging,omitempty"`
+}
+
+type PagingInformation struct {
+	Page     int   `json:"page"`      // 当前页码
+	PageSize int   `json:"page_size"` // 每页的数量
+	Total    int64 `json:"total"`     // 数据集中的总记录数
+	Pages    int   `json:"pages"`     // 总页数
 }
 
 func (h *UserHandler) Login(c *gin.Context) {

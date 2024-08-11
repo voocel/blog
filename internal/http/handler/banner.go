@@ -1,15 +1,24 @@
 package handler
 
 import (
+	"blog/config"
 	"blog/internal/entity"
 	"blog/internal/usecase"
+	"blog/pkg/log"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type BannerHandler struct {
 	bannerUseCase *usecase.BannerUseCase
+}
+
+type FileUploadResponse struct {
+	FileName  string `json:"file_name"`
+	IsSuccess bool   `json:"is_success"`
+	Msg       string `json:"msg"`
 }
 
 func NewBannerHandler(u *usecase.BannerUseCase) *BannerHandler {
@@ -20,7 +29,7 @@ func NewBannerHandler(u *usecase.BannerUseCase) *BannerHandler {
 
 func (h *BannerHandler) Create(c *gin.Context) {
 	resp := new(ApiResponse)
-	var req entity.BannerReq
+	var req entity.Banner
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		resp.Code = 1
@@ -75,9 +84,59 @@ func (h *BannerHandler) List(c *gin.Context) {
 	return
 }
 
-func (h *BannerHandler) Update(c *gin.Context) {
+func (h *BannerHandler) CreateBanner(c *gin.Context) {
 	resp := new(ApiResponse)
-	var req entity.BannerReq
+	form, err := c.MultipartForm()
+	if err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	fileList, ok := form.File["images"]
+	if !ok {
+		resp.Code = 1
+		resp.Message = "图片不存在"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	date := time.Now().Format("2006-01-02")
+	path := "static/banner/" + date + "/"
+
+	var resData []FileUploadResponse
+	for _, fileHeader := range fileList {
+		filename := fileHeader.Filename
+		filePathname := path + filename
+		item := FileUploadResponse{
+			IsSuccess: true,
+			FileName:  filePathname,
+		}
+		if err = c.SaveUploadedFile(fileHeader, filePathname); err != nil {
+			item.IsSuccess = false
+			item.Msg = err.Error()
+		} else {
+			err = h.bannerUseCase.AddBanner(c, &entity.Banner{
+				Name:      filename,
+				Path:      config.Conf.App.Domain + "/" + filePathname,
+				Hash:      "",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			})
+			if err != nil {
+				log.Errorf("save to banner err: %v", err)
+			}
+		}
+		resData = append(resData, item)
+	}
+	resp.Data = resData
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
+func (h *BannerHandler) UpdateBanner(c *gin.Context) {
+	resp := new(ApiResponse)
+	var req entity.BannerUpdateReq
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		resp.Code = 1
