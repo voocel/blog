@@ -14,8 +14,8 @@ func NewMenuRepo(db *gorm.DB) *MenuRepo {
 	return &MenuRepo{db: db}
 }
 
-func (m MenuRepo) AddMenuRepo(ctx context.Context, menu *entity.Menu) error {
-	return m.db.WithContext(ctx).Create(menu).Error
+func (m MenuRepo) AddMenuRepo(ctx context.Context, menu *entity.Menu) (*entity.Menu, error) {
+	return menu, m.db.WithContext(ctx).Create(menu).Error
 }
 
 func (m MenuRepo) GetMenuByIdRepo(ctx context.Context, id int64) (*entity.Menu, error) {
@@ -46,4 +46,8 @@ func (m MenuRepo) DeleteMenuRepo(ctx context.Context, id int64) error {
 
 func (m MenuRepo) DeleteMenusBatchRepo(ctx context.Context, ids []int64) error {
 	return m.db.WithContext(ctx).Where("id in (?)", ids).Delete(&entity.Menu{}).Error
+}
+
+func (m MenuRepo) IsTitlePathExistRepo(ctx context.Context, title, path string) bool {
+	return m.db.WithContext(ctx).Where("title = ? or path = ?", title, path).First(&entity.Menu{}).RowsAffected > 0
 }

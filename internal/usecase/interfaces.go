@@ -50,13 +50,14 @@ type (
 	}
 
 	MenuRepo interface {
-		AddMenuRepo(ctx context.Context, menu *entity.Menu) error
+		AddMenuRepo(ctx context.Context, menu *entity.Menu) (*entity.Menu, error)
 		GetMenuByIdRepo(ctx context.Context, id int64) (*entity.Menu, error)
 		GetMenuByPathRepo(ctx context.Context, path string) (*entity.Menu, error)
 		GetMenusRepo(ctx context.Context) ([]*entity.Menu, error)
 		UpdateMenuRepo(ctx context.Context, menu *entity.Menu) error
 		DeleteMenuRepo(ctx context.Context, id int64) error
 		DeleteMenusBatchRepo(ctx context.Context, ids []int64) error
+		IsTitlePathExistRepo(ctx context.Context, title, path string) bool
 	}
 
 	BannerRepo interface {
@@ -93,5 +94,16 @@ type (
 		GetLogstashRepo(ctx context.Context) ([]*entity.Logstash, error)
 		DeleteLogstashRepo(ctx context.Context, id int64) error
 		DeleteLogstashBatchRepo(ctx context.Context, ids []int64) error
+	}
+
+	MenuBannerRepo interface {
+		AddMenuBannerRepo(ctx context.Context, menuBanner *entity.MenuBanner) error
+		AddMenuBannerBatchRepo(ctx context.Context, menuBanners []*entity.MenuBanner) error
+		GetMenuBannerByIdRepo(ctx context.Context, id int64) (*entity.MenuBanner, error)
+		GetMenuBannerByMenuIdRepo(ctx context.Context, menuId int64) (*entity.MenuBanner, error)
+		GetMenuBannerByBannerIdRepo(ctx context.Context, bannerId int64) (*entity.MenuBanner, error)
+		GetMenuBannersRepo(ctx context.Context) ([]*entity.MenuBanner, error)
+		UpdateMenuBannerRepo(ctx context.Context, menuBanner *entity.MenuBanner) error
+		DeleteMenuBannerRepo(ctx context.Context, id int64) error
 	}
 )

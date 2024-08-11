@@ -21,8 +21,8 @@ type Menu struct {
 }
 
 type ImageSort struct {
-	ImageID uint `json:"image_id"`
-	Sort    int  `json:"sort"`
+	ImageID int64 `json:"image_id"`
+	Sort    int   `json:"sort"`
 }
 
 type MenuReq struct {

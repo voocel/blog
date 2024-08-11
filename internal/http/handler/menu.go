@@ -9,11 +9,12 @@ import (
 )
 
 type MenuHandler struct {
-	menuUseCase *usecase.MenuUseCase
+	menuUseCase       *usecase.MenuUseCase
+	menuBannerUsecase *usecase.MenuBannerUseCase
 }
 
-func NewMenuHandler(u *usecase.MenuUseCase) *MenuHandler {
-	return &MenuHandler{menuUseCase: u}
+func NewMenuHandler(u *usecase.MenuUseCase, mb *usecase.MenuBannerUseCase) *MenuHandler {
+	return &MenuHandler{menuUseCase: u, menuBannerUsecase: mb}
 }
 
 type MenuNameResponse struct {
@@ -32,9 +33,35 @@ func (h *MenuHandler) AddMenu(c *gin.Context) {
 		return
 	}
 
-	if err := h.menuUseCase.AddMenu(c, req); err != nil {
+	if h.menuUseCase.IsTitlePathExist(c, req.Title, req.Path) {
+		resp.Code = 1
+		resp.Message = "菜单名称或路径已存在"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	menu, err := h.menuUseCase.AddMenu(c, req)
+	if err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	// 菜单关联banner
+	var menuBannerList []*entity.MenuBanner
+	for _, sort := range req.ImageSortList {
+		menuBannerList = append(menuBannerList, &entity.MenuBanner{
+			MenuID:   menu.ID,
+			BannerID: sort.ImageID,
+			Sort:     sort.Sort,
+		})
+	}
+	if err := h.menuBannerUsecase.AddMenuBannerBatch(c, menuBannerList); err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
 	}
 	c.JSON(http.StatusOK, resp)
 	return

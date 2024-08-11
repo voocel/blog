@@ -14,7 +14,7 @@ func NewMenuUseCase(repo MenuRepo) *MenuUseCase {
 	return &MenuUseCase{repo: repo}
 }
 
-func (c *MenuUseCase) AddMenu(ctx context.Context, req entity.MenuReq) error {
+func (c *MenuUseCase) AddMenu(ctx context.Context, req entity.MenuReq) (*entity.Menu, error) {
 	menu := new(entity.Menu)
 	copier.Copy(menu, req)
 	return c.repo.AddMenuRepo(ctx, menu)
@@ -44,4 +44,8 @@ func (c *MenuUseCase) DeleteMenu(ctx context.Context, id int64) error {
 
 func (c *MenuUseCase) DeleteMenusBatch(ctx context.Context, ids []int64) error {
 	return c.repo.DeleteMenusBatchRepo(ctx, ids)
+}
+
+func (c *MenuUseCase) IsTitlePathExist(ctx context.Context, title, path string) bool {
+	return c.repo.IsTitlePathExistRepo(ctx, title, path)
 }
