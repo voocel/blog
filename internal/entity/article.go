@@ -31,14 +31,15 @@ type Article struct {
 }
 
 type ArticleReq struct {
-	Title    string `json:"title" binding:"required" msg:"文章标题必填"`
-	Abstract string `json:"abstract"`
-	Content  string `json:"content" binding:"required" msg:"文章内容必填"`
-	Category string `json:"category"`
-	Source   string `json:"source"`
-	Link     string `json:"link"`
-	BannerID uint   `json:"banner_id"`
-	Tags     Array  `json:"tags"`
+	Title     string `json:"title" binding:"required" msg:"文章标题必填"`
+	Abstract  string `json:"abstract"`
+	Content   string `json:"content" binding:"required" msg:"文章内容必填"`
+	Category  string `json:"category"`
+	Source    string `json:"source"`
+	Link      string `json:"link"`
+	BannerID  int64  `json:"banner_id"`
+	BannerUrl string `json:"banner_url"`
+	Tags      Array  `json:"tags"`
 }
 
 type ArticleUpdateReq struct {

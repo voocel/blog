@@ -14,6 +14,7 @@ type ArticleHandler struct {
 	logUsecase     *usecase.LogstashUseCase
 	articleUsecase *usecase.ArticleUseCase
 	bannerUsecase  *usecase.BannerUseCase
+	tagUsecase     *usecase.TagUseCase
 	redis          *redis.Redis
 }
 
@@ -26,11 +27,12 @@ type CalendarResponse struct {
 	Count int    `json:"count"`
 }
 
-func NewArticleHandler(u *usecase.ArticleUseCase, b *usecase.BannerUseCase, log *usecase.LogstashUseCase) *ArticleHandler {
+func NewArticleHandler(u *usecase.ArticleUseCase, b *usecase.BannerUseCase, log *usecase.LogstashUseCase, tag *usecase.TagUseCase) *ArticleHandler {
 	return &ArticleHandler{
 		logUsecase:     log,
 		articleUsecase: u,
 		bannerUsecase:  b,
+		tagUsecase:     tag,
 		redis:          redis.GetClient(),
 	}
 }
@@ -49,6 +51,32 @@ func (h *ArticleHandler) Create(c *gin.Context) {
 		})
 		return
 	}
+
+	if req.BannerID > 0 {
+		banner, err := h.bannerUsecase.Detail(c, req.BannerID)
+		if err != nil {
+			resp.Code = 1
+			resp.Message = "banner不存在"
+			c.JSON(http.StatusOK, resp)
+			return
+		}
+		req.BannerUrl = banner.Path
+	}
+
+	if len(req.Tags) > 0 {
+		if err := h.tagUsecase.AddTags(c, req.Tags); err != nil {
+			resp.Code = 1
+			resp.Message = err.Error()
+			c.JSON(http.StatusOK, resp)
+			h.logUsecase.AddLogstash(c, &entity.Logstash{
+				Level:     entity.ErrorLevel,
+				Content:   err.Error(),
+				CreatedAt: time.Now(),
+			})
+			return
+		}
+	}
+
 	if err := h.articleUsecase.CreateArticle(c, req); err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()

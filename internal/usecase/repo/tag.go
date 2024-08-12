@@ -18,6 +18,10 @@ func (t TagRepo) AddTagRepo(ctx context.Context, tag *entity.Tag) error {
 	return t.db.WithContext(ctx).Create(tag).Error
 }
 
+func (t TagRepo) AddTagsRepo(ctx context.Context, tags []*entity.Tag) error {
+	return t.db.WithContext(ctx).Create(tags).Error
+}
+
 func (t TagRepo) GetTagByIdRepo(ctx context.Context, id int64) (*entity.Tag, error) {
 	tag := new(entity.Tag)
 	err := t.db.WithContext(ctx).Where("id = ?", id).First(tag).Error

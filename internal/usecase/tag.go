@@ -19,6 +19,16 @@ func (t *TagUseCase) AddTag(ctx context.Context, req entity.TagReq) error {
 	return t.repo.AddTagRepo(ctx, tag)
 }
 
+func (t *TagUseCase) AddTags(ctx context.Context, req []string) error {
+	var tags []*entity.Tag
+	for _, v := range req {
+		tag := new(entity.Tag)
+		tag.Name = v
+		tags = append(tags, tag)
+	}
+	return t.repo.AddTagsRepo(ctx, tags)
+}
+
 func (t *TagUseCase) GetTagById(ctx context.Context, id int64) (*entity.Tag, error) {
 	return t.repo.GetTagByIdRepo(ctx, id)
 }

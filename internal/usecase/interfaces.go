@@ -79,6 +79,7 @@ type (
 
 	TagRepo interface {
 		AddTagRepo(ctx context.Context, tag *entity.Tag) error
+		AddTagsRepo(ctx context.Context, tags []*entity.Tag) error
 		GetTagByIdRepo(ctx context.Context, id int64) (*entity.Tag, error)
 		GetTagByNameRepo(ctx context.Context, name string) (*entity.Tag, error)
 		GetTagByNameExistRepo(ctx context.Context, name string) (bool, error)
