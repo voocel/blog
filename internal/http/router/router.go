@@ -40,7 +40,7 @@ func GetRouters(db *gorm.DB) (routers []Router) {
 	advertHandler := handler.NewAdvertHandler(ad)
 	adr := newAdvertRouter(advertHandler, u)
 
-	menuHandler := handler.NewMenuHandler(m, mb)
+	menuHandler := handler.NewMenuHandler(m, b, mb)
 	mr := newMenuRouter(menuHandler, u)
 
 	bannerHandler := handler.NewBannerHandler(b)

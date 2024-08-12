@@ -3,6 +3,7 @@ package handler
 import (
 	"blog/internal/entity"
 	"blog/internal/usecase"
+	"blog/pkg/log"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -10,11 +11,12 @@ import (
 
 type MenuHandler struct {
 	menuUseCase       *usecase.MenuUseCase
+	bannerUseCase     *usecase.BannerUseCase
 	menuBannerUsecase *usecase.MenuBannerUseCase
 }
 
-func NewMenuHandler(u *usecase.MenuUseCase, mb *usecase.MenuBannerUseCase) *MenuHandler {
-	return &MenuHandler{menuUseCase: u, menuBannerUsecase: mb}
+func NewMenuHandler(u *usecase.MenuUseCase, b *usecase.BannerUseCase, mb *usecase.MenuBannerUseCase) *MenuHandler {
+	return &MenuHandler{menuUseCase: u, bannerUseCase: b, menuBannerUsecase: mb}
 }
 
 type MenuNameResponse struct {
@@ -69,10 +71,43 @@ func (h *MenuHandler) AddMenu(c *gin.Context) {
 func (h *MenuHandler) DetailByPath(c *gin.Context) {
 	resp := new(ApiResponse)
 	path := c.Query("path")
-	result, err := h.menuUseCase.DetailByPath(c, path)
+	menu, err := h.menuUseCase.DetailByPath(c, path)
 	if err != nil {
 		resp.Code = 1
 		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	menuBanners, err := h.menuBannerUsecase.GetMenuBannerByMenuId(c, menu.ID)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	var banners = make([]entity.Banner, 0)
+	for _, banner := range menuBanners {
+		if menu.ID != banner.MenuID {
+			continue
+		}
+		bannerInfo, err := h.bannerUseCase.Detail(c, banner.BannerID)
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		banners = append(banners, entity.Banner{
+			ID:   banner.BannerID,
+			Path: bannerInfo.Path,
+		})
+	}
+	type MenuResponse struct {
+		entity.Menu
+		Banners []entity.Banner `json:"banners"`
+	}
+	result := MenuResponse{
+		Menu:    *menu,
+		Banners: banners,
 	}
 	resp.Data = result
 	c.JSON(http.StatusOK, resp)

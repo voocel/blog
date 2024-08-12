@@ -116,7 +116,7 @@ func dbConnect(user, pass, addr, dbName string) (*gorm.DB, error) {
 
 	if cfg.Migrate {
 		err = db.AutoMigrate(&entity.Advert{}, &entity.Article{}, &entity.Banner{}, &entity.Category{}, &entity.Comment{},
-			&entity.User{}, &entity.Menu{}, &entity.Star{}, &entity.Tag{}, &entity.Logstash{})
+			&entity.User{}, &entity.Menu{}, &entity.Star{}, &entity.Tag{}, &entity.Logstash{}, &entity.MenuBanner{})
 		if err != nil {
 			return nil, err
 		}

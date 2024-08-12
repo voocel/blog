@@ -25,11 +25,11 @@ func (c *MenuBannerUseCase) DeleteMenuBanner(ctx context.Context, id int64) erro
 	return c.repo.DeleteMenuBannerRepo(ctx, id)
 }
 
-func (c *MenuBannerUseCase) GetMenuBannerByMenuId(ctx context.Context, menuId int64) (*entity.MenuBanner, error) {
+func (c *MenuBannerUseCase) GetMenuBannerByMenuId(ctx context.Context, menuId int64) ([]*entity.MenuBanner, error) {
 	return c.repo.GetMenuBannerByMenuIdRepo(ctx, menuId)
 }
 
-func (c *MenuBannerUseCase) GetMenuBannerByBannerId(ctx context.Context, bannerId int64) (*entity.MenuBanner, error) {
+func (c *MenuBannerUseCase) GetMenuBannerByBannerId(ctx context.Context, bannerId int64) ([]*entity.MenuBanner, error) {
 	return c.repo.GetMenuBannerByBannerIdRepo(ctx, bannerId)
 }
 

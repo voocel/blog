@@ -100,8 +100,8 @@ type (
 		AddMenuBannerRepo(ctx context.Context, menuBanner *entity.MenuBanner) error
 		AddMenuBannerBatchRepo(ctx context.Context, menuBanners []*entity.MenuBanner) error
 		GetMenuBannerByIdRepo(ctx context.Context, id int64) (*entity.MenuBanner, error)
-		GetMenuBannerByMenuIdRepo(ctx context.Context, menuId int64) (*entity.MenuBanner, error)
-		GetMenuBannerByBannerIdRepo(ctx context.Context, bannerId int64) (*entity.MenuBanner, error)
+		GetMenuBannerByMenuIdRepo(ctx context.Context, menuId int64) ([]*entity.MenuBanner, error)
+		GetMenuBannerByBannerIdRepo(ctx context.Context, bannerId int64) ([]*entity.MenuBanner, error)
 		GetMenuBannersRepo(ctx context.Context) ([]*entity.MenuBanner, error)
 		UpdateMenuBannerRepo(ctx context.Context, menuBanner *entity.MenuBanner) error
 		DeleteMenuBannerRepo(ctx context.Context, id int64) error
