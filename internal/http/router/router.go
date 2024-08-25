@@ -55,7 +55,7 @@ func GetRouters(db *gorm.DB) (routers []Router) {
 	otherHandler := handler.NewOtherHandler()
 	or := newOtherRouter(otherHandler)
 
-	statHandler := handler.NewStatHandler(u)
+	statHandler := handler.NewStatHandler(u, a)
 	statr := newStatRouter(statHandler)
 
 	logstashHandler := handler.NewLogstashHandler(l)

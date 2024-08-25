@@ -8,11 +8,12 @@ import (
 )
 
 type StatHandler struct {
-	userUsecase *usecase.UserUseCase
+	userUsecase    *usecase.UserUseCase
+	articleUsecase *usecase.ArticleUseCase
 }
 
-func NewStatHandler(userUsecase *usecase.UserUseCase) *StatHandler {
-	return &StatHandler{userUsecase: userUsecase}
+func NewStatHandler(userUsecase *usecase.UserUseCase, articleUsecase *usecase.ArticleUseCase) *StatHandler {
+	return &StatHandler{userUsecase: userUsecase, articleUsecase: articleUsecase}
 }
 
 func (h *StatHandler) VisitSum(c *gin.Context) {
@@ -24,8 +25,15 @@ func (h *StatHandler) VisitSum(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
+	_, articleTotals, err := h.articleUsecase.GetList(c, 1, 10000)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
 	result := map[string]interface{}{
-		"article_count":    10,
+		"article_count":    articleTotals,
 		"chat_group_count": 20,
 		"message_count":    0,
 		"now_login_count":  0,
