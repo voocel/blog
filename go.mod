@@ -13,6 +13,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.6.1
 	github.com/spf13/viper v1.19.0
+	github.com/unrolled/secure v1.15.0
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.23.0
 	golang.org/x/sync v0.6.0

@@ -1,29 +1,40 @@
 package handler
 
 import (
+	"blog/internal/usecase"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"time"
 )
 
-type StatHandler struct{}
+type StatHandler struct {
+	userUsecase *usecase.UserUseCase
+}
 
-func NewStatHandler() *StatHandler {
-	return &StatHandler{}
+func NewStatHandler(userUsecase *usecase.UserUseCase) *StatHandler {
+	return &StatHandler{userUsecase: userUsecase}
 }
 
 func (h *StatHandler) VisitSum(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"code": 0,
-		"msg":  "ok",
-		"data": gin.H{
-			"article_count":    10,
-			"chat_group_count": 20,
-			"message_count":    0,
-			"now_login_count":  0,
-			"now_sign_count":   0,
-			"user_count":       2,
-		},
-	})
+	resp := new(ApiResponse)
+	users, err := h.userUsecase.UserList(c)
+	if err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	result := map[string]interface{}{
+		"article_count":    10,
+		"chat_group_count": 20,
+		"message_count":    0,
+		"now_login_count":  0,
+		"now_sign_count":   0,
+		"user_count":       len(users),
+	}
+	resp.Data = result
+	c.JSON(http.StatusOK, resp)
+	return
 }
 
 func (h *StatHandler) VisitWeekLogin(c *gin.Context) {
