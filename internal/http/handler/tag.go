@@ -3,121 +3,121 @@ package handler
 import (
 	"blog/internal/entity"
 	"blog/internal/usecase"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
-type TagHandler struct {
+// TagHandlerNew 标签处理器
+type TagHandlerNew struct {
 	tagUsecase *usecase.TagUseCase
 }
 
-func NewTagHandler(u *usecase.TagUseCase) *TagHandler {
-	return &TagHandler{tagUsecase: u}
+// NewTagHandlerNew 创建标签处理器
+func NewTagHandlerNew(tagUsecase *usecase.TagUseCase) *TagHandlerNew {
+	return &TagHandlerNew{
+		tagUsecase: tagUsecase,
+	}
 }
 
-func (h *TagHandler) Create(c *gin.Context) {
-	req := entity.TagReq{}
-	resp := new(ApiResponse)
-	if err := c.ShouldBind(&req); err != nil {
-		resp.Code = 1
-		resp.Message = "params invalid"
-		c.JSON(http.StatusOK, resp)
+// GetTags 获取标签列表
+func (h *TagHandlerNew) GetTags(c *gin.Context) {
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+	// search := c.Query("search") // 暂时未使用
+
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 || pageSize > 100 {
+		pageSize = 10
+	}
+
+	// todo
+	tags, err := h.tagUsecase.GetTags(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, entity.NewErrorResponse(500, err.Error()))
 		return
 	}
 
-	if err := h.tagUsecase.AddTag(c, req); err != nil {
-		resp.Code = 1
-		resp.Message = err.Error()
+	var tagResponses []entity.TagResponse
+	for _, tag := range tags {
+		tagResponses = append(tagResponses, convertToTagResponse(tag))
 	}
-	c.JSON(http.StatusOK, resp)
-	return
+
+	paginatedData := entity.NewPaginatedResponse(tagResponses, len(tagResponses), page, pageSize)
+	c.JSON(http.StatusOK, entity.NewSuccessResponse(paginatedData, "获取成功"))
 }
 
-func (h *TagHandler) Detail(c *gin.Context) {
-	resp := new(ApiResponse)
-	tid := c.Param("tid")
-	tagId, err := strconv.Atoi(tid)
-	if err != nil {
-		resp.Code = 1
-		resp.Message = "params invalid"
-		c.JSON(http.StatusOK, resp)
-		return
-	}
-
-	tag, err := h.tagUsecase.GetTagById(c, int64(tagId))
-	if err != nil {
-		resp.Code = 1
-		resp.Message = err.Error()
-	}
-	resp.Data = tag
-	c.JSON(http.StatusOK, resp)
-	return
-}
-
-func (h *TagHandler) List(c *gin.Context) {
-	resp := new(ApiResponse)
-	tags, err := h.tagUsecase.GetTags(c)
-	if err != nil {
-		resp.Code = 1
-		resp.Message = err.Error()
-		c.JSON(http.StatusOK, resp)
-		return
-	}
-	resp.Data = tags
-	c.JSON(http.StatusOK, resp)
-	return
-}
-
-func (h *TagHandler) Update(c *gin.Context) {
-	resp := new(ApiResponse)
-	var req entity.TagReq
+// CreateTag 创建标签
+func (h *TagHandlerNew) CreateTag(c *gin.Context) {
+	var req entity.TagRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		resp.Code = 1
-		resp.Message = "params invalid"
-		c.JSON(http.StatusOK, resp)
+		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "请求参数错误"))
 		return
 	}
 
-	if err := h.tagUsecase.UpdateTag(c, req); err != nil {
-		resp.Code = 1
-		resp.Message = err.Error()
+	err := h.tagUsecase.AddTag(c.Request.Context(), req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, err.Error()))
+		return
 	}
-	c.JSON(http.StatusOK, resp)
-	return
+
+	c.JSON(http.StatusOK, entity.NewSuccessResponse[any](nil, "创建成功"))
 }
 
-func (h *TagHandler) Delete(c *gin.Context) {
-	resp := new(ApiResponse)
-	tid := c.Param("tid")
-	tagId, err := strconv.Atoi(tid)
+// UpdateTag 更新标签
+func (h *TagHandlerNew) UpdateTag(c *gin.Context) {
+	idStr := c.Param("id")
+	_, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		resp.Code = 1
-		resp.Message = "params invalid"
-		c.JSON(http.StatusOK, resp)
+		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "标签ID格式错误"))
 		return
 	}
 
-	if err := h.tagUsecase.DeleteTag(c, int64(tagId)); err != nil {
-		resp.Code = 1
-		resp.Message = err.Error()
+	var req entity.TagRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "请求参数错误"))
+		return
 	}
+
+	err = h.tagUsecase.UpdateTag(c.Request.Context(), req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, entity.NewSuccessResponse[any](nil, "更新成功"))
 }
 
-func (h *TagHandler) DeleteBatch(c *gin.Context) {
-	resp := new(ApiResponse)
-	var req IdListReq
-	err := c.ShouldBindJSON(&req)
+// DeleteTag 删除标签
+func (h *TagHandlerNew) DeleteTag(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		resp.Code = 1
-		resp.Message = "params invalid"
-		c.JSON(http.StatusOK, resp)
+		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "标签ID格式错误"))
 		return
 	}
-	if err := h.tagUsecase.DeleteTagBatch(c, req.IDList); err != nil {
-		resp.Code = 1
-		resp.Message = err.Error()
+
+	err = h.tagUsecase.DeleteTag(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, err.Error()))
+		return
 	}
-	c.JSON(http.StatusOK, resp)
-	return
+
+	c.JSON(http.StatusOK, entity.NewSuccessResponse[any](nil, "删除成功"))
+}
+
+func convertToTagResponse(tag *entity.Tag) entity.TagResponse {
+	return entity.TagResponse{
+		ID:           strconv.FormatInt(tag.ID, 10),
+		Name:         tag.Name,
+		Slug:         tag.Slug,
+		Description:  tag.Description,
+		Color:        tag.Color,
+		ArticleCount: tag.ArticleCount,
+		CreatedAt:    tag.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt:    tag.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+	}
 }

@@ -9,11 +9,13 @@ type (
 	UserRepo interface {
 		GetUserByIdRepo(ctx context.Context, uid int64) (*entity.User, error)
 		GetUserByNameRepo(ctx context.Context, name string) (*entity.User, error)
+		GetUserByEmailRepo(ctx context.Context, email string) (*entity.User, error)
 		GetUserByNameExistRepo(ctx context.Context, name string) (bool, error)
-		GetUsersRepo(ctx context.Context) ([]*entity.User, error)
+		GetUserByEmailExistRepo(ctx context.Context, email string) (bool, error)
+		GetUsersRepo(ctx context.Context, page, pageSize int, search string) ([]*entity.User, int64, error)
 		AddUserRepo(ctx context.Context, user *entity.User) error
-		UpdateAvatarUserRepo(ctx context.Context, uid int64, avatar string) error
-		UpdateAddressUserRepo(ctx context.Context, uid int64, address string) error
+		UpdateUserRepo(ctx context.Context, user *entity.User) error
+		DeleteUserRepo(ctx context.Context, uid int64) error
 	}
 
 	ArticleRepo interface {

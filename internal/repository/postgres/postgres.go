@@ -1,4 +1,4 @@
-package mysql
+package postgres
 
 import (
 	"blog/config"
@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -24,6 +24,7 @@ var (
 	SmallerThanPredicate        = Predicate("<")
 	SmallerThanOrEqualPredicate = Predicate("<=")
 	LikePredicate               = Predicate("LIKE")
+	ILikePredicate              = Predicate("ILIKE") // PostgreSQL 特有的不区分大小写匹配
 )
 
 var _ Repo = (*dbRepo)(nil)
@@ -42,13 +43,13 @@ type dbRepo struct {
 }
 
 func New() (Repo, error) {
-	cfg := config.Conf.Mysql
-	dbr, err := dbConnect(cfg.Username, cfg.Password, fmt.Sprintf("%s:%d", cfg.Host, cfg.Port), cfg.Dbname)
+	cfg := config.Conf.Postgres
+	dbr, err := dbConnect(cfg.Username, cfg.Password, fmt.Sprintf("%s:%d", cfg.Host, cfg.Port), cfg.Dbname, cfg.SSLMode)
 	if err != nil {
 		return nil, err
 	}
 
-	dbw, err := dbConnect(cfg.Username, cfg.Password, fmt.Sprintf("%s:%d", cfg.Host, cfg.Port), cfg.Dbname)
+	dbw, err := dbConnect(cfg.Username, cfg.Password, fmt.Sprintf("%s:%d", cfg.Host, cfg.Port), cfg.Dbname, cfg.SSLMode)
 	if err != nil {
 		return nil, err
 	}
@@ -85,16 +86,26 @@ func (d *dbRepo) DbWClose() error {
 	return sqlDB.Close()
 }
 
-func dbConnect(user, pass, addr, dbName string) (*gorm.DB, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=%t&loc=%s",
+func dbConnect(user, pass, addr, dbName, sslMode string) (*gorm.DB, error) {
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=Asia/Shanghai",
+		addr,      // host:port 格式
 		user,
 		pass,
-		addr,
 		dbName,
-		true,
-		"Local")
+		"", // port 已经包含在 addr 中，这里留空
+		sslMode)
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	// 重新格式化 DSN，正确分离 host 和 port
+	host, port := parseAddress(addr)
+	dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=Asia/Shanghai",
+		host,
+		port,
+		user,
+		pass,
+		dbName,
+		sslMode)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
@@ -105,13 +116,12 @@ func dbConnect(user, pass, addr, dbName string) (*gorm.DB, error) {
 		return nil, errors.Wrap(err, fmt.Sprintf("[db connection failed] Database name: %s", dbName))
 	}
 
-	db.Set("gorm:table_options", "CHARSET=utf8mb4")
 	sqlDB, err := db.DB()
 	if err != nil {
 		return nil, err
 	}
 
-	cfg := config.Conf.Mysql
+	cfg := config.Conf.Postgres
 	sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
 	sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
 	sqlDB.SetConnMaxLifetime(time.Second * cfg.ConnMaxLifeTime)
@@ -142,6 +152,22 @@ func dbConnect(user, pass, addr, dbName string) (*gorm.DB, error) {
 	return db, nil
 }
 
+// parseAddress 解析地址字符串，分离 host 和 port
+func parseAddress(addr string) (host, port string) {
+	if len(addr) == 0 {
+		return "localhost", "5432"
+	}
+	
+	for i := len(addr) - 1; i >= 0; i-- {
+		if addr[i] == ':' {
+			return addr[:i], addr[i+1:]
+		}
+	}
+	
+	// 如果没有找到 :，则认为整个字符串是 host
+	return addr, "5432"
+}
+
 type Transaction interface {
 	ExecTx(ctx context.Context, fn func(ctx context.Context) error) error
 }
@@ -161,4 +187,4 @@ func (d *dbRepo) DB(ctx context.Context) *gorm.DB {
 		return tx
 	}
 	return d.DbW
-}
+} 

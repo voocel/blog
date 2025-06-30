@@ -2,32 +2,35 @@ mode: debug
 name: http
 log_level: info
 log_path: log
-log_level_addr: :4241
+log_level_addr: :4245
 log_level_pattern: /log/level
 
 app:
-  domain: http://127.0.0.1:8080
+  domain: http://localhost        # 对外访问域名（生产环境可改为实际域名）
   static_root_path: static
   runtime_root_path: runtime/
-  image_allow_ext: .jpg,.jpeg,.png
+  image_allow_ext: .jpg,.jpeg,.png,.gif,.webp
   image_max_size: 5
   heartbeat: 1000
   jwt_time: 7200
-  jwt_secret: social-key
+  jwt_secret: blog-secret-key-2024
+  upload_path: uploads
 
 http:
-  addr: :8080
+  addr: :8080                     # HTTP服务器监听端口
 
-mysql:
+postgres:
   host: 127.0.0.1
-  port: 3306
-  username: root
+  port: 5432
+  username: postgres
   password: 123456
   dbname: blog
+  ssl_mode: disable
+  migrate: true
   max_open_conns: 100
   max_idle_conns: 10
-  # seconds
-  max_life_time: 24*60*60
+  # seconds  
+  conn_max_life_time: 86400       # 24*60*60 seconds = 1 day
 
 redis:
   addr: 127.0.0.1:6379

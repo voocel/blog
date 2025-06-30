@@ -3,27 +3,31 @@ package router
 import (
 	"blog/internal/http/handler"
 	"blog/internal/http/middleware"
-	"blog/internal/usecase"
+
 	"github.com/gin-gonic/gin"
 )
 
-type TagRouter struct {
-	h           *handler.TagHandler
-	userUseCase *usecase.UserUseCase
+type tagRouterNew struct {
+	tagHandler *handler.TagHandlerNew
 }
 
-func newTagRouter(h *handler.TagHandler, userUseCase *usecase.UserUseCase) *TagRouter {
-	return &TagRouter{h: h, userUseCase: userUseCase}
-}
-
-func (r *TagRouter) Load(g *gin.Engine) {
-	group := g.Group("/api/tag")
-	{
-		group.POST("/add", middleware.JWTMiddleware(r.userUseCase), r.h.Create)
-		group.GET("/list", r.h.List)
-		group.GET("/detail/:tid", r.h.Detail)
-		group.PUT("/update", middleware.JWTMiddleware(r.userUseCase), r.h.Update)
-		group.PUT("/delete/:aid", middleware.JWTMiddleware(r.userUseCase), r.h.Delete)
-		group.PUT("/delete_batch", middleware.JWTMiddleware(r.userUseCase), r.h.DeleteBatch)
+func newTagRouterNew(tagHandler *handler.TagHandlerNew) Router {
+	return &tagRouterNew{
+		tagHandler: tagHandler,
 	}
 }
+
+func (r *tagRouterNew) Load(engine *gin.Engine) {
+	publicGroup := engine.Group("/api/tags")
+	{
+		publicGroup.GET("", r.tagHandler.GetTags)
+	}
+
+	adminGroup := engine.Group("/api/tags")
+	adminGroup.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
+	{
+		adminGroup.POST("", r.tagHandler.CreateTag)
+		adminGroup.PUT("/:id", r.tagHandler.UpdateTag)
+		adminGroup.DELETE("/:id", r.tagHandler.DeleteTag)
+	}
+} 

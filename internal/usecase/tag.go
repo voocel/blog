@@ -13,17 +13,21 @@ func NewTagUseCase(repo TagRepo) *TagUseCase {
 	return &TagUseCase{repo: repo}
 }
 
-func (t *TagUseCase) AddTag(ctx context.Context, req entity.TagReq) error {
+func (t *TagUseCase) AddTag(ctx context.Context, req entity.TagRequest) error {
 	tag := new(entity.Tag)
 	tag.Name = req.Name
+	tag.Slug = req.Slug
+	tag.Description = req.Description
+	tag.Color = req.Color
 	return t.repo.AddTagRepo(ctx, tag)
 }
 
-func (t *TagUseCase) AddTags(ctx context.Context, req []string) error {
+func (t *TagUseCase) AddTags(ctx context.Context, names []string) error {
 	var tags []*entity.Tag
-	for _, v := range req {
+	for _, name := range names {
 		tag := new(entity.Tag)
-		tag.Name = v
+		tag.Name = name
+		tag.Slug = name // 简化处理
 		tags = append(tags, tag)
 	}
 	return t.repo.AddTagsRepo(ctx, tags)
@@ -32,6 +36,7 @@ func (t *TagUseCase) AddTags(ctx context.Context, req []string) error {
 func (t *TagUseCase) GetTagById(ctx context.Context, id int64) (*entity.Tag, error) {
 	return t.repo.GetTagByIdRepo(ctx, id)
 }
+
 func (t *TagUseCase) GetTagByName(ctx context.Context, name string) (*entity.Tag, error) {
 	return t.repo.GetTagByNameRepo(ctx, name)
 }
@@ -40,10 +45,12 @@ func (t *TagUseCase) GetTags(ctx context.Context) ([]*entity.Tag, error) {
 	return t.repo.GetTagsRepo(ctx)
 }
 
-func (t *TagUseCase) UpdateTag(ctx context.Context, req entity.TagReq) error {
+func (t *TagUseCase) UpdateTag(ctx context.Context, req entity.TagRequest) error {
 	tag := new(entity.Tag)
-	tag.ID = req.ID
 	tag.Name = req.Name
+	tag.Slug = req.Slug
+	tag.Description = req.Description
+	tag.Color = req.Color
 	return t.repo.UpdateTagRepo(ctx, tag)
 }
 

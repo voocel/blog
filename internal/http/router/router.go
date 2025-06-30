@@ -4,63 +4,72 @@ import (
 	"blog/internal/http/handler"
 	"blog/internal/usecase"
 	"blog/internal/usecase/repo"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
+// Router 路由接口
 type Router interface {
 	Load(r *gin.Engine)
 }
 
-func GetRouters(db *gorm.DB) (routers []Router) {
-	u := usecase.NewUserUseCase(repo.NewUserRepo(db))
-	a := usecase.NewArticleUseCase(repo.NewArticleRepo(db))
-	c := usecase.NewCategoryUseCase(repo.NewCategoryRepo(db))
-	s := usecase.NewStarUseCase(repo.NewStarRepo(db))
-	ad := usecase.NewAdvertUseCase(repo.NewAdvertRepo(db))
-	m := usecase.NewMenuUseCase(repo.NewMenuRepo(db))
-	b := usecase.NewBannerUseCase(repo.NewBannerRepo(db))
-	cm := usecase.NewCommentUseCase(repo.NewCommentRepo(db))
-	t := usecase.NewTagUseCase(repo.NewTagRepo(db))
-	l := usecase.NewLogstashUseCase(repo.NewLogstashRepo(db))
-	mb := usecase.NewMenuBannerUseCase(repo.NewMenuBannerRepo(db))
+// GetNewRouters 获取新的路由器列表
+func GetNewRouters(db *gorm.DB) (routers []Router) {
+	// 创建Repository层
+	userRepo := repo.NewUserRepo(db)
+	tagRepo := repo.NewTagRepo(db)
+	categoryRepo := repo.NewCategoryRepo(db)
+	articleRepo := repo.NewArticleRepo(db)
+	commentRepo := repo.NewCommentRepo(db)
 
-	userHandler := handler.NewUserHandler(u)
-	ur := newUserRouter(userHandler, u)
+	// 创建UseCase层
+	authUseCase := usecase.NewAuthUseCase(userRepo)
+	userUseCase := usecase.NewUserUseCase(userRepo)
+	tagUseCase := usecase.NewTagUseCase(tagRepo)
+	categoryUseCase := usecase.NewCategoryUseCase(categoryRepo)
+	articleUseCase := usecase.NewArticleUseCase(articleRepo)
+	commentUseCase := usecase.NewCommentUseCase(commentRepo)
 
-	articleHandler := handler.NewArticleHandler(a, b, l, t)
-	ar := newArticleRouter(articleHandler, u)
+	// 创建Handler层
+	authHandler := handler.NewAuthHandler(authUseCase)
+	userAdminHandler := handler.NewUserAdminHandler(userUseCase)
+	articleHandler := handler.NewArticleHandlerNew(articleUseCase, tagUseCase)
+	categoryHandler := handler.NewCategoryHandlerNew(categoryUseCase)
+	tagHandler := handler.NewTagHandlerNew(tagUseCase)
+	commentHandler := handler.NewCommentHandlerNew(commentUseCase)
+	fileHandler := handler.NewFileHandler()
+	discussionHandler := handler.NewDiscussionHandler()
+	friendlinkHandler := handler.NewFriendlinkHandler()
+	statisticsHandler := handler.NewStatisticsHandler()
+	systemHandler := handler.NewSystemHandler()
 
-	categoryHandler := handler.NewCategoryHandler(c)
-	cr := newCategoryRouter(categoryHandler, u)
+	// 创建Router层
+	authRouter := newAuthRouter(authHandler)
+	userAdminRouter := newUserAdminRouter(userAdminHandler)
+	articleRouter := newArticleRouterNew(articleHandler)
+	categoryRouter := newCategoryRouterNew(categoryHandler)
+	tagRouter := newTagRouterNew(tagHandler)
+	commentRouter := newCommentRouterNew(commentHandler)
+	fileRouter := newFileRouter(fileHandler)
+	discussionRouter := newDiscussionRouter(discussionHandler)
+	friendlinkRouter := newFriendlinkRouter(friendlinkHandler)
+	statisticsRouter := newStatisticsRouter(statisticsHandler)
+	systemRouter := newSystemRouter(systemHandler)
 
-	starHandler := handler.NewStarHandler(s)
-	sr := newStarRouter(starHandler, u)
+	routers = append(routers,
+		authRouter,
+		userAdminRouter,
+		articleRouter,
+		categoryRouter,
+		tagRouter,
+		commentRouter,
+		fileRouter,
+		discussionRouter,
+		friendlinkRouter,
+		statisticsRouter,
+		systemRouter,
+	)
 
-	advertHandler := handler.NewAdvertHandler(ad)
-	adr := newAdvertRouter(advertHandler, u)
-
-	menuHandler := handler.NewMenuHandler(m, b, mb)
-	mr := newMenuRouter(menuHandler, u)
-
-	bannerHandler := handler.NewBannerHandler(b)
-	br := newBannerRouter(bannerHandler, u)
-
-	commentHandler := handler.NewCommentHandler(cm)
-	cmr := newCommentRouter(commentHandler, u)
-
-	tagHandler := handler.NewTagHandler(t)
-	tr := newTagRouter(tagHandler, u)
-
-	otherHandler := handler.NewOtherHandler()
-	or := newOtherRouter(otherHandler)
-
-	statHandler := handler.NewStatHandler(u, a)
-	statr := newStatRouter(statHandler)
-
-	logstashHandler := handler.NewLogstashHandler(l)
-	lr := newLogstashRouter(logstashHandler)
-
-	routers = append(routers, ur, ar, cr, sr, adr, mr, br, cmr, tr, or, statr, lr)
 	return
 }

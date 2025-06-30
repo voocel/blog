@@ -3,6 +3,7 @@ package usecase
 import (
 	"blog/internal/entity"
 	"context"
+
 	"github.com/jinzhu/copier"
 	"golang.org/x/sync/singleflight"
 )
@@ -16,7 +17,7 @@ func NewArticleUseCase(r ArticleRepo) *ArticleUseCase {
 	return &ArticleUseCase{repo: r}
 }
 
-func (c *ArticleUseCase) CreateArticle(ctx context.Context, req entity.ArticleReq) error {
+func (c *ArticleUseCase) CreateArticle(ctx context.Context, req entity.ArticleRequest) error {
 	article := new(entity.Article)
 	copier.Copy(article, req)
 	err := c.repo.AddArticleRepo(ctx, article)
@@ -31,7 +32,7 @@ func (c *ArticleUseCase) GetList(ctx context.Context, page, pageSize int) ([]*en
 	return c.repo.GetArticlesRepo(ctx, page, pageSize)
 }
 
-func (c *ArticleUseCase) UpdateArticle(ctx context.Context, req entity.ArticleUpdateReq) error {
+func (c *ArticleUseCase) UpdateArticle(ctx context.Context, req entity.ArticleUpdateRequest) error {
 	article := new(entity.Article)
 	copier.Copy(article, req)
 	err := c.repo.UpdateArticleRepo(ctx, article)

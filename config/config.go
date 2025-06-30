@@ -1,11 +1,12 @@
 package config
 
 import (
-	"github.com/fsnotify/fsnotify"
-	"github.com/spf13/viper"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/fsnotify/fsnotify"
+	"github.com/spf13/viper"
 )
 
 var Conf = new(config)
@@ -18,15 +19,22 @@ type config struct {
 	LogLevelAddr    string `mapstructure:"log_level_addr"`
 	LogLevelPattern string `mapstructure:"log_level_pattern"`
 
-	App   AppConfig
-	Http  HttpConfig
-	Redis RedisConfig
-	Mysql MysqlConfig
+	App      AppConfig
+	Http     HttpConfig
+	Redis    RedisConfig
+	Postgres PostgresConfig
 }
 
 type AppConfig struct {
-	Domain         string
-	StaticRootPath string `mapstructure:"static_root_path"`
+	Domain          string
+	StaticRootPath  string `mapstructure:"static_root_path"`
+	RuntimeRootPath string `mapstructure:"runtime_root_path"`
+	ImageAllowExt   string `mapstructure:"image_allow_ext"`
+	ImageMaxSize    int    `mapstructure:"image_max_size"`
+	Heartbeat       int    `mapstructure:"heartbeat"`
+	JwtTime         int    `mapstructure:"jwt_time"`
+	JwtSecret       string `mapstructure:"jwt_secret"`
+	UploadPath      string `mapstructure:"upload_path"`
 }
 
 type HttpConfig struct {
@@ -41,12 +49,13 @@ type RedisConfig struct {
 	MinIdleConn int `mapstructure:"min_idle_conn"`
 }
 
-type MysqlConfig struct {
+type PostgresConfig struct {
 	Host            string
 	Port            int
 	Dbname          string
 	Username        string
 	Password        string
+	SSLMode         string `mapstructure:"ssl_mode"`
 	Migrate         bool
 	MaxOpenConns    int           `mapstructure:"max_open_conns"`
 	MaxIdleConns    int           `mapstructure:"max_idle_conns"`
