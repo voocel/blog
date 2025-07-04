@@ -18,10 +18,6 @@ type Discussion struct {
 	CreatedAt  time.Time    `json:"createdAt"`
 	UpdatedAt  time.Time    `json:"updatedAt"`
 	DeletedAt  sql.NullTime `gorm:"index" json:"-"`
-
-	// 关联
-	User    *User    `gorm:"foreignKey:UserID" json:"author,omitempty"`
-	Replies []Reply  `gorm:"foreignKey:DiscussionID" json:"replies,omitempty"`
 }
 
 // Reply 回复实体
@@ -33,17 +29,14 @@ type Reply struct {
 	CreatedAt    time.Time    `json:"createdAt"`
 	UpdatedAt    time.Time    `json:"updatedAt"`
 	DeletedAt    sql.NullTime `gorm:"index" json:"-"`
-
-	// 关联
-	User *User `gorm:"foreignKey:UserID" json:"author,omitempty"`
 }
 
 // DiscussionRequest 创建讨论请求
 type DiscussionRequest struct {
-	Title  string   `json:"title" binding:"required" msg:"标题不能为空"`
-	Content string  `json:"content" binding:"required" msg:"内容不能为空"`
-	TagIds []string `json:"tagIds"`
-	Status string   `json:"status"`
+	Title   string   `json:"title" binding:"required" msg:"标题不能为空"`
+	Content string   `json:"content" binding:"required" msg:"内容不能为空"`
+	TagIds  []string `json:"tagIds"`
+	Status  string   `json:"status"`
 }
 
 // DiscussionResponse 讨论响应
@@ -78,15 +71,15 @@ type AuthorResponse struct {
 
 // DiscussionDetailResponse 讨论详情响应
 type DiscussionDetailResponse struct {
-	ID         string         `json:"id"`
-	Title      string         `json:"title"`
-	Content    string         `json:"content"`
-	Status     string         `json:"status"`
-	ViewCount  int            `json:"viewCount"`
-	ReplyCount int            `json:"replyCount"`
-	Tags       []TagResponse  `json:"tags"`
-	Author     AuthorResponse `json:"author"`
+	ID         string          `json:"id"`
+	Title      string          `json:"title"`
+	Content    string          `json:"content"`
+	Status     string          `json:"status"`
+	ViewCount  int             `json:"viewCount"`
+	ReplyCount int             `json:"replyCount"`
+	Tags       []TagResponse   `json:"tags"`
+	Author     AuthorResponse  `json:"author"`
 	Replies    []ReplyResponse `json:"replies"`
-	CreatedAt  string         `json:"createdAt"`
-	UpdatedAt  string         `json:"updatedAt"`
-} 
+	CreatedAt  string          `json:"createdAt"`
+	UpdatedAt  string          `json:"updatedAt"`
+}

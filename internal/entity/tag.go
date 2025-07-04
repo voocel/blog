@@ -15,9 +15,6 @@ type Tag struct {
 	CreatedAt    time.Time    `json:"createdAt"`
 	UpdatedAt    time.Time    `json:"updatedAt"`
 	DeletedAt    sql.NullTime `gorm:"index" json:"-"`
-
-	// 关联
-	Articles []Article `gorm:"many2many:article_tags" json:"articles,omitempty"`
 }
 
 // TagRequest 标签请求

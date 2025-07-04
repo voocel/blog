@@ -88,7 +88,7 @@ func (d *dbRepo) DbWClose() error {
 
 func dbConnect(user, pass, addr, dbName, sslMode string) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=Asia/Shanghai",
-		addr,      // host:port 格式
+		addr, // host:port 格式
 		user,
 		pass,
 		dbName,
@@ -132,6 +132,7 @@ func dbConnect(user, pass, addr, dbName, sslMode string) (*gorm.DB, error) {
 			&entity.Category{},
 			&entity.Tag{},
 			&entity.Article{},
+			&entity.ArticleTag{},
 			&entity.Comment{},
 			&entity.Discussion{},
 			&entity.Reply{},
@@ -157,13 +158,13 @@ func parseAddress(addr string) (host, port string) {
 	if len(addr) == 0 {
 		return "localhost", "5432"
 	}
-	
+
 	for i := len(addr) - 1; i >= 0; i-- {
 		if addr[i] == ':' {
 			return addr[:i], addr[i+1:]
 		}
 	}
-	
+
 	// 如果没有找到 :，则认为整个字符串是 host
 	return addr, "5432"
 }
@@ -187,4 +188,4 @@ func (d *dbRepo) DB(ctx context.Context) *gorm.DB {
 		return tx
 	}
 	return d.DbW
-} 
+}

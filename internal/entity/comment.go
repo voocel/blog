@@ -16,13 +16,6 @@ type Comment struct {
 	CreatedAt    time.Time    `json:"createdAt"`
 	UpdatedAt    time.Time    `json:"updatedAt"`
 	DeletedAt    sql.NullTime `gorm:"index" json:"-"`
-
-	// 关联
-	User       *User       `gorm:"foreignKey:UserID" json:"author,omitempty"`
-	Article    *Article    `gorm:"foreignKey:ArticleID" json:"article,omitempty"`
-	Discussion *Discussion `gorm:"foreignKey:DiscussionID" json:"discussion,omitempty"`
-	Parent     *Comment    `gorm:"foreignKey:ParentID" json:"parent,omitempty"`
-	Replies    []Comment   `gorm:"foreignKey:ParentID" json:"replies,omitempty"`
 }
 
 // CommentRequest 评论请求

@@ -25,11 +25,6 @@ type Article struct {
 	CreatedAt    time.Time    `json:"createdAt"`
 	UpdatedAt    time.Time    `json:"updatedAt"`
 	DeletedAt    sql.NullTime `gorm:"index" json:"-"`
-
-	// 关联
-	User     *User     `gorm:"foreignKey:UserID" json:"author,omitempty"`
-	Category *Category `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
-	Tags     []Tag     `gorm:"many2many:article_tags" json:"tags,omitempty"`
 }
 
 // ArticleRequest 创建文章请求
@@ -83,4 +78,20 @@ type ArticleResponse struct {
 	PublishedAt  string           `json:"publishedAt,omitempty"`
 	CreatedAt    string           `json:"createdAt"`
 	UpdatedAt    string           `json:"updatedAt"`
+}
+
+// ArticleTag 文章标签关联表
+type ArticleTag struct {
+	ID        int64     `gorm:"primarykey" json:"id"`
+	ArticleID int64     `gorm:"not null;index" json:"articleId"`
+	TagID     int64     `gorm:"not null;index" json:"tagId"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+// ArticleWithRelations 文章及其关联信息
+type ArticleWithRelations struct {
+	*Article
+	User     *User     `json:"author,omitempty"`
+	Category *Category `json:"category,omitempty"`
+	Tags     []*Tag    `json:"tags,omitempty"`
 }

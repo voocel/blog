@@ -3,6 +3,7 @@ package repo
 import (
 	"blog/internal/entity"
 	"context"
+
 	"gorm.io/gorm"
 )
 
@@ -57,4 +58,34 @@ func (a ArticleRepo) DeleteArticleRepo(ctx context.Context, aid int64) error {
 
 func (a ArticleRepo) DeleteArticleListRepo(ctx context.Context, aids []int64) error {
 	return a.db.Where("id in (?)", aids).Delete(&entity.Article{}).Error
+}
+
+// ArticleTag相关方法
+func (a ArticleRepo) AddArticleTagsRepo(ctx context.Context, articleId int64, tagIds []int64) error {
+	var articleTags []entity.ArticleTag
+	for _, tagId := range tagIds {
+		articleTags = append(articleTags, entity.ArticleTag{
+			ArticleID: articleId,
+			TagID:     tagId,
+		})
+	}
+	return a.db.WithContext(ctx).Create(&articleTags).Error
+}
+
+func (a ArticleRepo) DeleteArticleTagsRepo(ctx context.Context, articleId int64) error {
+	return a.db.WithContext(ctx).Where("article_id = ?", articleId).Delete(&entity.ArticleTag{}).Error
+}
+
+func (a ArticleRepo) GetArticleTagsRepo(ctx context.Context, articleId int64) ([]int64, error) {
+	var articleTags []entity.ArticleTag
+	err := a.db.WithContext(ctx).Where("article_id = ?", articleId).Find(&articleTags).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var tagIds []int64
+	for _, at := range articleTags {
+		tagIds = append(tagIds, at.TagID)
+	}
+	return tagIds, nil
 }

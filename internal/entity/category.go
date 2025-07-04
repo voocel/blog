@@ -15,11 +15,6 @@ type Category struct {
 	CreatedAt    time.Time    `json:"createdAt"`
 	UpdatedAt    time.Time    `json:"updatedAt"`
 	DeletedAt    sql.NullTime `gorm:"index" json:"-"`
-
-	// 关联
-	Parent   *Category  `gorm:"foreignKey:ParentID" json:"parent,omitempty"`
-	Children []Category `gorm:"foreignKey:ParentID" json:"children,omitempty"`
-	Articles []Article  `gorm:"foreignKey:CategoryID" json:"articles,omitempty"`
 }
 
 // CategoryRequest 分类请求

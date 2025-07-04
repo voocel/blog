@@ -25,6 +25,11 @@ type (
 		GetArticlesRepo(ctx context.Context, page, pageSize int) ([]*entity.Article, int64, error)
 		DeleteArticleRepo(ctx context.Context, aid int64) error
 		DeleteArticleListRepo(ctx context.Context, aids []int64) error
+
+		// ArticleTag相关方法
+		AddArticleTagsRepo(ctx context.Context, articleId int64, tagIds []int64) error
+		DeleteArticleTagsRepo(ctx context.Context, articleId int64) error
+		GetArticleTagsRepo(ctx context.Context, articleId int64) ([]int64, error)
 	}
 
 	CategoryRepo interface {

@@ -61,13 +61,13 @@ func (h *ArticleHandlerNew) GetArticle(c *gin.Context) {
 		return
 	}
 
-	article, err := h.articleUsecase.GetDetailById(c.Request.Context(), id)
+	articleWithRelations, err := h.articleUsecase.GetDetailByIdWithRelations(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, entity.NewErrorResponse(404, "文章不存在"))
 		return
 	}
 
-	response := convertToArticleResponse(article)
+	response := convertToArticleResponseWithRelations(articleWithRelations)
 	c.JSON(http.StatusOK, entity.NewSuccessResponse(response, "获取成功"))
 }
 
@@ -91,7 +91,7 @@ func (h *ArticleHandlerNew) CreateArticle(c *gin.Context) {
 // UpdateArticle 更新文章
 func (h *ArticleHandlerNew) UpdateArticle(c *gin.Context) {
 	idStr := c.Param("id")
-	_, err := strconv.ParseInt(idStr, 10, 64)
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "文章ID格式错误"))
 		return
@@ -103,7 +103,7 @@ func (h *ArticleHandlerNew) UpdateArticle(c *gin.Context) {
 		return
 	}
 
-	err = h.articleUsecase.UpdateArticle(c.Request.Context(), req)
+	err = h.articleUsecase.UpdateArticle(c.Request.Context(), id, req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, err.Error()))
 		return
@@ -146,4 +146,41 @@ func convertToArticleResponse(article *entity.Article) entity.ArticleResponse {
 		CreatedAt:    article.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		UpdatedAt:    article.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
 	}
+}
+
+func convertToArticleResponseWithRelations(articleWithRelations *entity.ArticleWithRelations) entity.ArticleResponse {
+	response := convertToArticleResponse(articleWithRelations.Article)
+
+	// 设置作者信息
+	if articleWithRelations.User != nil {
+		response.Author = entity.AuthorResponse{
+			ID:       strconv.FormatInt(articleWithRelations.User.ID, 10),
+			Username: articleWithRelations.User.Username,
+			Avatar:   articleWithRelations.User.Avatar,
+		}
+	}
+
+	// 设置分类信息
+	if articleWithRelations.Category != nil {
+		response.Category = entity.CategoryResponse{
+			ID:   strconv.FormatInt(articleWithRelations.Category.ID, 10),
+			Name: articleWithRelations.Category.Name,
+			Slug: articleWithRelations.Category.Slug,
+		}
+	}
+
+	// 设置标签信息
+	if len(articleWithRelations.Tags) > 0 {
+		var tags []entity.TagResponse
+		for _, tag := range articleWithRelations.Tags {
+			tags = append(tags, entity.TagResponse{
+				ID:   strconv.FormatInt(tag.ID, 10),
+				Name: tag.Name,
+				Slug: tag.Slug,
+			})
+		}
+		response.Tags = tags
+	}
+
+	return response
 }

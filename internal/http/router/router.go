@@ -28,7 +28,7 @@ func GetNewRouters(db *gorm.DB) (routers []Router) {
 	userUseCase := usecase.NewUserUseCase(userRepo)
 	tagUseCase := usecase.NewTagUseCase(tagRepo)
 	categoryUseCase := usecase.NewCategoryUseCase(categoryRepo)
-	articleUseCase := usecase.NewArticleUseCase(articleRepo)
+	articleUseCase := usecase.NewArticleUseCase(articleRepo, userRepo, categoryRepo, tagRepo)
 	commentUseCase := usecase.NewCommentUseCase(commentRepo)
 
 	// 创建Handler层
