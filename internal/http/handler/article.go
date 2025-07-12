@@ -132,7 +132,7 @@ func (h *ArticleHandlerNew) DeleteArticle(c *gin.Context) {
 
 func convertToArticleResponse(article *entity.Article) entity.ArticleResponse {
 	return entity.ArticleResponse{
-		ID:           strconv.FormatInt(article.ID, 10),
+		ID:           article.ID,
 		Title:        article.Title,
 		Subtitle:     article.Subtitle,
 		Content:      article.Content,
@@ -154,7 +154,7 @@ func convertToArticleResponseWithRelations(articleWithRelations *entity.ArticleW
 	// 设置作者信息
 	if articleWithRelations.User != nil {
 		response.Author = entity.AuthorResponse{
-			ID:       strconv.FormatInt(articleWithRelations.User.ID, 10),
+			ID:       articleWithRelations.User.ID,
 			Username: articleWithRelations.User.Username,
 			Avatar:   articleWithRelations.User.Avatar,
 		}
@@ -163,9 +163,9 @@ func convertToArticleResponseWithRelations(articleWithRelations *entity.ArticleW
 	// 设置分类信息
 	if articleWithRelations.Category != nil {
 		response.Category = entity.CategoryResponse{
-			ID:   strconv.FormatInt(articleWithRelations.Category.ID, 10),
+			ID:   articleWithRelations.Category.ID,
 			Name: articleWithRelations.Category.Name,
-			Slug: articleWithRelations.Category.Slug,
+			Path: articleWithRelations.Category.Path,
 		}
 	}
 
@@ -174,9 +174,9 @@ func convertToArticleResponseWithRelations(articleWithRelations *entity.ArticleW
 		var tags []entity.TagResponse
 		for _, tag := range articleWithRelations.Tags {
 			tags = append(tags, entity.TagResponse{
-				ID:   strconv.FormatInt(tag.ID, 10),
-				Name: tag.Name,
-				Slug: tag.Slug,
+				ID:    tag.ID,
+				Name:  tag.Name,
+				Title: tag.Title,
 			})
 		}
 		response.Tags = tags

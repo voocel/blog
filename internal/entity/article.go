@@ -61,7 +61,7 @@ type ArticleUpdateRequest struct {
 
 // ArticleResponse 文章响应
 type ArticleResponse struct {
-	ID           string           `json:"id"`
+	ID           int64            `json:"id"`
 	Title        string           `json:"title"`
 	Subtitle     string           `json:"subtitle,omitempty"`
 	Content      string           `json:"content"`

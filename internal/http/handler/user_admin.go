@@ -92,7 +92,7 @@ func (h *UserAdminHandler) DeleteUser(c *gin.Context) {
 
 func convertToUserAdminResponse(user *entity.User) entity.UserAdminResponse {
 	return entity.UserAdminResponse{
-		ID:          strconv.FormatInt(user.ID, 10),
+		ID:          user.ID,
 		Username:    user.Username,
 		Email:       user.Email,
 		Avatar:      user.Avatar,

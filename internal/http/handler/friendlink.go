@@ -31,10 +31,10 @@ func (h *FriendlinkHandler) GetFriendlinks(c *gin.Context) {
 	var friendlinks []entity.FriendlinkResponse
 	if status == "" || status == "active" {
 		friendlink := entity.FriendlinkResponse{
-			ID:          "1",
-			Name:        "示例网站",
+			ID:          1,
+			Name:        "示例友链",
 			URL:         "https://example.com",
-			Logo:        "https://example.com/logo.png",
+			Logo:        "/static/logo/example.png",
 			Description: "这是一个示例友链",
 			Status:      "active",
 			SortOrder:   1,
@@ -88,4 +88,4 @@ func (h *FriendlinkHandler) DeleteFriendlink(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, entity.NewSuccessResponse[any](nil, "删除成功"))
-} 
+}

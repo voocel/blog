@@ -6,7 +6,6 @@ import (
 	"blog/pkg/util"
 	"context"
 	"errors"
-	"strconv"
 	"time"
 )
 
@@ -58,7 +57,7 @@ func (a *AuthUseCase) Login(ctx context.Context, req entity.LoginRequest) (*enti
 
 	// 构造响应
 	userInfo := &entity.UserInfo{
-		ID:          strconv.FormatInt(user.ID, 10),
+		ID:          user.ID,
 		Username:    user.Username,
 		Email:       user.Email,
 		Avatar:      user.Avatar,
@@ -172,7 +171,7 @@ func (a *AuthUseCase) GetProfile(ctx context.Context, userID int64) (*entity.Use
 	}
 
 	return &entity.UserInfo{
-		ID:          strconv.FormatInt(user.ID, 10),
+		ID:          user.ID,
 		Username:    user.Username,
 		Email:       user.Email,
 		Avatar:      user.Avatar,

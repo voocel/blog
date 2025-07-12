@@ -57,17 +57,17 @@ func (h *StatisticsHandler) GetVisits(c *gin.Context) {
 	// todo
 	var visits []entity.VisitStatistics
 	visit := entity.VisitStatistics{
-		ID:           "1",
-		ArticleID:    "123",
-		ArticleTitle: "示例文章标题",
+		ID:           1,
+		ArticleID:    123,
+		ArticleTitle: "示例文章",
 		IP:           "192.168.1.1",
-		UserAgent:    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-		Referer:      "https://google.com",
-		VisitCount:   5,
+		UserAgent:    "Mozilla/5.0 ...",
+		Referer:      "https://example.com",
+		VisitCount:   1,
 		CreatedAt:    "2024-01-01T00:00:00Z",
 	}
 	visits = append(visits, visit)
 
 	paginatedData := entity.NewPaginatedResponse(visits, 1, page, pageSize)
 	c.JSON(http.StatusOK, entity.NewSuccessResponse(paginatedData, "获取成功"))
-} 
+}

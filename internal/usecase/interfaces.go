@@ -38,6 +38,9 @@ type (
 		GetCategoryByNameRepo(ctx context.Context, name string) (*entity.Category, error)
 		GetCategoryByNameExistRepo(ctx context.Context, name string) (bool, error)
 		GetCategoriesRepo(ctx context.Context) ([]*entity.Category, error)
+		UpdateCategoryRepo(ctx context.Context, category *entity.Category) error
+		DeleteCategoryRepo(ctx context.Context, cid int64) error
+		GetCategoryByPathExistRepo(ctx context.Context, path string) (bool, error)
 	}
 
 	StarRepo interface {
@@ -81,6 +84,8 @@ type (
 		GetCommentByIdRepo(ctx context.Context, id int64) (*entity.Comment, error)
 		GetCommentsByArticleIdRepo(ctx context.Context, aid int64) ([]*entity.Comment, error)
 		GetCommentsRepo(ctx context.Context) ([]*entity.Comment, error)
+		GetCommentsWithPaginationRepo(ctx context.Context, page, pageSize int, articleId, discussionId *int64) ([]*entity.Comment, int64, error)
+		UpdateCommentRepo(ctx context.Context, comment *entity.Comment) error
 		DeleteCommentRepo(ctx context.Context, id int64) error
 	}
 

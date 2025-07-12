@@ -31,7 +31,7 @@ type FriendLinkRequest struct {
 
 // FriendLinkResponse 友链响应
 type FriendLinkResponse struct {
-	ID          string `json:"id"`
+	ID          int64  `json:"id"`
 	Name        string `json:"name"`
 	URL         string `json:"url"`
 	Logo        string `json:"logo"`

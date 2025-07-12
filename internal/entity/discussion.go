@@ -33,15 +33,15 @@ type Reply struct {
 
 // DiscussionRequest 创建讨论请求
 type DiscussionRequest struct {
-	Title   string   `json:"title" binding:"required" msg:"标题不能为空"`
-	Content string   `json:"content" binding:"required" msg:"内容不能为空"`
-	TagIds  []string `json:"tagIds"`
-	Status  string   `json:"status"`
+	Title   string  `json:"title" binding:"required" msg:"标题不能为空"`
+	Content string  `json:"content" binding:"required" msg:"内容不能为空"`
+	TagIds  []int64 `json:"tagIds"`
+	Status  string  `json:"status"`
 }
 
 // DiscussionResponse 讨论响应
 type DiscussionResponse struct {
-	ID         string          `json:"id"`
+	ID         int64           `json:"id"`
 	Title      string          `json:"title"`
 	Content    string          `json:"content"`
 	Status     string          `json:"status"`
@@ -56,7 +56,7 @@ type DiscussionResponse struct {
 
 // ReplyResponse 回复响应
 type ReplyResponse struct {
-	ID        string         `json:"id"`
+	ID        int64          `json:"id"`
 	Content   string         `json:"content"`
 	Author    AuthorResponse `json:"author"`
 	CreatedAt string         `json:"createdAt"`
@@ -64,14 +64,14 @@ type ReplyResponse struct {
 
 // AuthorResponse 作者响应
 type AuthorResponse struct {
-	ID       string `json:"id"`
+	ID       int64  `json:"id"`
 	Username string `json:"username"`
 	Avatar   string `json:"avatar"`
 }
 
 // DiscussionDetailResponse 讨论详情响应
 type DiscussionDetailResponse struct {
-	ID         string          `json:"id"`
+	ID         int64           `json:"id"`
 	Title      string          `json:"title"`
 	Content    string          `json:"content"`
 	Status     string          `json:"status"`

@@ -111,9 +111,9 @@ func (h *TagHandlerNew) DeleteTag(c *gin.Context) {
 
 func convertToTagResponse(tag *entity.Tag) entity.TagResponse {
 	return entity.TagResponse{
-		ID:           strconv.FormatInt(tag.ID, 10),
+		ID:           tag.ID,
 		Name:         tag.Name,
-		Slug:         tag.Slug,
+		Title:        tag.Title,
 		Description:  tag.Description,
 		Color:        tag.Color,
 		ArticleCount: tag.ArticleCount,

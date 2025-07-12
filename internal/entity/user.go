@@ -30,7 +30,7 @@ type User struct {
 
 // UserAdminResponse 管理员用户响应
 type UserAdminResponse struct {
-	ID          string `json:"id"`
+	ID          int64  `json:"id"`
 	Username    string `json:"username"`
 	Email       string `json:"email"`
 	Avatar      string `json:"avatar"`

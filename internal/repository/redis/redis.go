@@ -21,10 +21,10 @@ func Init() {
 		PoolSize:     config.Conf.Redis.PoolSize,
 		MinIdleConns: config.Conf.Redis.MinIdleConn,
 	})
-	_, err := c.Ping(context.TODO()).Result()
-	if err != nil {
-		panic(err)
-	}
+	//_, err := c.Ping(context.TODO()).Result()
+	//if err != nil {
+	//	panic(err)
+	//}
 	redisClient = &Redis{
 		client: c,
 	}

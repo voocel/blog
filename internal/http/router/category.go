@@ -21,6 +21,7 @@ func (r *categoryRouterNew) Load(engine *gin.Engine) {
 	publicGroup := engine.Group("/api/categories")
 	{
 		publicGroup.GET("", r.categoryHandler.GetCategories)
+		publicGroup.GET("/:id", r.categoryHandler.GetCategory)
 	}
 
 	adminGroup := engine.Group("/api/categories")

@@ -3,6 +3,7 @@ package repo
 import (
 	"blog/internal/entity"
 	"context"
+
 	"gorm.io/gorm"
 )
 
@@ -39,4 +40,18 @@ func (c CategoryRepo) GetCategoriesRepo(ctx context.Context) ([]*entity.Category
 	categories := make([]*entity.Category, 0)
 	err := c.db.WithContext(ctx).Find(&categories).Error
 	return categories, err
+}
+
+func (c CategoryRepo) UpdateCategoryRepo(ctx context.Context, category *entity.Category) error {
+	return c.db.WithContext(ctx).Model(category).Updates(category).Error
+}
+
+func (c CategoryRepo) DeleteCategoryRepo(ctx context.Context, cid int64) error {
+	return c.db.WithContext(ctx).Delete(&entity.Category{}, cid).Error
+}
+
+func (c CategoryRepo) GetCategoryByPathExistRepo(ctx context.Context, path string) (bool, error) {
+	var count int64
+	err := c.db.WithContext(ctx).Model(&entity.Category{}).Where("path = ?", path).Count(&count).Error
+	return count > 0, err
 }

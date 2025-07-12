@@ -8,7 +8,7 @@ import (
 type Tag struct {
 	ID           int64        `gorm:"primarykey" json:"id"`
 	Name         string       `gorm:"size:50;not null;uniqueIndex" json:"name"`
-	Slug         string       `gorm:"size:100;not null;uniqueIndex" json:"slug"`
+	Title        string       `gorm:"size:100" json:"title"`
 	Description  string       `gorm:"size:500" json:"description"`
 	Color        string       `gorm:"size:20" json:"color"`
 	ArticleCount int          `gorm:"default:0" json:"articleCount"`
@@ -20,16 +20,16 @@ type Tag struct {
 // TagRequest 标签请求
 type TagRequest struct {
 	Name        string `json:"name" binding:"required" msg:"标签名称不能为空"`
-	Slug        string `json:"slug" binding:"required" msg:"标签别名不能为空"`
+	Title       string `json:"title"`
 	Description string `json:"description"`
 	Color       string `json:"color"`
 }
 
 // TagResponse 标签响应
 type TagResponse struct {
-	ID           string `json:"id"`
+	ID           int64  `json:"id"`
 	Name         string `json:"name"`
-	Slug         string `json:"slug"`
+	Title        string `json:"title,omitempty"`
 	Description  string `json:"description,omitempty"`
 	Color        string `json:"color,omitempty"`
 	ArticleCount int    `json:"articleCount"`

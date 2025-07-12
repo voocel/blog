@@ -28,12 +28,12 @@ type CommentRequest struct {
 
 // CommentResponse 评论响应
 type CommentResponse struct {
-	ID           string            `json:"id"`
+	ID           int64             `json:"id"`
 	Content      string            `json:"content"`
 	Status       string            `json:"status"`
-	ArticleID    string            `json:"articleId,omitempty"`
-	DiscussionID string            `json:"discussionId,omitempty"`
-	ParentID     string            `json:"parentId,omitempty"`
+	ArticleID    int64             `json:"articleId,omitempty"`
+	DiscussionID int64             `json:"discussionId,omitempty"`
+	ParentID     int64             `json:"parentId,omitempty"`
 	Author       AuthorResponse    `json:"author"`
 	Replies      []CommentResponse `json:"replies,omitempty"`
 	CreatedAt    string            `json:"createdAt"`

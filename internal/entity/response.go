@@ -80,7 +80,7 @@ type FriendlinkRequest struct {
 }
 
 type FriendlinkResponse struct {
-	ID          string `json:"id"`
+	ID          int64  `json:"id"`
 	Name        string `json:"name"`
 	URL         string `json:"url"`
 	Logo        string `json:"logo"`
@@ -105,8 +105,8 @@ type DashboardStatistics struct {
 }
 
 type VisitStatistics struct {
-	ID           string `json:"id"`
-	ArticleID    string `json:"articleId,omitempty"`
+	ID           int64  `json:"id"`
+	ArticleID    int64  `json:"articleId,omitempty"`
 	ArticleTitle string `json:"articleTitle,omitempty"`
 	IP           string `json:"ip"`
 	UserAgent    string `json:"userAgent"`

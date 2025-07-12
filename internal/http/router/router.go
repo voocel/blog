@@ -37,7 +37,7 @@ func GetNewRouters(db *gorm.DB) (routers []Router) {
 	articleHandler := handler.NewArticleHandlerNew(articleUseCase, tagUseCase)
 	categoryHandler := handler.NewCategoryHandlerNew(categoryUseCase)
 	tagHandler := handler.NewTagHandlerNew(tagUseCase)
-	commentHandler := handler.NewCommentHandlerNew(commentUseCase)
+	commentHandler := handler.NewCommentHandlerNew(commentUseCase, userUseCase)
 	fileHandler := handler.NewFileHandler()
 	discussionHandler := handler.NewDiscussionHandler()
 	friendlinkHandler := handler.NewFriendlinkHandler()

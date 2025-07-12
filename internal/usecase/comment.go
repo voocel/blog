@@ -32,3 +32,11 @@ func (c *CommentUseCase) GetCommentsByArticleId(ctx context.Context, aid int64) 
 func (c *CommentUseCase) DeleteComment(ctx context.Context, cid int64) error {
 	return c.repo.DeleteCommentRepo(ctx, cid)
 }
+
+func (c *CommentUseCase) GetCommentsWithPagination(ctx context.Context, page, pageSize int, articleId, discussionId *int64) ([]*entity.Comment, int64, error) {
+	return c.repo.GetCommentsWithPaginationRepo(ctx, page, pageSize, articleId, discussionId)
+}
+
+func (c *CommentUseCase) UpdateComment(ctx context.Context, comment *entity.Comment) error {
+	return c.repo.UpdateCommentRepo(ctx, comment)
+}

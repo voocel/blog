@@ -32,7 +32,7 @@ func (h *DiscussionHandler) GetDiscussions(c *gin.Context) {
 	// todo
 	var discussions []entity.DiscussionResponse
 	discussion := entity.DiscussionResponse{
-		ID:         "1",
+		ID:         1,
 		Title:      "示例讨论",
 		Content:    "这是一个示例讨论内容",
 		Status:     "active",
@@ -40,13 +40,13 @@ func (h *DiscussionHandler) GetDiscussions(c *gin.Context) {
 		ReplyCount: 5,
 		Tags: []entity.TagResponse{
 			{
-				ID:   "1",
-				Name: "技术",
-				Slug: "tech",
+				ID:    1,
+				Name:  "技术",
+				Title: "tech",
 			},
 		},
 		Author: entity.AuthorResponse{
-			ID:       "1",
+			ID:       1,
 			Username: "admin",
 			Avatar:   "/static/avatar/default.png",
 		},
@@ -70,7 +70,7 @@ func (h *DiscussionHandler) GetDiscussion(c *gin.Context) {
 
 	// todo
 	discussion := entity.DiscussionDetailResponse{
-		ID:         "1",
+		ID:         1,
 		Title:      "示例讨论",
 		Content:    "这是一个示例讨论内容",
 		Status:     "active",
@@ -78,32 +78,32 @@ func (h *DiscussionHandler) GetDiscussion(c *gin.Context) {
 		ReplyCount: 2,
 		Tags: []entity.TagResponse{
 			{
-				ID:   "1",
-				Name: "技术",
-				Slug: "tech",
+				ID:    1,
+				Name:  "技术",
+				Title: "tech",
 			},
 		},
 		Author: entity.AuthorResponse{
-			ID:       "1",
+			ID:       1,
 			Username: "admin",
 			Avatar:   "/static/avatar/default.png",
 		},
 		Replies: []entity.ReplyResponse{
 			{
-				ID:      "1",
+				ID:      1,
 				Content: "这是第一个回复",
 				Author: entity.AuthorResponse{
-					ID:       "2",
+					ID:       2,
 					Username: "user1",
 					Avatar:   "/static/avatar/default.png",
 				},
 				CreatedAt: "2024-01-01T01:00:00Z",
 			},
 			{
-				ID:      "2",
+				ID:      2,
 				Content: "这是第二个回复",
 				Author: entity.AuthorResponse{
-					ID:       "3",
+					ID:       3,
 					Username: "user2",
 					Avatar:   "/static/avatar/default.png",
 				},

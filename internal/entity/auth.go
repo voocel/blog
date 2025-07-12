@@ -25,7 +25,7 @@ type LoginResponse struct {
 
 // UserInfo 用户信息
 type UserInfo struct {
-	ID          string `json:"id"`
+	ID          int64  `json:"id"`
 	Username    string `json:"username"`
 	Email       string `json:"email"`
 	Avatar      string `json:"avatar"`
