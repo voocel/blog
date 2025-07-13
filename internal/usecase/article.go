@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"blog/internal/entity"
+	"blog/pkg/log"
 	"context"
 
 	"github.com/jinzhu/copier"
@@ -57,6 +58,18 @@ func (c *ArticleUseCase) GetDetailById(ctx context.Context, aid int64) (*entity.
 func (c *ArticleUseCase) GetDetailByIdWithRelations(ctx context.Context, aid int64) (*entity.ArticleWithRelations, error) {
 	// 获取文章基本信息
 	article, err := c.repo.GetArticleByIdRepo(ctx, aid)
+	if err != nil {
+		return nil, err
+	}
+
+	// 增加访问次数
+	err = c.repo.IncrementViewCountRepo(ctx, aid)
+	if err != nil {
+		log.Error("Error incrementing view count:", err.Error())
+	}
+
+	// 获取更新后的文章信息
+	article, err = c.repo.GetArticleByIdRepo(ctx, aid)
 	if err != nil {
 		return nil, err
 	}

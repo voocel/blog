@@ -66,7 +66,11 @@ func (a ArticleRepo) DeleteArticleListRepo(ctx context.Context, aids []int64) er
 	return a.db.Where("id in (?)", aids).Delete(&entity.Article{}).Error
 }
 
-// ArticleTag相关方法
+func (a ArticleRepo) IncrementViewCountRepo(ctx context.Context, aid int64) error {
+	return a.db.WithContext(ctx).Model(&entity.Article{}).Where("id = ?", aid).
+		UpdateColumn("view_count", gorm.Expr("view_count + 1")).Error
+}
+
 func (a ArticleRepo) AddArticleTagsRepo(ctx context.Context, articleId int64, tagIds []int64) error {
 	var articleTags []entity.ArticleTag
 	for _, tagId := range tagIds {
