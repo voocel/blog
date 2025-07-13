@@ -41,7 +41,7 @@ func (h *TagHandlerNew) GetTags(c *gin.Context) {
 		return
 	}
 
-	var tagResponses []entity.TagResponse
+	tagResponses := make([]entity.TagResponse, 0)
 	for _, tag := range tags {
 		tagResponses = append(tagResponses, convertToTagResponse(tag))
 	}
@@ -70,7 +70,7 @@ func (h *TagHandlerNew) CreateTag(c *gin.Context) {
 // UpdateTag 更新标签
 func (h *TagHandlerNew) UpdateTag(c *gin.Context) {
 	idStr := c.Param("id")
-	_, err := strconv.ParseInt(idStr, 10, 64)
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "标签ID格式错误"))
 		return
@@ -82,7 +82,7 @@ func (h *TagHandlerNew) UpdateTag(c *gin.Context) {
 		return
 	}
 
-	err = h.tagUsecase.UpdateTag(c.Request.Context(), req)
+	err = h.tagUsecase.UpdateTag(c.Request.Context(), id, req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, err.Error()))
 		return
@@ -107,6 +107,25 @@ func (h *TagHandlerNew) DeleteTag(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, entity.NewSuccessResponse[any](nil, "删除成功"))
+}
+
+// GetTag 获取单个标签
+func (h *TagHandlerNew) GetTag(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "标签ID格式错误"))
+		return
+	}
+
+	tag, err := h.tagUsecase.GetTagById(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, entity.NewErrorResponse(404, "标签不存在"))
+		return
+	}
+
+	response := convertToTagResponse(tag)
+	c.JSON(http.StatusOK, entity.NewSuccessResponse(response, "获取成功"))
 }
 
 func convertToTagResponse(tag *entity.Tag) entity.TagResponse {

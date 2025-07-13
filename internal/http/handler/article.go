@@ -43,7 +43,7 @@ func (h *ArticleHandlerNew) GetArticles(c *gin.Context) {
 		return
 	}
 
-	var articleResponses []entity.ArticleResponse
+	articleResponses := make([]entity.ArticleResponse, 0)
 	for _, article := range articles {
 		articleResponses = append(articleResponses, convertToArticleResponse(article))
 	}
@@ -79,7 +79,13 @@ func (h *ArticleHandlerNew) CreateArticle(c *gin.Context) {
 		return
 	}
 
-	err := h.articleUsecase.CreateArticle(c.Request.Context(), req)
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, entity.NewErrorResponse(401, "用户未登录"))
+		return
+	}
+
+	err := h.articleUsecase.CreateArticle(c.Request.Context(), req, userID.(int64))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, err.Error()))
 		return
@@ -170,17 +176,15 @@ func convertToArticleResponseWithRelations(articleWithRelations *entity.ArticleW
 	}
 
 	// 设置标签信息
-	if len(articleWithRelations.Tags) > 0 {
-		var tags []entity.TagResponse
-		for _, tag := range articleWithRelations.Tags {
-			tags = append(tags, entity.TagResponse{
-				ID:    tag.ID,
-				Name:  tag.Name,
-				Title: tag.Title,
-			})
-		}
-		response.Tags = tags
+	tags := make([]entity.TagResponse, 0)
+	for _, tag := range articleWithRelations.Tags {
+		tags = append(tags, entity.TagResponse{
+			ID:    tag.ID,
+			Name:  tag.Name,
+			Title: tag.Title,
+		})
 	}
+	response.Tags = tags
 
 	return response
 }

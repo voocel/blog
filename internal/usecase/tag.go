@@ -45,12 +45,17 @@ func (t *TagUseCase) GetTags(ctx context.Context) ([]*entity.Tag, error) {
 	return t.repo.GetTagsRepo(ctx)
 }
 
-func (t *TagUseCase) UpdateTag(ctx context.Context, req entity.TagRequest) error {
-	tag := new(entity.Tag)
+func (t *TagUseCase) UpdateTag(ctx context.Context, id int64, req entity.TagRequest) error {
+	tag, err := t.repo.GetTagByIdRepo(ctx, id)
+	if err != nil {
+		return err
+	}
+
 	tag.Name = req.Name
 	tag.Title = req.Title
 	tag.Description = req.Description
 	tag.Color = req.Color
+
 	return t.repo.UpdateTagRepo(ctx, tag)
 }
 

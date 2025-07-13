@@ -30,5 +30,6 @@ func (r *discussionRouter) Load(engine *gin.Engine) {
 		authGroup.POST("", r.discussionHandler.CreateDiscussion)
 		authGroup.PUT("/:id", r.discussionHandler.UpdateDiscussion)
 		authGroup.DELETE("/:id", r.discussionHandler.DeleteDiscussion)
+		authGroup.POST("/:id/replies", r.discussionHandler.CreateReply)
 	}
 }

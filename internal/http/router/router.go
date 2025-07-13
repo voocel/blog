@@ -22,6 +22,10 @@ func GetNewRouters(db *gorm.DB) (routers []Router) {
 	categoryRepo := repo.NewCategoryRepo(db)
 	articleRepo := repo.NewArticleRepo(db)
 	commentRepo := repo.NewCommentRepo(db)
+	discussionRepo := repo.NewDiscussionRepo(db)
+	replyRepo := repo.NewReplyRepo(db)
+	friendlinkRepo := repo.NewFriendlinkRepo(db)
+	statisticsRepo := repo.NewStatisticsRepo(db)
 
 	// 创建UseCase层
 	authUseCase := usecase.NewAuthUseCase(userRepo)
@@ -30,6 +34,9 @@ func GetNewRouters(db *gorm.DB) (routers []Router) {
 	categoryUseCase := usecase.NewCategoryUseCase(categoryRepo)
 	articleUseCase := usecase.NewArticleUseCase(articleRepo, userRepo, categoryRepo, tagRepo)
 	commentUseCase := usecase.NewCommentUseCase(commentRepo)
+	discussionUseCase := usecase.NewDiscussionUseCase(discussionRepo, replyRepo, userRepo, tagRepo)
+	friendlinkUseCase := usecase.NewFriendlinkUseCase(friendlinkRepo)
+	statisticsUseCase := usecase.NewStatisticsUseCase(statisticsRepo)
 
 	// 创建Handler层
 	authHandler := handler.NewAuthHandler(authUseCase)
@@ -39,9 +46,9 @@ func GetNewRouters(db *gorm.DB) (routers []Router) {
 	tagHandler := handler.NewTagHandlerNew(tagUseCase)
 	commentHandler := handler.NewCommentHandlerNew(commentUseCase, userUseCase)
 	fileHandler := handler.NewFileHandler()
-	discussionHandler := handler.NewDiscussionHandler()
-	friendlinkHandler := handler.NewFriendlinkHandler()
-	statisticsHandler := handler.NewStatisticsHandler()
+	discussionHandler := handler.NewDiscussionHandler(discussionUseCase)
+	friendlinkHandler := handler.NewFriendlinkHandler(friendlinkUseCase)
+	statisticsHandler := handler.NewStatisticsHandler(statisticsUseCase)
 	systemHandler := handler.NewSystemHandler()
 
 	// 创建Router层

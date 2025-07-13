@@ -21,6 +21,7 @@ func (r *friendlinkRouter) Load(engine *gin.Engine) {
 	publicGroup := engine.Group("/api/friendlinks")
 	{
 		publicGroup.GET("", r.friendlinkHandler.GetFriendlinks)
+		publicGroup.GET("/:id", r.friendlinkHandler.GetFriendlink)
 	}
 
 	adminGroup := engine.Group("/api/friendlinks")

@@ -38,7 +38,7 @@ func (h *UserAdminHandler) GetUsers(c *gin.Context) {
 		return
 	}
 
-	var userResponses []entity.UserAdminResponse
+	userResponses := make([]entity.UserAdminResponse, 0)
 	for _, user := range users {
 		userResponses = append(userResponses, convertToUserAdminResponse(user))
 	}

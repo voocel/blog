@@ -17,11 +17,10 @@ func newStatisticsRouter(statisticsHandler *handler.StatisticsHandler) Router {
 	}
 }
 
-func (r *statisticsRouter) Load(engine *gin.Engine) {
-	adminGroup := engine.Group("/api/admin/statistics")
+func (r *statisticsRouter) Load(rg *gin.Engine) {
+	v1 := rg.Group("/api")
+	adminGroup := v1.Group("/admin/statistics")
 	adminGroup.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
-	{
-		adminGroup.GET("/dashboard", r.statisticsHandler.GetDashboard)
-		adminGroup.GET("/visits", r.statisticsHandler.GetVisits)
-	}
-} 
+
+	adminGroup.GET("/dashboard", r.statisticsHandler.GetDashboard)
+}

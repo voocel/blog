@@ -71,7 +71,7 @@ func (h *CommentHandlerNew) GetComments(c *gin.Context) {
 	}
 
 	// 转换为响应格式
-	var commentResponses []entity.CommentResponse
+	commentResponses := make([]entity.CommentResponse, 0)
 	for _, comment := range comments {
 		user := userMap[comment.UserID]
 		commentResponses = append(commentResponses, convertToCommentResponse(comment, user))

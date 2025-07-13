@@ -2,6 +2,7 @@ package handler
 
 import (
 	"blog/internal/entity"
+	"blog/internal/usecase"
 	"net/http"
 	"strconv"
 
@@ -9,10 +10,13 @@ import (
 )
 
 type FriendlinkHandler struct {
+	friendlinkUsecase *usecase.FriendlinkUseCase
 }
 
-func NewFriendlinkHandler() *FriendlinkHandler {
-	return &FriendlinkHandler{}
+func NewFriendlinkHandler(friendlinkUsecase *usecase.FriendlinkUseCase) *FriendlinkHandler {
+	return &FriendlinkHandler{
+		friendlinkUsecase: friendlinkUsecase,
+	}
 }
 
 func (h *FriendlinkHandler) GetFriendlinks(c *gin.Context) {
@@ -27,24 +31,18 @@ func (h *FriendlinkHandler) GetFriendlinks(c *gin.Context) {
 		pageSize = 10
 	}
 
-	// todo
-	var friendlinks []entity.FriendlinkResponse
-	if status == "" || status == "active" {
-		friendlink := entity.FriendlinkResponse{
-			ID:          1,
-			Name:        "示例友链",
-			URL:         "https://example.com",
-			Logo:        "/static/logo/example.png",
-			Description: "这是一个示例友链",
-			Status:      "active",
-			SortOrder:   1,
-			CreatedAt:   "2024-01-01T00:00:00Z",
-			UpdatedAt:   "2024-01-01T00:00:00Z",
-		}
-		friendlinks = append(friendlinks, friendlink)
+	friendlinks, total, err := h.friendlinkUsecase.GetFriendlinks(c.Request.Context(), page, pageSize, status)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, entity.NewErrorResponse(500, err.Error()))
+		return
 	}
 
-	paginatedData := entity.NewPaginatedResponse(friendlinks, len(friendlinks), page, pageSize)
+	friendlinkResponses := make([]entity.FriendlinkResponse, 0)
+	for _, friendlink := range friendlinks {
+		friendlinkResponses = append(friendlinkResponses, *friendlink)
+	}
+
+	paginatedData := entity.NewPaginatedResponse(friendlinkResponses, int(total), page, pageSize)
 	c.JSON(http.StatusOK, entity.NewSuccessResponse(paginatedData, "获取成功"))
 }
 
@@ -56,14 +54,19 @@ func (h *FriendlinkHandler) CreateFriendlink(c *gin.Context) {
 		return
 	}
 
-	// todo
+	err := h.friendlinkUsecase.CreateFriendlink(c.Request.Context(), &req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, entity.NewErrorResponse(500, err.Error()))
+		return
+	}
+
 	c.JSON(http.StatusOK, entity.NewSuccessResponse[any](nil, "创建成功"))
 }
 
 // UpdateFriendlink 更新友链
 func (h *FriendlinkHandler) UpdateFriendlink(c *gin.Context) {
 	idStr := c.Param("id")
-	_, err := strconv.ParseInt(idStr, 10, 64)
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "友链ID格式错误"))
 		return
@@ -75,17 +78,47 @@ func (h *FriendlinkHandler) UpdateFriendlink(c *gin.Context) {
 		return
 	}
 
+	err = h.friendlinkUsecase.UpdateFriendlink(c.Request.Context(), id, &req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, entity.NewErrorResponse(500, err.Error()))
+		return
+	}
+
 	c.JSON(http.StatusOK, entity.NewSuccessResponse[any](nil, "更新成功"))
 }
 
 // DeleteFriendlink 删除友链
 func (h *FriendlinkHandler) DeleteFriendlink(c *gin.Context) {
 	idStr := c.Param("id")
-	_, err := strconv.ParseInt(idStr, 10, 64)
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "友链ID格式错误"))
 		return
 	}
 
+	err = h.friendlinkUsecase.DeleteFriendlink(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, entity.NewErrorResponse(500, err.Error()))
+		return
+	}
+
 	c.JSON(http.StatusOK, entity.NewSuccessResponse[any](nil, "删除成功"))
+}
+
+// GetFriendlink 获取单个友链
+func (h *FriendlinkHandler) GetFriendlink(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "友链ID格式错误"))
+		return
+	}
+
+	friendlink, err := h.friendlinkUsecase.GetFriendlinkByID(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, entity.NewErrorResponse(404, err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, entity.NewSuccessResponse(friendlink, "获取成功"))
 }

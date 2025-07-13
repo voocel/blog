@@ -23,6 +23,7 @@ type config struct {
 	Http     HttpConfig
 	Redis    RedisConfig
 	Postgres PostgresConfig
+	Mysql    MysqlConfig
 }
 
 type AppConfig struct {
@@ -50,6 +51,19 @@ type RedisConfig struct {
 }
 
 type PostgresConfig struct {
+	Host            string
+	Port            int
+	Dbname          string
+	Username        string
+	Password        string
+	SSLMode         string `mapstructure:"ssl_mode"`
+	Migrate         bool
+	MaxOpenConns    int           `mapstructure:"max_open_conns"`
+	MaxIdleConns    int           `mapstructure:"max_idle_conns"`
+	ConnMaxLifeTime time.Duration `mapstructure:"conn_max_life_time"`
+}
+
+type MysqlConfig struct {
 	Host            string
 	Port            int
 	Dbname          string

@@ -119,4 +119,43 @@ type (
 		UpdateMenuBannerRepo(ctx context.Context, menuBanner *entity.MenuBanner) error
 		DeleteMenuBannerRepo(ctx context.Context, id int64) error
 	}
+
+	DiscussionRepo interface {
+		AddDiscussionRepo(ctx context.Context, discussion *entity.Discussion) error
+		GetDiscussionByIdRepo(ctx context.Context, id int64) (*entity.Discussion, error)
+		GetDiscussionsRepo(ctx context.Context, page, pageSize int, tagId *int64, search string) ([]*entity.Discussion, int64, error)
+		UpdateDiscussionRepo(ctx context.Context, discussion *entity.Discussion) error
+		DeleteDiscussionRepo(ctx context.Context, id int64) error
+		IncrementViewCountRepo(ctx context.Context, id int64) error
+
+		// 讨论标签关联
+		AddDiscussionTagsRepo(ctx context.Context, discussionId int64, tagIds []int64) error
+		DeleteDiscussionTagsRepo(ctx context.Context, discussionId int64) error
+		GetDiscussionTagsRepo(ctx context.Context, discussionId int64) ([]int64, error)
+		GetDiscussionsByTagIdRepo(ctx context.Context, tagId int64) ([]*entity.Discussion, error)
+	}
+
+	ReplyRepo interface {
+		AddReplyRepo(ctx context.Context, reply *entity.Reply) error
+		GetReplyByIdRepo(ctx context.Context, id int64) (*entity.Reply, error)
+		GetRepliesByDiscussionIdRepo(ctx context.Context, discussionId int64) ([]*entity.Reply, error)
+		UpdateReplyRepo(ctx context.Context, reply *entity.Reply) error
+		DeleteReplyRepo(ctx context.Context, id int64) error
+		GetReplyCountByDiscussionIdRepo(ctx context.Context, discussionId int64) (int64, error)
+	}
+
+	FriendlinkRepo interface {
+		AddFriendlinkRepo(ctx context.Context, friendlink *entity.FriendLink) error
+		GetFriendlinkByIdRepo(ctx context.Context, id int64) (*entity.FriendLink, error)
+		GetFriendlinksRepo(ctx context.Context, page, pageSize int, status string) ([]*entity.FriendLink, int64, error)
+		UpdateFriendlinkRepo(ctx context.Context, friendlink *entity.FriendLink) error
+		DeleteFriendlinkRepo(ctx context.Context, id int64) error
+	}
+
+	StatisticsRepo interface {
+		GetUsersCountRepo(ctx context.Context) (int, error)
+		GetArticlesCountRepo(ctx context.Context) (int, error)
+		GetCommentsCountRepo(ctx context.Context) (int, error)
+		GetVisitsCountRepo(ctx context.Context) (int, error)
+	}
 )

@@ -32,14 +32,13 @@ func (h *CategoryHandlerNew) GetCategories(c *gin.Context) {
 		pageSize = 10
 	}
 
-	// todo
 	categories, err := h.categoryUsecase.List(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, entity.NewErrorResponse(500, err.Error()))
 		return
 	}
 
-	var categoryResponses []entity.CategoryResponse
+	categoryResponses := make([]entity.CategoryResponse, 0)
 	for _, category := range categories {
 		categoryResponses = append(categoryResponses, convertToCategoryResponse(category))
 	}

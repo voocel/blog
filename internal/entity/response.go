@@ -60,6 +60,10 @@ func NewPaginatedResponse[T any](items []T, total, page, pageSize int) *Paginate
 		totalPages = 1
 	}
 
+	if items == nil {
+		items = make([]T, 0)
+	}
+
 	return &PaginatedResponse[T]{
 		Items:      items,
 		Total:      total,
@@ -91,28 +95,12 @@ type FriendlinkResponse struct {
 	UpdatedAt   string `json:"updatedAt"`
 }
 
-// 统计相关响应结构
-type StatisticsItem struct {
-	Total  int     `json:"total"`
-	Growth float64 `json:"growth"`
-}
-
+// DashboardStatistics 仪表盘统计
 type DashboardStatistics struct {
-	Users    StatisticsItem `json:"users"`
-	Articles StatisticsItem `json:"articles"`
-	Comments StatisticsItem `json:"comments"`
-	Visits   StatisticsItem `json:"visits"`
-}
-
-type VisitStatistics struct {
-	ID           int64  `json:"id"`
-	ArticleID    int64  `json:"articleId,omitempty"`
-	ArticleTitle string `json:"articleTitle,omitempty"`
-	IP           string `json:"ip"`
-	UserAgent    string `json:"userAgent"`
-	Referer      string `json:"referer,omitempty"`
-	VisitCount   int    `json:"visitCount"`
-	CreatedAt    string `json:"createdAt"`
+	Users    int `json:"users"`    // 用户总数
+	Articles int `json:"articles"` // 文章总数
+	Comments int `json:"comments"` // 评论总数
+	Visits   int `json:"visits"`   // 访问总数
 }
 
 // 系统信息相关响应结构

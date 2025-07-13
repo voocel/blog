@@ -25,9 +25,12 @@ func NewArticleUseCase(r ArticleRepo, userRepo UserRepo, categoryRepo CategoryRe
 	}
 }
 
-func (c *ArticleUseCase) CreateArticle(ctx context.Context, req entity.ArticleRequest) error {
+func (c *ArticleUseCase) CreateArticle(ctx context.Context, req entity.ArticleRequest, userID int64) error {
 	article := new(entity.Article)
 	copier.Copy(article, req)
+
+	// 设置用户ID
+	article.UserID = userID
 
 	// 创建文章
 	err := c.repo.AddArticleRepo(ctx, article)

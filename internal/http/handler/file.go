@@ -119,7 +119,6 @@ func (h *FileHandler) GetFiles(c *gin.Context) {
 		pageSize = 10
 	}
 
-	// 默认路径
 	if path == "" {
 		path = "uploads"
 	}
@@ -127,9 +126,7 @@ func (h *FileHandler) GetFiles(c *gin.Context) {
 	// 读取上传目录
 	uploadDir := filepath.Join(config.Conf.App.StaticRootPath, path)
 
-	var files []entity.FileResponse
-
-	// 遍历目录
+	files := make([]entity.FileResponse, 0)
 	if entries, err := os.ReadDir(uploadDir); err == nil {
 		for _, entry := range entries {
 			if fileType == "file" && entry.IsDir() {

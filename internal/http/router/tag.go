@@ -21,6 +21,7 @@ func (r *tagRouterNew) Load(engine *gin.Engine) {
 	publicGroup := engine.Group("/api/tags")
 	{
 		publicGroup.GET("", r.tagHandler.GetTags)
+		publicGroup.GET("/:id", r.tagHandler.GetTag)
 	}
 
 	adminGroup := engine.Group("/api/tags")
@@ -30,4 +31,4 @@ func (r *tagRouterNew) Load(engine *gin.Engine) {
 		adminGroup.PUT("/:id", r.tagHandler.UpdateTag)
 		adminGroup.DELETE("/:id", r.tagHandler.DeleteTag)
 	}
-} 
+}

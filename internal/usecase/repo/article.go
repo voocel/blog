@@ -44,12 +44,18 @@ func (a ArticleRepo) GetArticleByIdRepo(ctx context.Context, aid int64) (*entity
 func (a ArticleRepo) GetArticlesRepo(ctx context.Context, page, pageSize int) ([]*entity.Article, int64, error) {
 	var total int64
 	var articles []*entity.Article
-	err := a.db.WithContext(ctx).Scopes(Paginate(page, pageSize)).Find(&articles).Count(&total).Error
+
+	err := a.db.WithContext(ctx).Model(&entity.Article{}).Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	err = a.db.WithContext(ctx).Scopes(Paginate(page, pageSize)).Find(&articles).Error
 	return articles, total, err
 }
 
 func (a ArticleRepo) UpdateArticleRepo(ctx context.Context, article *entity.Article) error {
-	return a.db.Updates(article).Error
+	return a.db.WithContext(ctx).Where("id = ?", article.ID).Updates(article).Error
 }
 
 func (a ArticleRepo) DeleteArticleRepo(ctx context.Context, aid int64) error {
