@@ -2,8 +2,8 @@ package handler
 
 import (
 	"blog/internal/entity"
-	"blog/internal/http/middleware"
 	"blog/internal/usecase"
+	"blog/pkg/log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,130 +11,112 @@ import (
 
 type AuthHandler struct {
 	authUseCase *usecase.AuthUseCase
+	userUseCase *usecase.UserUseCase
 }
 
-func NewAuthHandler(authUseCase *usecase.AuthUseCase) *AuthHandler {
+func NewAuthHandler(authUseCase *usecase.AuthUseCase, userUseCase *usecase.UserUseCase) *AuthHandler {
 	return &AuthHandler{
 		authUseCase: authUseCase,
+		userUseCase: userUseCase,
 	}
 }
 
-// Login 用户登录
+// Login - POST /auth/login
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req entity.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "请求参数错误"))
+		log.Errorw("Login bind JSON failed",
+			log.Pair("error", err.Error()),
+			log.Pair("ip", c.ClientIP()),
+		)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
 		return
 	}
 
-	response, err := h.authUseCase.Login(c.Request.Context(), req)
+	log.Infow("Login attempt",
+		log.Pair("email", req.Email),
+		log.Pair("ip", c.ClientIP()),
+	)
+
+	resp, err := h.authUseCase.Login(c.Request.Context(), req)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, entity.NewErrorResponse(401, err.Error()))
+		log.Errorw("Login failed",
+			log.Pair("email", req.Email),
+			log.Pair("error", err.Error()),
+			log.Pair("ip", c.ClientIP()),
+		)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, entity.NewSuccessResponse(response, "登录成功"))
+	log.Infow("Login success",
+		log.Pair("email", req.Email),
+		log.Pair("username", resp.User.Username),
+		log.Pair("ip", c.ClientIP()),
+	)
+
+	c.JSON(http.StatusOK, resp)
 }
 
-// Register 用户注册
+// Register - POST /auth/register
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req entity.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "请求参数错误"))
+		log.Errorw("Register bind JSON failed",
+			log.Pair("error", err.Error()),
+			log.Pair("ip", c.ClientIP()),
+		)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
 		return
 	}
 
-	response, err := h.authUseCase.Register(c.Request.Context(), req)
+	log.Infow("Register attempt",
+		log.Pair("email", req.Email),
+		log.Pair("username", req.Username),
+		log.Pair("ip", c.ClientIP()),
+	)
+
+	resp, err := h.authUseCase.Register(c.Request.Context(), req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, err.Error()))
+		log.Errorw("Register failed",
+			log.Pair("email", req.Email),
+			log.Pair("error", err.Error()),
+			log.Pair("ip", c.ClientIP()),
+		)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, entity.NewSuccessResponse(response, "注册成功"))
+	log.Infow("Register success",
+		log.Pair("email", req.Email),
+		log.Pair("username", resp.User.Username),
+		log.Pair("ip", c.ClientIP()),
+	)
+
+	c.JSON(http.StatusCreated, resp)
 }
 
-// RefreshToken 刷新令牌
-func (h *AuthHandler) RefreshToken(c *gin.Context) {
-	var req entity.RefreshTokenRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "请求参数错误"))
-		return
-	}
-
-	response, err := h.authUseCase.RefreshToken(c.Request.Context(), req)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, entity.NewErrorResponse(401, err.Error()))
-		return
-	}
-
-	c.JSON(http.StatusOK, entity.NewSuccessResponse(response, "令牌刷新成功"))
-}
-
-// Logout 用户登出
-func (h *AuthHandler) Logout(c *gin.Context) {
-	// 简单的登出响应，实际令牌失效由客户端处理
-	c.JSON(http.StatusOK, entity.NewSuccessResponse[any](nil, "登出成功"))
-}
-
-// GetProfile 获取当前用户信息
-func (h *AuthHandler) GetProfile(c *gin.Context) {
-	userID, exists := middleware.GetCurrentUserID(c)
+// GetCurrentUser - GET /auth/me
+func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
+	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, entity.NewErrorResponse(401, "用户信息不存在"))
+		log.Errorw("GetCurrentUser: user_id not found in context",
+			log.Pair("ip", c.ClientIP()),
+		)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
-	response, err := h.authUseCase.GetProfile(c.Request.Context(), userID)
+	user, err := h.authUseCase.GetCurrentUser(c.Request.Context(), userID.(string))
 	if err != nil {
-		c.JSON(http.StatusNotFound, entity.NewErrorResponse(404, err.Error()))
+		log.Errorw("GetCurrentUser failed",
+			log.Pair("user_id", userID),
+			log.Pair("error", err.Error()),
+			log.Pair("ip", c.ClientIP()),
+		)
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
-	c.JSON(http.StatusOK, entity.NewSuccessResponse(response, "获取成功"))
-}
-
-// UpdateProfile 更新用户资料
-func (h *AuthHandler) UpdateProfile(c *gin.Context) {
-	userID, exists := middleware.GetCurrentUserID(c)
-	if !exists {
-		c.JSON(http.StatusUnauthorized, entity.NewErrorResponse(401, "用户信息不存在"))
-		return
-	}
-
-	var req entity.UpdateProfileRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "请求参数错误"))
-		return
-	}
-
-	response, err := h.authUseCase.UpdateProfile(c.Request.Context(), userID, req)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, err.Error()))
-		return
-	}
-
-	c.JSON(http.StatusOK, entity.NewSuccessResponse(response, "更新成功"))
-}
-
-// ChangePassword 修改密码
-func (h *AuthHandler) ChangePassword(c *gin.Context) {
-	userID, exists := middleware.GetCurrentUserID(c)
-	if !exists {
-		c.JSON(http.StatusUnauthorized, entity.NewErrorResponse(401, "用户信息不存在"))
-		return
-	}
-
-	var req entity.ChangePasswordRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "请求参数错误"))
-		return
-	}
-
-	err := h.authUseCase.ChangePassword(c.Request.Context(), userID, req)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, err.Error()))
-		return
-	}
-
-	c.JSON(http.StatusOK, entity.NewSuccessResponse[any](nil, "密码修改成功"))
+	c.JSON(http.StatusOK, user)
 }

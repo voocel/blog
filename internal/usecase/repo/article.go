@@ -2,100 +2,121 @@ package repo
 
 import (
 	"blog/internal/entity"
+	"blog/internal/usecase"
 	"context"
+	"errors"
 
 	"gorm.io/gorm"
 )
 
-func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
-	return func(db *gorm.DB) *gorm.DB {
-		if page == 0 {
-			page = 1
-		}
-		switch {
-		case pageSize > 100:
-			pageSize = 100
-		case pageSize <= 0:
-			pageSize = 10
-		}
-		offset := (page - 1) * pageSize
-		return db.Offset(offset).Limit(pageSize)
-	}
-}
-
-type ArticleRepo struct {
+type postRepo struct {
 	db *gorm.DB
 }
 
-func NewArticleRepo(db *gorm.DB) *ArticleRepo {
-	return &ArticleRepo{db: db}
+func NewPostRepo(db *gorm.DB) usecase.PostRepo {
+	return &postRepo{db: db}
 }
 
-func (a ArticleRepo) AddArticleRepo(ctx context.Context, article *entity.Article) error {
-	return a.db.Create(article).Error
+func (r *postRepo) Create(ctx context.Context, post *entity.Post) error {
+	return r.db.WithContext(ctx).Create(post).Error
 }
 
-func (a ArticleRepo) GetArticleByIdRepo(ctx context.Context, aid int64) (*entity.Article, error) {
-	var model = new(entity.Article)
-	err := a.db.First(model, aid).Error
-	return model, err
+func (r *postRepo) GetByID(ctx context.Context, id string) (*entity.Post, error) {
+	var post entity.Post
+	err := r.db.WithContext(ctx).Where("id = ?", id).First(&post).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("post not found")
+		}
+		return nil, err
+	}
+	return &post, nil
 }
 
-func (a ArticleRepo) GetArticlesRepo(ctx context.Context, page, pageSize int) ([]*entity.Article, int64, error) {
+// List 支持多种过滤条件和可选分页
+func (r *postRepo) List(ctx context.Context, filters map[string]interface{}, page, limit int) ([]entity.Post, int64, error) {
+	var posts []entity.Post
 	var total int64
-	var articles []*entity.Article
 
-	err := a.db.WithContext(ctx).Model(&entity.Article{}).Count(&total).Error
+	query := r.db.WithContext(ctx).Model(&entity.Post{})
+
+	// 应用过滤条件
+	if categoryID, ok := filters["categoryId"].(string); ok && categoryID != "" {
+		query = query.Where("category_id = ?", categoryID)
+	}
+	if status, ok := filters["status"].(string); ok && status != "" {
+		query = query.Where("status = ?", status)
+	}
+	if search, ok := filters["search"].(string); ok && search != "" {
+		query = query.Where("title LIKE ? OR excerpt LIKE ?", "%"+search+"%", "%"+search+"%")
+	}
+
+	// 获取总数
+	err := query.Count(&total).Error
 	if err != nil {
 		return nil, 0, err
 	}
 
-	err = a.db.WithContext(ctx).Scopes(Paginate(page, pageSize)).Find(&articles).Error
-	return articles, total, err
+	// 分页查询（如果提供了 page 和 limit）
+	if page > 0 && limit > 0 {
+		offset := (page - 1) * limit
+		query = query.Offset(offset).Limit(limit)
+	}
+
+	// 按日期倒序排列
+	err = query.Order("date DESC").Find(&posts).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return posts, total, nil
 }
 
-func (a ArticleRepo) UpdateArticleRepo(ctx context.Context, article *entity.Article) error {
-	return a.db.WithContext(ctx).Where("id = ?", article.ID).Updates(article).Error
+func (r *postRepo) Update(ctx context.Context, post *entity.Post) error {
+	return r.db.WithContext(ctx).Save(post).Error
 }
 
-func (a ArticleRepo) DeleteArticleRepo(ctx context.Context, aid int64) error {
-	return a.db.Delete(&entity.Article{}, aid).Error
+func (r *postRepo) Delete(ctx context.Context, id string) error {
+	// 先删除关联的标签
+	r.RemoveTags(ctx, id)
+	// 再删除文章
+	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Post{}).Error
 }
 
-func (a ArticleRepo) DeleteArticleListRepo(ctx context.Context, aids []int64) error {
-	return a.db.Where("id in (?)", aids).Delete(&entity.Article{}).Error
+func (r *postRepo) IncrementViews(ctx context.Context, id string) error {
+	return r.db.WithContext(ctx).Model(&entity.Post{}).
+		Where("id = ?", id).
+		UpdateColumn("views", gorm.Expr("views + 1")).Error
 }
 
-func (a ArticleRepo) IncrementViewCountRepo(ctx context.Context, aid int64) error {
-	return a.db.WithContext(ctx).Model(&entity.Article{}).Where("id = ?", aid).
-		UpdateColumn("view_count", gorm.Expr("view_count + 1")).Error
-}
-
-func (a ArticleRepo) AddArticleTagsRepo(ctx context.Context, articleId int64, tagIds []int64) error {
-	var articleTags []entity.ArticleTag
-	for _, tagId := range tagIds {
-		articleTags = append(articleTags, entity.ArticleTag{
-			ArticleID: articleId,
-			TagID:     tagId,
+// AddTags 添加文章标签关联
+func (r *postRepo) AddTags(ctx context.Context, postID string, tagIDs []string) error {
+	var postTags []entity.PostTag
+	for _, tagID := range tagIDs {
+		postTags = append(postTags, entity.PostTag{
+			PostID: postID,
+			TagID:  tagID,
 		})
 	}
-	return a.db.WithContext(ctx).Create(&articleTags).Error
+	return r.db.WithContext(ctx).Create(&postTags).Error
 }
 
-func (a ArticleRepo) DeleteArticleTagsRepo(ctx context.Context, articleId int64) error {
-	return a.db.WithContext(ctx).Where("article_id = ?", articleId).Delete(&entity.ArticleTag{}).Error
+// RemoveTags 删除文章的所有标签关联
+func (r *postRepo) RemoveTags(ctx context.Context, postID string) error {
+	return r.db.WithContext(ctx).Where("post_id = ?", postID).Delete(&entity.PostTag{}).Error
 }
 
-func (a ArticleRepo) GetArticleTagsRepo(ctx context.Context, articleId int64) ([]int64, error) {
-	var articleTags []entity.ArticleTag
-	err := a.db.WithContext(ctx).Where("article_id = ?", articleId).Find(&articleTags).Error
+// GetTagIDs 获取文章的标签 ID 列表
+func (r *postRepo) GetTagIDs(ctx context.Context, postID string) ([]string, error) {
+	var postTags []entity.PostTag
+	err := r.db.WithContext(ctx).Where("post_id = ?", postID).Find(&postTags).Error
 	if err != nil {
 		return nil, err
 	}
 
-	var tagIds []int64
-	for _, at := range articleTags {
-		tagIds = append(tagIds, at.TagID)
+	tagIDs := make([]string, len(postTags))
+	for i, pt := range postTags {
+		tagIDs[i] = pt.TagID
 	}
-	return tagIds, nil
+	return tagIDs, nil
 }

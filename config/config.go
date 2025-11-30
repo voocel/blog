@@ -21,7 +21,6 @@ type config struct {
 
 	App      AppConfig
 	Http     HttpConfig
-	Redis    RedisConfig
 	Postgres PostgresConfig
 	Mysql    MysqlConfig
 }
@@ -40,14 +39,6 @@ type AppConfig struct {
 
 type HttpConfig struct {
 	Addr string
-}
-
-type RedisConfig struct {
-	Addr        string
-	Password    string
-	Db          int
-	PoolSize    int `mapstructure:"pool_size"`
-	MinIdleConn int `mapstructure:"min_idle_conn"`
 }
 
 type PostgresConfig struct {

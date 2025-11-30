@@ -121,18 +121,6 @@ func dbConnect(user, pass, addr, dbName string) (*gorm.DB, error) {
 			&entity.User{},
 			&entity.Category{},
 			&entity.Tag{},
-			&entity.Article{},
-			&entity.Comment{},
-			&entity.Discussion{},
-			&entity.Reply{},
-			&entity.FriendLink{},
-			&entity.File{},
-			&entity.Advert{},
-			&entity.Banner{},
-			&entity.Menu{},
-			&entity.Star{},
-			&entity.Logstash{},
-			&entity.MenuBanner{},
 		)
 		if err != nil {
 			return nil, err

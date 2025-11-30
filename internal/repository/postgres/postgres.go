@@ -129,21 +129,12 @@ func dbConnect(user, pass, addr, dbName, sslMode string) (*gorm.DB, error) {
 	if cfg.Migrate {
 		err = db.AutoMigrate(
 			&entity.User{},
+			&entity.Post{},
+			&entity.PostTag{},
 			&entity.Category{},
 			&entity.Tag{},
-			&entity.Article{},
-			&entity.ArticleTag{},
-			&entity.Comment{},
-			&entity.Discussion{},
-			&entity.Reply{},
-			&entity.FriendLink{},
-			&entity.File{},
-			&entity.Advert{},
-			&entity.Banner{},
-			&entity.Menu{},
-			&entity.Star{},
-			&entity.Logstash{},
-			&entity.MenuBanner{},
+			&entity.Media{},
+			&entity.Analytics{},
 		)
 		if err != nil {
 			return nil, err

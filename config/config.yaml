@@ -29,11 +29,5 @@ postgres:
   migrate: true
   max_open_conns: 100
   max_idle_conns: 10
-  # seconds  
+  # seconds
   conn_max_life_time: 86400       # 24*60*60 seconds = 1 day
-
-redis:
-  addr: 127.0.0.1:6379
-  password:
-  pool_size: 5
-  min_idle_conn: 2

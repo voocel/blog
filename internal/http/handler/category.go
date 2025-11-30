@@ -4,137 +4,53 @@ import (
 	"blog/internal/entity"
 	"blog/internal/usecase"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type CategoryHandlerNew struct {
-	categoryUsecase *usecase.CategoryUseCase
+type CategoryHandler struct {
+	categoryUseCase *usecase.CategoryUseCase
 }
 
-func NewCategoryHandlerNew(categoryUsecase *usecase.CategoryUseCase) *CategoryHandlerNew {
-	return &CategoryHandlerNew{
-		categoryUsecase: categoryUsecase,
-	}
+func NewCategoryHandler(categoryUseCase *usecase.CategoryUseCase) *CategoryHandler {
+	return &CategoryHandler{categoryUseCase: categoryUseCase}
 }
 
-// GetCategories 获取分类列表
-func (h *CategoryHandlerNew) GetCategories(c *gin.Context) {
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
-	// search := c.Query("search")
-
-	if page < 1 {
-		page = 1
-	}
-	if pageSize < 1 || pageSize > 100 {
-		pageSize = 10
-	}
-
-	categories, err := h.categoryUsecase.List(c.Request.Context())
+// ListCategories - GET /categories
+func (h *CategoryHandler) ListCategories(c *gin.Context) {
+	categories, err := h.categoryUseCase.List(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, entity.NewErrorResponse(500, err.Error()))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	categoryResponses := make([]entity.CategoryResponse, 0)
-	for _, category := range categories {
-		categoryResponses = append(categoryResponses, convertToCategoryResponse(category))
-	}
-
-	paginatedData := entity.NewPaginatedResponse(categoryResponses, len(categoryResponses), page, pageSize)
-	c.JSON(http.StatusOK, entity.NewSuccessResponse(paginatedData, "获取成功"))
+	c.JSON(http.StatusOK, categories)
 }
 
-// CreateCategory 创建分类
-func (h *CategoryHandlerNew) CreateCategory(c *gin.Context) {
-	var req entity.CategoryRequest
+// CreateCategory - POST /categories
+func (h *CategoryHandler) CreateCategory(c *gin.Context) {
+	var req entity.CreateCategoryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "请求参数错误"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
 
-	err := h.categoryUsecase.Create(c.Request.Context(), &req)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, entity.NewErrorResponse(500, err.Error()))
+	if err := h.categoryUseCase.Create(c.Request.Context(), req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, entity.NewSuccessResponse[any](nil, "创建成功"))
+	c.JSON(http.StatusCreated, gin.H{"message": "Category created successfully"})
 }
 
-// UpdateCategory 更新分类
-func (h *CategoryHandlerNew) UpdateCategory(c *gin.Context) {
-	idStr := c.Param("id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "分类ID格式错误"))
+// DeleteCategory - DELETE /categories/:id
+func (h *CategoryHandler) DeleteCategory(c *gin.Context) {
+	id := c.Param("id")
+
+	if err := h.categoryUseCase.Delete(c.Request.Context(), id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	var req entity.CategoryRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "请求参数错误"))
-		return
-	}
-
-	err = h.categoryUsecase.Update(c.Request.Context(), id, &req)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, entity.NewErrorResponse(500, err.Error()))
-		return
-	}
-
-	c.JSON(http.StatusOK, entity.NewSuccessResponse[any](nil, "更新成功"))
-}
-
-// DeleteCategory 删除分类
-func (h *CategoryHandlerNew) DeleteCategory(c *gin.Context) {
-	idStr := c.Param("id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "分类ID格式错误"))
-		return
-	}
-
-	err = h.categoryUsecase.Delete(c.Request.Context(), id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, entity.NewErrorResponse(500, err.Error()))
-		return
-	}
-
-	c.JSON(http.StatusOK, entity.NewSuccessResponse[any](nil, "删除成功"))
-}
-
-// GetCategory 获取单个分类
-func (h *CategoryHandlerNew) GetCategory(c *gin.Context) {
-	idStr := c.Param("id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, entity.NewErrorResponse(400, "分类ID格式错误"))
-		return
-	}
-
-	category, err := h.categoryUsecase.GetByID(c.Request.Context(), id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, entity.NewErrorResponse(500, err.Error()))
-		return
-	}
-
-	response := convertToCategoryResponse(category)
-	c.JSON(http.StatusOK, entity.NewSuccessResponse(response, "获取成功"))
-}
-
-func convertToCategoryResponse(category *entity.Category) entity.CategoryResponse {
-	response := entity.CategoryResponse{
-		ID:           category.ID,
-		Name:         category.Name,
-		Path:         category.Path,
-		Description:  category.Description,
-		ArticleCount: category.ArticleCount,
-		CreatedAt:    category.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		UpdatedAt:    category.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
-	}
-
-	return response
+	c.Status(http.StatusNoContent)
 }

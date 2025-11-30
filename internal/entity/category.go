@@ -1,35 +1,33 @@
 package entity
 
 import (
-	"database/sql"
 	"time"
 )
 
+// Category 分类模型
 type Category struct {
-	ID           int64        `gorm:"primarykey" json:"id"`
-	Name         string       `gorm:"size:100;not null" json:"name"`
-	Path         string       `gorm:"size:150;not null;uniqueIndex" json:"path"`
-	Description  string       `gorm:"size:500" json:"description"`
-	ArticleCount int          `gorm:"default:0" json:"articleCount"`
-	CreatedAt    time.Time    `json:"createdAt"`
-	UpdatedAt    time.Time    `json:"updatedAt"`
-	DeletedAt    sql.NullTime `gorm:"index" json:"-"`
-}
-
-// CategoryRequest 分类请求
-type CategoryRequest struct {
-	Name        string `json:"name" binding:"required" msg:"分类名称不能为空"`
-	Path        string `json:"path" binding:"required" msg:"分类路径不能为空"`
-	Description string `json:"description"`
+	ID        string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	Name      string    `gorm:"type:varchar(100);uniqueIndex;not null" json:"name"`
+	Slug      string    `gorm:"type:varchar(150);uniqueIndex;not null" json:"slug"`
+	Count     int       `gorm:"type:int;default:0" json:"count"` // number of posts
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"-"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"-"`
 }
 
 // CategoryResponse 分类响应
 type CategoryResponse struct {
-	ID           int64  `json:"id"`
-	Name         string `json:"name"`
-	Path         string `json:"path"`
-	Description  string `json:"description,omitempty"`
-	ArticleCount int    `json:"articleCount"`
-	CreatedAt    string `json:"createdAt"`
-	UpdatedAt    string `json:"updatedAt"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Slug  string `json:"slug"`
+	Count int    `json:"count"`
+}
+
+// CreateCategoryRequest 创建分类请求
+type CreateCategoryRequest struct {
+	Name string `json:"name" binding:"required"`
+	Slug string `json:"slug"` // optional, auto-generated if empty
+}
+
+func (Category) TableName() string {
+	return "categories"
 }

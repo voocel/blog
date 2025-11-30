@@ -3,74 +3,57 @@ package middleware
 import (
 	"blog/pkg/log"
 	"bytes"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"io"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
-type bodyWriter struct {
-	gin.ResponseWriter
-	body *bytes.Buffer
-}
+// RequestLogger 请求日志中间件
+func RequestLogger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		startTime := time.Now()
+		path := c.Request.URL.Path
+		method := c.Request.Method
 
-func (w bodyWriter) Write(b []byte) (int, error) {
-	w.body.Write(b)
-	return w.ResponseWriter.Write(b)
-}
-func (w bodyWriter) WriteString(s string) (int, error) {
-	w.body.WriteString(s)
-	return w.ResponseWriter.WriteString(s)
-}
+		// 读取请求体（用于日志记录）
+		var bodyBytes []byte
+		if c.Request.Body != nil {
+			bodyBytes, _ = io.ReadAll(c.Request.Body)
+			// 重新设置请求体，因为读取后会被消耗
+			c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+		}
 
-func Logger(c *gin.Context) {
-	var body string
-	now := time.Now()
-	path := c.Request.URL.Path
-	requestID := c.GetString("request_id")
-	if requestID == "" {
-		requestID = uuid.New().String()
+		// 处理请求
+		c.Next()
+
+		// 计算耗时
+		latency := time.Since(startTime)
+		statusCode := c.Writer.Status()
+		clientIP := c.ClientIP()
+
+		// 记录详细日志
+		if statusCode >= 400 {
+			// 错误请求记录更详细的信息
+			log.Errorw("HTTP Request Error",
+				log.Pair("status", statusCode),
+				log.Pair("method", method),
+				log.Pair("path", path),
+				log.Pair("ip", clientIP),
+				log.Pair("latency", latency.String()),
+				log.Pair("user-agent", c.Request.UserAgent()),
+				log.Pair("body", string(bodyBytes)),
+				log.Pair("errors", c.Errors.String()),
+			)
+		} else {
+			// 正常请求只记录基本信息
+			log.Infow("HTTP Request",
+				log.Pair("status", statusCode),
+				log.Pair("method", method),
+				log.Pair("path", path),
+				log.Pair("ip", clientIP),
+				log.Pair("latency", latency.String()),
+			)
+		}
 	}
-	method := c.Request.Method
-	ip := c.ClientIP()
-
-	buf := new(bytes.Buffer)
-	buf.Grow(1024)
-	io.Copy(buf, c.Request.Body)
-	c.Request.Body = io.NopCloser(buf)
-	body = buf.String()
-	if buf.Len() > 1024 {
-		body = "too large body"
-	}
-
-	log.Infow("request",
-		log.Pair("request_id", requestID),
-		log.Pair("host", ip),
-		log.Pair("path", path),
-		log.Pair("method", method),
-		log.Pair("body", body),
-	)
-
-	bw := &bodyWriter{
-		ResponseWriter: c.Writer,
-		body:           new(bytes.Buffer),
-	}
-	c.Writer = bw
-
-	c.Next()
-
-	body = bw.body.String()
-	if buf.Len() > 1024 {
-		body = "too large body"
-	}
-	latency := time.Since(now)
-	log.Infow("response",
-		log.Pair("request_id", requestID),
-		log.Pair("host", ip),
-		log.Pair("path", path),
-		log.Pair("status", c.Writer.Status()),
-		log.Pair("cost", latency),
-		log.Pair("body", body),
-		log.Pair("error", c.Errors.ByType(gin.ErrorTypePrivate).String()),
-	)
 }

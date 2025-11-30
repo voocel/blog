@@ -3,23 +3,45 @@ package usecase
 import (
 	"blog/internal/entity"
 	"context"
-
-	"golang.org/x/sync/singleflight"
 )
 
 type UserUseCase struct {
-	repo UserRepo
-	sf   singleflight.Group
+	userRepo UserRepo
 }
 
-func NewUserUseCase(r UserRepo) *UserUseCase {
-	return &UserUseCase{repo: r}
+func NewUserUseCase(userRepo UserRepo) *UserUseCase {
+	return &UserUseCase{userRepo: userRepo}
 }
 
-func (u *UserUseCase) GetUserById(ctx context.Context, uid int64) (*entity.User, error) {
-	return u.repo.GetUserByIdRepo(ctx, uid)
+func (uc *UserUseCase) GetByID(ctx context.Context, id string) (*entity.UserResponse, error) {
+	user, err := uc.userRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entity.UserResponse{
+		Username: user.Username,
+		Email:    user.Email,
+		Role:     user.Role,
+		Avatar:   user.Avatar,
+	}, nil
 }
 
-func (u *UserUseCase) UserList(ctx context.Context, page, pageSize int, search string) ([]*entity.User, int64, error) {
-	return u.repo.GetUsersRepo(ctx, page, pageSize, search)
+func (uc *UserUseCase) UpdateProfile(ctx context.Context, id string, req entity.UpdateProfileRequest) error {
+	user, err := uc.userRepo.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if req.Username != "" {
+		user.Username = req.Username
+	}
+	if req.Bio != "" {
+		user.Bio = req.Bio
+	}
+	if req.Avatar != "" {
+		user.Avatar = req.Avatar
+	}
+
+	return uc.userRepo.Update(ctx, user)
 }

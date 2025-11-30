@@ -2,56 +2,71 @@ package repo
 
 import (
 	"blog/internal/entity"
+	"blog/internal/usecase"
 	"context"
+	"errors"
 
 	"gorm.io/gorm"
 )
 
-type CategoryRepo struct {
+type categoryRepo struct {
 	db *gorm.DB
 }
 
-func NewCategoryRepo(db *gorm.DB) *CategoryRepo {
-	return &CategoryRepo{db: db}
+func NewCategoryRepo(db *gorm.DB) usecase.CategoryRepo {
+	return &categoryRepo{db: db}
 }
 
-func (c CategoryRepo) AddCategoryRepo(ctx context.Context, category *entity.Category) error {
-	return c.db.WithContext(ctx).Create(category).Error
+func (r *categoryRepo) Create(ctx context.Context, category *entity.Category) error {
+	return r.db.WithContext(ctx).Create(category).Error
 }
 
-func (c CategoryRepo) GetCategoryByIdRepo(ctx context.Context, cid int64) (*entity.Category, error) {
-	var category = new(entity.Category)
-	err := c.db.WithContext(ctx).Where("id = ?", cid).First(category).Error
-	return category, err
+func (r *categoryRepo) GetByID(ctx context.Context, id string) (*entity.Category, error) {
+	var category entity.Category
+	err := r.db.WithContext(ctx).Where("id = ?", id).First(&category).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("category not found")
+		}
+		return nil, err
+	}
+	return &category, nil
 }
 
-func (c CategoryRepo) GetCategoryByNameRepo(ctx context.Context, name string) (*entity.Category, error) {
-	var category = new(entity.Category)
-	err := c.db.WithContext(ctx).Where("name = ?", name).First(category).Error
-	return category, err
+func (r *categoryRepo) GetBySlug(ctx context.Context, slug string) (*entity.Category, error) {
+	var category entity.Category
+	err := r.db.WithContext(ctx).Where("slug = ?", slug).First(&category).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("category not found")
+		}
+		return nil, err
+	}
+	return &category, nil
 }
 
-func (c CategoryRepo) GetCategoryByNameExistRepo(ctx context.Context, name string) (bool, error) {
-	c.db.WithContext(ctx).Where("name = ?", name).First(&entity.Category{})
-	return c.db.RowsAffected > 0, c.db.Error
-}
-
-func (c CategoryRepo) GetCategoriesRepo(ctx context.Context) ([]*entity.Category, error) {
-	categories := make([]*entity.Category, 0)
-	err := c.db.WithContext(ctx).Find(&categories).Error
+func (r *categoryRepo) List(ctx context.Context) ([]entity.Category, error) {
+	var categories []entity.Category
+	err := r.db.WithContext(ctx).Order("name ASC").Find(&categories).Error
 	return categories, err
 }
 
-func (c CategoryRepo) UpdateCategoryRepo(ctx context.Context, category *entity.Category) error {
-	return c.db.WithContext(ctx).Model(category).Updates(category).Error
+func (r *categoryRepo) Update(ctx context.Context, category *entity.Category) error {
+	return r.db.WithContext(ctx).Save(category).Error
 }
 
-func (c CategoryRepo) DeleteCategoryRepo(ctx context.Context, cid int64) error {
-	return c.db.WithContext(ctx).Delete(&entity.Category{}, cid).Error
+func (r *categoryRepo) Delete(ctx context.Context, id string) error {
+	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Category{}).Error
 }
 
-func (c CategoryRepo) GetCategoryByPathExistRepo(ctx context.Context, path string) (bool, error) {
-	var count int64
-	err := c.db.WithContext(ctx).Model(&entity.Category{}).Where("path = ?", path).Count(&count).Error
-	return count > 0, err
+func (r *categoryRepo) IncrementCount(ctx context.Context, id string) error {
+	return r.db.WithContext(ctx).Model(&entity.Category{}).
+		Where("id = ?", id).
+		UpdateColumn("count", gorm.Expr("count + 1")).Error
+}
+
+func (r *categoryRepo) DecrementCount(ctx context.Context, id string) error {
+	return r.db.WithContext(ctx).Model(&entity.Category{}).
+		Where("id = ?", id).
+		UpdateColumn("count", gorm.Expr("CASE WHEN count > 0 THEN count - 1 ELSE 0 END")).Error
 }

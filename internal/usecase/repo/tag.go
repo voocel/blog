@@ -2,56 +2,65 @@ package repo
 
 import (
 	"blog/internal/entity"
+	"blog/internal/usecase"
 	"context"
+	"errors"
+
 	"gorm.io/gorm"
 )
 
-type TagRepo struct {
+type tagRepo struct {
 	db *gorm.DB
 }
 
-func NewTagRepo(db *gorm.DB) *TagRepo {
-	return &TagRepo{db: db}
+func NewTagRepo(db *gorm.DB) usecase.TagRepo {
+	return &tagRepo{db: db}
 }
 
-func (t TagRepo) AddTagRepo(ctx context.Context, tag *entity.Tag) error {
-	return t.db.WithContext(ctx).Create(tag).Error
+func (r *tagRepo) Create(ctx context.Context, tag *entity.Tag) error {
+	return r.db.WithContext(ctx).Create(tag).Error
 }
 
-func (t TagRepo) AddTagsRepo(ctx context.Context, tags []*entity.Tag) error {
-	return t.db.WithContext(ctx).Create(tags).Error
+func (r *tagRepo) GetByID(ctx context.Context, id string) (*entity.Tag, error) {
+	var tag entity.Tag
+	err := r.db.WithContext(ctx).Where("id = ?", id).First(&tag).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("tag not found")
+		}
+		return nil, err
+	}
+	return &tag, nil
 }
 
-func (t TagRepo) GetTagByIdRepo(ctx context.Context, id int64) (*entity.Tag, error) {
-	tag := new(entity.Tag)
-	err := t.db.WithContext(ctx).Where("id = ?", id).First(tag).Error
-	return tag, err
+func (r *tagRepo) GetByName(ctx context.Context, name string) (*entity.Tag, error) {
+	var tag entity.Tag
+	err := r.db.WithContext(ctx).Where("name = ?", name).First(&tag).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("tag not found")
+		}
+		return nil, err
+	}
+	return &tag, nil
 }
 
-func (t TagRepo) GetTagByNameRepo(ctx context.Context, name string) (*entity.Tag, error) {
-	tag := new(entity.Tag)
-	err := t.db.WithContext(ctx).Where("name = ?", name).First(tag).Error
-	return tag, err
+func (r *tagRepo) GetByIDs(ctx context.Context, ids []string) ([]entity.Tag, error) {
+	var tags []entity.Tag
+	err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&tags).Error
+	return tags, err
 }
 
-func (t TagRepo) GetTagByNameExistRepo(ctx context.Context, name string) (bool, error) {
-	t.db.WithContext(ctx).Where("name = ?", name).First(&entity.Tag{})
-	return t.db.RowsAffected > 0, t.db.Error
+func (r *tagRepo) List(ctx context.Context) ([]entity.Tag, error) {
+	var tags []entity.Tag
+	err := r.db.WithContext(ctx).Order("name ASC").Find(&tags).Error
+	return tags, err
 }
 
-func (t TagRepo) GetTagsRepo(ctx context.Context) ([]*entity.Tag, error) {
-	var tags []*entity.Tag
-	return tags, t.db.WithContext(ctx).Find(&tags).Error
+func (r *tagRepo) Update(ctx context.Context, tag *entity.Tag) error {
+	return r.db.WithContext(ctx).Save(tag).Error
 }
 
-func (t TagRepo) UpdateTagRepo(ctx context.Context, tag *entity.Tag) error {
-	return t.db.WithContext(ctx).Updates(tag).Error
-}
-
-func (t TagRepo) DeleteTagRepo(ctx context.Context, id int64) error {
-	return t.db.WithContext(ctx).Delete(&entity.Tag{}, id).Error
-}
-
-func (t TagRepo) DeleteTagsBatchRepo(ctx context.Context, ids []int64) error {
-	return t.db.WithContext(ctx).Delete(&entity.Tag{}, ids).Error
+func (r *tagRepo) Delete(ctx context.Context, id string) error {
+	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Tag{}).Error
 }

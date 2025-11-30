@@ -1,66 +1,69 @@
 package entity
 
 import (
-	"database/sql"
 	"time"
+
+	"gorm.io/gorm"
 )
 
+// User 用户模型
 type User struct {
-	ID            int64        `gorm:"primarykey" json:"id"`
-	Username      string       `gorm:"size:32;not null;index" json:"username"`
-	Email         string       `gorm:"size:100;not null;uniqueIndex" json:"email"`
-	Password      string       `gorm:"size:255;not null" json:"password"`
-	Nickname      string       `gorm:"size:50" json:"nickname"`
-	Avatar        string       `gorm:"size:255" json:"avatar"`
-	Website       string       `gorm:"size:255" json:"website"`
-	Description   string       `gorm:"size:500" json:"description"`
-	Role          string       `gorm:"size:20;default:user" json:"role"`     // admin, user
-	Status        string       `gorm:"size:20;default:active" json:"status"` // active, inactive
-	Mobile        string       `gorm:"size:20" json:"mobile"`
-	IP            string       `gorm:"size:45" json:"ip"`
-	Scores        int64        `gorm:"default:0" json:"scores"` // 积分
-	Sex           int8         `gorm:"default:0" json:"sex"`
-	Source        int8         `gorm:"default:0" json:"source"` // 注册来源
-	Birthday      time.Time    `json:"birthday"`
-	LastLoginTime time.Time    `json:"lastLoginTime"`
-	CreatedAt     time.Time    `json:"createdAt"`
-	UpdatedAt     time.Time    `json:"updatedAt"`
-	DeletedAt     sql.NullTime `gorm:"index" json:"-"`
+	ID         string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	Username   string    `gorm:"type:varchar(50);not null" json:"username"` // 昵称，非唯一
+	Email      string    `gorm:"type:varchar(100);uniqueIndex;not null" json:"email"` // 唯一标识
+	Password   string    `gorm:"type:varchar(255)" json:"-"` // 可选，OAuth 用户可为空
+	Role       string    `gorm:"type:varchar(20);not null;default:'visitor'" json:"role"` // admin | visitor
+	Avatar     string    `gorm:"type:varchar(500)" json:"avatar,omitempty"`
+	Bio        string    `gorm:"type:text" json:"bio,omitempty"`
+	Provider   string    `gorm:"type:varchar(20);not null;default:'email';uniqueIndex:idx_provider_user" json:"provider"` // email | google | github | apple
+	ProviderID string    `gorm:"type:varchar(255);uniqueIndex:idx_provider_user" json:"-"` // 第三方平台用户ID，与provider组合唯一
+	CreatedAt  time.Time `gorm:"autoCreateTime" json:"createdAt"`
+	UpdatedAt  time.Time `gorm:"autoUpdateTime" json:"updatedAt"`
 }
 
-// UserAdminResponse 管理员用户响应
-type UserAdminResponse struct {
-	ID          int64  `json:"id"`
-	Username    string `json:"username"`
-	Email       string `json:"email"`
-	Avatar      string `json:"avatar"`
-	Role        string `json:"role"`
-	Status      string `json:"status"`
-	Nickname    string `json:"nickname,omitempty"`
-	Website     string `json:"website,omitempty"`
-	Description string `json:"description,omitempty"`
-	CreatedAt   string `json:"createdAt"`
-	UpdatedAt   string `json:"updatedAt"`
+// TableName 指定表名
+func (User) TableName() string {
+	return "users"
 }
 
-// CreateUserRequest 创建用户请求
-type CreateUserRequest struct {
-	Username    string `json:"username" binding:"required,min=3,max=32" msg:"用户名长度3-32位"`
-	Email       string `json:"email" binding:"required,email" msg:"邮箱格式不正确"`
-	Password    string `json:"password" binding:"required,min=6" msg:"密码至少6位"`
-	Role        string `json:"role,omitempty"`
-	Nickname    string `json:"nickname,omitempty"`
-	Website     string `json:"website,omitempty"`
-	Description string `json:"description,omitempty"`
+// BeforeCreate GORM 钩子，在创建前确保 provider 有值
+func (u *User) BeforeCreate(tx *gorm.DB) error {
+	if u.Provider == "" {
+		u.Provider = "email"
+	}
+	return nil
 }
 
-// UpdateUserRequest 更新用户请求
-type UpdateUserRequest struct {
-	Username    string `json:"username,omitempty"`
-	Email       string `json:"email,omitempty"`
-	Role        string `json:"role,omitempty"`
-	Status      string `json:"status,omitempty"`
-	Nickname    string `json:"nickname,omitempty"`
-	Website     string `json:"website,omitempty"`
-	Description string `json:"description,omitempty"`
+// UserResponse 用户响应（不包含密码）
+type UserResponse struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Role     string `json:"role"`
+	Avatar   string `json:"avatar,omitempty"`
+}
+
+// LoginRequest 登录请求
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+// RegisterRequest 注册请求
+type RegisterRequest struct {
+	Username string `json:"username"` // 可选，如果为空则自动生成
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=6"`
+}
+
+// LoginResponse 登录响应
+type LoginResponse struct {
+	Token string       `json:"token"`
+	User  UserResponse `json:"user"`
+}
+
+// UpdateProfileRequest 更新个人信息请求
+type UpdateProfileRequest struct {
+	Username string `json:"username,omitempty"`
+	Bio      string `json:"bio,omitempty"`
+	Avatar   string `json:"avatar,omitempty"`
 }

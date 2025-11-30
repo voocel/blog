@@ -2,6 +2,7 @@ package router
 
 import (
 	"blog/internal/http/handler"
+	"blog/internal/http/middleware"
 	"blog/internal/usecase"
 	"blog/internal/usecase/repo"
 
@@ -9,74 +10,94 @@ import (
 	"gorm.io/gorm"
 )
 
-// Router 路由接口
-type Router interface {
-	Load(r *gin.Engine)
-}
-
-// GetNewRouters 获取新的路由器列表
-func GetNewRouters(db *gorm.DB) (routers []Router) {
-	// 创建Repository层
+// SetupRoutes 配置所有路由
+func SetupRoutes(r *gin.Engine, db *gorm.DB) {
+	// 创建 Repository 层
 	userRepo := repo.NewUserRepo(db)
-	tagRepo := repo.NewTagRepo(db)
+	postRepo := repo.NewPostRepo(db)
 	categoryRepo := repo.NewCategoryRepo(db)
-	articleRepo := repo.NewArticleRepo(db)
-	commentRepo := repo.NewCommentRepo(db)
-	discussionRepo := repo.NewDiscussionRepo(db)
-	replyRepo := repo.NewReplyRepo(db)
-	friendlinkRepo := repo.NewFriendlinkRepo(db)
-	statisticsRepo := repo.NewStatisticsRepo(db)
+	tagRepo := repo.NewTagRepo(db)
+	mediaRepo := repo.NewMediaRepo(db)
+	analyticsRepo := repo.NewAnalyticsRepo(db)
 
-	// 创建UseCase层
+	// 创建 UseCase 层
 	authUseCase := usecase.NewAuthUseCase(userRepo)
 	userUseCase := usecase.NewUserUseCase(userRepo)
-	tagUseCase := usecase.NewTagUseCase(tagRepo)
+	postUseCase := usecase.NewPostUseCase(postRepo, categoryRepo, tagRepo)
 	categoryUseCase := usecase.NewCategoryUseCase(categoryRepo)
-	articleUseCase := usecase.NewArticleUseCase(articleRepo, userRepo, categoryRepo, tagRepo)
-	commentUseCase := usecase.NewCommentUseCase(commentRepo)
-	discussionUseCase := usecase.NewDiscussionUseCase(discussionRepo, replyRepo, userRepo, tagRepo)
-	friendlinkUseCase := usecase.NewFriendlinkUseCase(friendlinkRepo)
-	statisticsUseCase := usecase.NewStatisticsUseCase(statisticsRepo)
+	tagUseCase := usecase.NewTagUseCase(tagRepo)
+	mediaUseCase := usecase.NewMediaUseCase(mediaRepo)
+	analyticsUseCase := usecase.NewAnalyticsUseCase(analyticsRepo)
 
-	// 创建Handler层
-	authHandler := handler.NewAuthHandler(authUseCase)
-	userAdminHandler := handler.NewUserAdminHandler(userUseCase)
-	articleHandler := handler.NewArticleHandlerNew(articleUseCase, tagUseCase)
-	categoryHandler := handler.NewCategoryHandlerNew(categoryUseCase)
-	tagHandler := handler.NewTagHandlerNew(tagUseCase)
-	commentHandler := handler.NewCommentHandlerNew(commentUseCase, userUseCase)
-	fileHandler := handler.NewFileHandler()
-	discussionHandler := handler.NewDiscussionHandler(discussionUseCase)
-	friendlinkHandler := handler.NewFriendlinkHandler(friendlinkUseCase)
-	statisticsHandler := handler.NewStatisticsHandler(statisticsUseCase)
-	systemHandler := handler.NewSystemHandler()
+	// 创建 Handler 层
+	authHandler := handler.NewAuthHandler(authUseCase, userUseCase)
+	userHandler := handler.NewUserHandler(userUseCase)
+	postHandler := handler.NewPostHandler(postUseCase)
+	categoryHandler := handler.NewCategoryHandler(categoryUseCase)
+	tagHandler := handler.NewTagHandler(tagUseCase)
+	mediaHandler := handler.NewMediaHandler(mediaUseCase)
+	analyticsHandler := handler.NewAnalyticsHandler(analyticsUseCase)
 
-	// 创建Router层
-	authRouter := newAuthRouter(authHandler)
-	userAdminRouter := newUserAdminRouter(userAdminHandler)
-	articleRouter := newArticleRouterNew(articleHandler)
-	categoryRouter := newCategoryRouterNew(categoryHandler)
-	tagRouter := newTagRouterNew(tagHandler)
-	commentRouter := newCommentRouterNew(commentHandler)
-	fileRouter := newFileRouter(fileHandler)
-	discussionRouter := newDiscussionRouter(discussionHandler)
-	friendlinkRouter := newFriendlinkRouter(friendlinkHandler)
-	statisticsRouter := newStatisticsRouter(statisticsHandler)
-	systemRouter := newSystemRouter(systemHandler)
+	// API v1 路由组
+	v1 := r.Group("/api/v1")
+	{
+		// 0. System - Health Check
+		v1.GET("/health", handler.HealthCheck)
 
-	routers = append(routers,
-		authRouter,
-		userAdminRouter,
-		articleRouter,
-		categoryRouter,
-		tagRouter,
-		commentRouter,
-		fileRouter,
-		discussionRouter,
-		friendlinkRouter,
-		statisticsRouter,
-		systemRouter,
-	)
+		// 1. Authentication & User
+		auth := v1.Group("/auth")
+		{
+			auth.POST("/login", authHandler.Login)
+			auth.POST("/register", authHandler.Register)
+			auth.GET("/me", middleware.JWTAuth(), authHandler.GetCurrentUser)
+		}
 
-	return
+		users := v1.Group("/users")
+		users.Use(middleware.JWTAuth())
+		{
+			users.PUT("/profile", userHandler.UpdateProfile)
+		}
+
+		// 2. Blog Posts
+		posts := v1.Group("/posts")
+		{
+			posts.GET("", postHandler.ListPosts)           // 公开
+			posts.GET("/:id", postHandler.GetPost)         // 公开
+			posts.POST("", middleware.JWTAuth(), postHandler.CreatePost)
+			posts.PUT("/:id", middleware.JWTAuth(), postHandler.UpdatePost)
+			posts.DELETE("/:id", middleware.JWTAuth(), postHandler.DeletePost)
+		}
+
+		// 3. Taxonomy (Categories & Tags)
+		categories := v1.Group("/categories")
+		{
+			categories.GET("", categoryHandler.ListCategories) // 公开
+			categories.POST("", middleware.JWTAuth(), categoryHandler.CreateCategory)
+			categories.DELETE("/:id", middleware.JWTAuth(), categoryHandler.DeleteCategory)
+		}
+
+		tags := v1.Group("/tags")
+		{
+			tags.GET("", tagHandler.ListTags) // 公开
+			tags.POST("", middleware.JWTAuth(), tagHandler.CreateTag)
+			tags.DELETE("/:id", middleware.JWTAuth(), tagHandler.DeleteTag)
+		}
+
+		// 4. Media Assets
+		v1.POST("/upload", middleware.JWTAuth(), mediaHandler.UploadFile)
+
+		files := v1.Group("/files")
+		files.Use(middleware.JWTAuth())
+		{
+			files.GET("", mediaHandler.ListFiles)
+			files.DELETE("/:id", mediaHandler.DeleteFile)
+		}
+
+		// 5. Analytics
+		analytics := v1.Group("/analytics")
+		{
+			analytics.POST("/visit", analyticsHandler.LogVisit) // 公开
+			analytics.GET("/logs", middleware.JWTAuth(), analyticsHandler.GetLogs)
+		}
+	}
 }
