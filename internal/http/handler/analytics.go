@@ -25,7 +25,6 @@ func (h *AnalyticsHandler) LogVisit(c *gin.Context) {
 		return
 	}
 
-	// 提取 IP 和 User-Agent
 	ip := c.ClientIP()
 	userAgent := c.GetHeader("User-Agent")
 
@@ -50,4 +49,15 @@ func (h *AnalyticsHandler) GetLogs(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, logs)
+}
+
+// GetDashboardOverview - GET /analytics/dashboard-overview
+func (h *AnalyticsHandler) GetDashboardOverview(c *gin.Context) {
+	overview, err := h.analyticsUseCase.GetDashboardOverview(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, overview)
 }

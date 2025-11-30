@@ -4,7 +4,6 @@ import (
 	"time"
 )
 
-// Category 分类模型
 type Category struct {
 	ID        string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	Name      string    `gorm:"type:varchar(100);uniqueIndex;not null" json:"name"`
@@ -14,7 +13,6 @@ type Category struct {
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"-"`
 }
 
-// CategoryResponse 分类响应
 type CategoryResponse struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
@@ -22,7 +20,6 @@ type CategoryResponse struct {
 	Count int    `json:"count"`
 }
 
-// CreateCategoryRequest 创建分类请求
 type CreateCategoryRequest struct {
 	Name string `json:"name" binding:"required"`
 	Slug string `json:"slug"` // optional, auto-generated if empty

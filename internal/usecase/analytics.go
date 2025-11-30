@@ -9,17 +9,25 @@ import (
 
 type AnalyticsUseCase struct {
 	analyticsRepo AnalyticsRepo
+	postRepo      PostRepo
+	categoryRepo  CategoryRepo
+	tagRepo       TagRepo
+	mediaRepo     MediaRepo
 }
 
-func NewAnalyticsUseCase(analyticsRepo AnalyticsRepo) *AnalyticsUseCase {
-	return &AnalyticsUseCase{analyticsRepo: analyticsRepo}
+func NewAnalyticsUseCase(analyticsRepo AnalyticsRepo, postRepo PostRepo, categoryRepo CategoryRepo, tagRepo TagRepo, mediaRepo MediaRepo) *AnalyticsUseCase {
+	return &AnalyticsUseCase{
+		analyticsRepo: analyticsRepo,
+		postRepo:      postRepo,
+		categoryRepo:  categoryRepo,
+		tagRepo:       tagRepo,
+		mediaRepo:     mediaRepo,
+	}
 }
 
 func (uc *AnalyticsUseCase) LogVisit(ctx context.Context, req entity.LogVisitRequest, ip, userAgent string) error {
-	// 使用 GeoIP 查询地理位置
 	location := geoip.Lookup(ip)
 
-	// 如果未提供文章 ID，保存为 NULL 避免空字符串触发 UUID 解析错误
 	var postID *string
 	if req.PostID != "" {
 		postID = &req.PostID
@@ -63,4 +71,62 @@ func (uc *AnalyticsUseCase) GetLogs(ctx context.Context, startDate, endDate stri
 	}
 
 	return responses, nil
+}
+
+// GetDashboardOverview retrieves dashboard overview data
+func (uc *AnalyticsUseCase) GetDashboardOverview(ctx context.Context) (*entity.DashboardOverviewResponse, error) {
+	postsCount, _ := uc.postRepo.Count(ctx)
+	categoriesCount, _ := uc.categoryRepo.Count(ctx)
+	tagsCount, _ := uc.tagRepo.Count(ctx)
+	filesCount, _ := uc.mediaRepo.Count(ctx)
+
+	recentPosts, _ := uc.postRepo.GetRecent(ctx, 3)
+
+	recentPostResponses := make([]entity.PostResponse, 0, len(recentPosts))
+	for _, post := range recentPosts {
+		resp := entity.PostResponse{
+			ID:         post.ID,
+			Title:      post.Title,
+			Excerpt:    post.Excerpt,
+			Content:    post.Content,
+			Author:     post.Author,
+			Date:       post.Date,
+			CategoryID: post.CategoryID,
+			ImageUrl:   post.ImageUrl,
+			Views:      post.Views,
+			Status:     post.Status,
+			ReadTime:   calculateReadTime(post.Content),
+			Tags:       []string{},
+		}
+
+		if category, err := uc.categoryRepo.GetByID(ctx, post.CategoryID); err == nil {
+			resp.Category = category.Name
+		}
+
+		if tagIDs, err := uc.postRepo.GetTagIDs(ctx, post.ID); err == nil && len(tagIDs) > 0 {
+			if tags, err := uc.tagRepo.GetByIDs(ctx, tagIDs); err == nil {
+				for _, tag := range tags {
+					resp.Tags = append(resp.Tags, tag.Name)
+				}
+			}
+		}
+
+		recentPostResponses = append(recentPostResponses, resp)
+	}
+
+	systemStatus := entity.DashboardSystemStatus{
+		StorageUsage: 45, // todo
+		AIQuota:      60, // todo
+	}
+
+	return &entity.DashboardOverviewResponse{
+		Counts: entity.DashboardCounts{
+			Posts:      postsCount,
+			Categories: categoriesCount,
+			Tags:       tagsCount,
+			Files:      filesCount,
+		},
+		RecentPosts:  recentPostResponses,
+		SystemStatus: systemStatus,
+	}, nil
 }

@@ -24,7 +24,6 @@ func NewPostUseCase(postRepo PostRepo, categoryRepo CategoryRepo, tagRepo TagRep
 }
 
 func (uc *PostUseCase) Create(ctx context.Context, req entity.CreatePostRequest, author string) error {
-	// 设置默认状态
 	if req.Status == "" {
 		req.Status = "draft"
 	}
@@ -41,19 +40,16 @@ func (uc *PostUseCase) Create(ctx context.Context, req entity.CreatePostRequest,
 		Views:      0,
 	}
 
-	// 创建文章
 	if err := uc.postRepo.Create(ctx, post); err != nil {
 		return err
 	}
 
-	// 添加标签关联
 	if len(req.Tags) > 0 {
 		if err := uc.postRepo.AddTags(ctx, post.ID, req.Tags); err != nil {
 			return err
 		}
 	}
 
-	// 更新分类计数
 	uc.categoryRepo.IncrementCount(ctx, req.CategoryID)
 
 	return nil
@@ -65,7 +61,7 @@ func (uc *PostUseCase) GetByID(ctx context.Context, id string) (*entity.PostResp
 		return nil, err
 	}
 
-	// 增加浏览量
+	// Increment views
 	go uc.postRepo.IncrementViews(context.Background(), id)
 
 	return uc.assemblePostResponse(ctx, post)
@@ -86,7 +82,7 @@ func (uc *PostUseCase) List(ctx context.Context, filters map[string]interface{},
 		responses = append(responses, *resp)
 	}
 
-	// 如果有分页参数，返回分页响应
+	// Return paginated response if pagination parameters provided
 	if page > 0 && limit > 0 {
 		totalPages := int(math.Ceil(float64(total) / float64(limit)))
 		return entity.PaginatedPostsResponse{
@@ -100,7 +96,7 @@ func (uc *PostUseCase) List(ctx context.Context, filters map[string]interface{},
 		}, nil
 	}
 
-	// 否则直接返回数组
+	// Otherwise return array directly
 	return responses, nil
 }
 
@@ -110,7 +106,7 @@ func (uc *PostUseCase) Update(ctx context.Context, id string, req entity.UpdateP
 		return err
 	}
 
-	// 更新字段
+	// Update fields
 	if req.Title != "" {
 		post.Title = req.Title
 	}
@@ -127,19 +123,18 @@ func (uc *PostUseCase) Update(ctx context.Context, id string, req entity.UpdateP
 		post.Status = req.Status
 	}
 
-	// 处理分类变更
+	// Handle category change
 	if req.CategoryID != "" && req.CategoryID != post.CategoryID {
 		uc.categoryRepo.DecrementCount(ctx, post.CategoryID)
 		uc.categoryRepo.IncrementCount(ctx, req.CategoryID)
 		post.CategoryID = req.CategoryID
 	}
 
-	// 更新文章
 	if err := uc.postRepo.Update(ctx, post); err != nil {
 		return err
 	}
 
-	// 更新标签
+	// Update tags
 	if req.Tags != nil {
 		uc.postRepo.RemoveTags(ctx, id)
 		if len(req.Tags) > 0 {
@@ -156,18 +151,15 @@ func (uc *PostUseCase) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
-	// 删除文章
 	if err := uc.postRepo.Delete(ctx, id); err != nil {
 		return err
 	}
 
-	// 更新分类计数
 	uc.categoryRepo.DecrementCount(ctx, post.CategoryID)
 
 	return nil
 }
 
-// 组装文章响应
 func (uc *PostUseCase) assemblePostResponse(ctx context.Context, post *entity.Post) (*entity.PostResponse, error) {
 	resp := &entity.PostResponse{
 		ID:         post.ID,
@@ -184,12 +176,10 @@ func (uc *PostUseCase) assemblePostResponse(ctx context.Context, post *entity.Po
 		Tags:       []string{},
 	}
 
-	// 获取分类名称
 	if category, err := uc.categoryRepo.GetByID(ctx, post.CategoryID); err == nil {
 		resp.Category = category.Name
 	}
 
-	// 获取标签名称
 	if tagIDs, err := uc.postRepo.GetTagIDs(ctx, post.ID); err == nil && len(tagIDs) > 0 {
 		if tags, err := uc.tagRepo.GetByIDs(ctx, tagIDs); err == nil {
 			for _, tag := range tags {
@@ -201,7 +191,7 @@ func (uc *PostUseCase) assemblePostResponse(ctx context.Context, post *entity.Po
 	return resp, nil
 }
 
-// 计算阅读时间（约200字/分钟）
+// calculateReadTime calculates reading time (approximately 200 words/minute)
 func calculateReadTime(content string) string {
 	wordCount := len(strings.Fields(content))
 	minutes := wordCount / 200

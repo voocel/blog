@@ -42,3 +42,10 @@ func (r *mediaRepo) List(ctx context.Context) ([]entity.Media, error) {
 func (r *mediaRepo) Delete(ctx context.Context, id string) error {
 	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Media{}).Error
 }
+
+// Count counts total number of media files
+func (r *mediaRepo) Count(ctx context.Context) (int64, error) {
+	var count int64
+	err := r.db.WithContext(ctx).Model(&entity.Media{}).Count(&count).Error
+	return count, err
+}

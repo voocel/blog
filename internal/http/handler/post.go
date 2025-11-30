@@ -19,7 +19,6 @@ func NewPostHandler(postUseCase *usecase.PostUseCase) *PostHandler {
 
 // ListPosts - GET /posts
 func (h *PostHandler) ListPosts(c *gin.Context) {
-	// 获取查询参数
 	page, _ := strconv.Atoi(c.Query("page"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
 	category := c.Query("category")
@@ -27,7 +26,6 @@ func (h *PostHandler) ListPosts(c *gin.Context) {
 	status := c.DefaultQuery("status", "published")
 	search := c.Query("search")
 
-	// 构建过滤条件
 	filters := make(map[string]interface{})
 	if category != "" {
 		filters["categoryId"] = category
@@ -42,7 +40,6 @@ func (h *PostHandler) ListPosts(c *gin.Context) {
 		filters["search"] = search
 	}
 
-	// 获取文章列表
 	result, err := h.postUseCase.List(c.Request.Context(), filters, page, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -75,7 +72,10 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 
 	var req entity.CreatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid request",
+			"details": err.Error(),
+		})
 		return
 	}
 
@@ -93,7 +93,10 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 
 	var req entity.UpdatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid request",
+			"details": err.Error(),
+		})
 		return
 	}
 
@@ -102,7 +105,6 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 		return
 	}
 
-	// 返回更新后的文章
 	post, _ := h.postUseCase.GetByID(c.Request.Context(), id)
 	c.JSON(http.StatusOK, post)
 }

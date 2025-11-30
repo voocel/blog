@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// Media 媒体文件模型
+// Media media file model
 type Media struct {
 	ID        string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	URL       string    `gorm:"type:varchar(500);not null" json:"url"` // Absolute URL
@@ -18,7 +18,7 @@ type Media struct {
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"-"`
 }
 
-// MediaResponse 媒体文件响应
+// MediaResponse media file response
 type MediaResponse struct {
 	ID   string `json:"id"`
 	URL  string `json:"url"`

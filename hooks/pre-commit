@@ -1,9 +1,9 @@
 #!/bin/sh
 
 #
-#  Go代码规范自动审查
+#  Go code style automatic review
 #
-#  使用方法: 拷贝此文件到仓库目录".git/hooks"
+#  Usage: Copy this file to repository directory ".git/hooks"
 #
 
 set -e
@@ -13,8 +13,8 @@ go fmt .
 
 # Check the exit status
 if [ $? -eq 0 ]; then
-  echo "恭喜您, 代码符合规范!"
+  echo "Congratulations, code complies with standards!"
 else
-  echo "代码规范审查失败, 请修改后再进行提交!"
+  echo "Code style review failed, please modify before committing!"
   exit 1
 fi

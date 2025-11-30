@@ -81,7 +81,7 @@ func LoadConfig(paths ...string) {
 	}
 
 	viper.SetConfigType("yaml")
-	viper.SetEnvPrefix("social")
+	viper.SetEnvPrefix("blog")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 

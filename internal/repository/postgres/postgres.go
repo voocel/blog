@@ -24,7 +24,7 @@ var (
 	SmallerThanPredicate        = Predicate("<")
 	SmallerThanOrEqualPredicate = Predicate("<=")
 	LikePredicate               = Predicate("LIKE")
-	ILikePredicate              = Predicate("ILIKE") // PostgreSQL 特有的不区分大小写匹配
+	ILikePredicate              = Predicate("ILIKE") // PostgreSQL-specific case-insensitive matching
 )
 
 var _ Repo = (*dbRepo)(nil)
@@ -88,14 +88,14 @@ func (d *dbRepo) DbWClose() error {
 
 func dbConnect(user, pass, addr, dbName, sslMode string) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=Asia/Shanghai",
-		addr, // host:port 格式
+		addr, // host:port format
 		user,
 		pass,
 		dbName,
-		"", // port 已经包含在 addr 中，这里留空
+		"",
 		sslMode)
 
-	// 重新格式化 DSN，正确分离 host 和 port
+	// Reformat DSN, correctly separate host and port
 	host, port := parseAddress(addr)
 	dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=Asia/Shanghai",
 		host,
@@ -144,7 +144,7 @@ func dbConnect(user, pass, addr, dbName, sslMode string) (*gorm.DB, error) {
 	return db, nil
 }
 
-// parseAddress 解析地址字符串，分离 host 和 port
+// parseAddress parses address string, separates host and port
 func parseAddress(addr string) (host, port string) {
 	if len(addr) == 0 {
 		return "localhost", "5432"
@@ -156,7 +156,6 @@ func parseAddress(addr string) (host, port string) {
 		}
 	}
 
-	// 如果没有找到 :，则认为整个字符串是 host
 	return addr, "5432"
 }
 

@@ -64,3 +64,10 @@ func (r *tagRepo) Update(ctx context.Context, tag *entity.Tag) error {
 func (r *tagRepo) Delete(ctx context.Context, id string) error {
 	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Tag{}).Error
 }
+
+// Count counts total number of tags
+func (r *tagRepo) Count(ctx context.Context) (int64, error) {
+	var count int64
+	err := r.db.WithContext(ctx).Model(&entity.Tag{}).Count(&count).Error
+	return count, err
+}

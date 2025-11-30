@@ -10,9 +10,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// SetupRoutes 配置所有路由
+// SetupRoutes configures all routes
 func SetupRoutes(r *gin.Engine, db *gorm.DB) {
-	// 创建 Repository 层
+	// Create Repository layer
 	userRepo := repo.NewUserRepo(db)
 	postRepo := repo.NewPostRepo(db)
 	categoryRepo := repo.NewCategoryRepo(db)
@@ -20,16 +20,16 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	mediaRepo := repo.NewMediaRepo(db)
 	analyticsRepo := repo.NewAnalyticsRepo(db)
 
-	// 创建 UseCase 层
+	// Create UseCase layer
 	authUseCase := usecase.NewAuthUseCase(userRepo)
 	userUseCase := usecase.NewUserUseCase(userRepo)
 	postUseCase := usecase.NewPostUseCase(postRepo, categoryRepo, tagRepo)
 	categoryUseCase := usecase.NewCategoryUseCase(categoryRepo)
 	tagUseCase := usecase.NewTagUseCase(tagRepo)
 	mediaUseCase := usecase.NewMediaUseCase(mediaRepo)
-	analyticsUseCase := usecase.NewAnalyticsUseCase(analyticsRepo)
+	analyticsUseCase := usecase.NewAnalyticsUseCase(analyticsRepo, postRepo, categoryRepo, tagRepo, mediaRepo)
 
-	// 创建 Handler 层
+	// Create Handler layer
 	authHandler := handler.NewAuthHandler(authUseCase, userUseCase)
 	userHandler := handler.NewUserHandler(userUseCase)
 	postHandler := handler.NewPostHandler(postUseCase)
@@ -38,13 +38,13 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	mediaHandler := handler.NewMediaHandler(mediaUseCase)
 	analyticsHandler := handler.NewAnalyticsHandler(analyticsUseCase)
 
-	// API v1 路由组
+	// API v1 route group
 	v1 := r.Group("/api/v1")
 	{
-		// 0. System - Health Check
+		// System - Health Check
 		v1.GET("/health", handler.HealthCheck)
 
-		// 1. Authentication & User
+		// Authentication & User
 		auth := v1.Group("/auth")
 		{
 			auth.POST("/login", authHandler.Login)
@@ -58,32 +58,32 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 			users.PUT("/profile", userHandler.UpdateProfile)
 		}
 
-		// 2. Blog Posts
+		// Blog Posts
 		posts := v1.Group("/posts")
 		{
-			posts.GET("", postHandler.ListPosts)           // 公开
-			posts.GET("/:id", postHandler.GetPost)         // 公开
+			posts.GET("", postHandler.ListPosts)   // Public
+			posts.GET("/:id", postHandler.GetPost) // Public
 			posts.POST("", middleware.JWTAuth(), postHandler.CreatePost)
 			posts.PUT("/:id", middleware.JWTAuth(), postHandler.UpdatePost)
 			posts.DELETE("/:id", middleware.JWTAuth(), postHandler.DeletePost)
 		}
 
-		// 3. Taxonomy (Categories & Tags)
+		// Taxonomy (Categories & Tags)
 		categories := v1.Group("/categories")
 		{
-			categories.GET("", categoryHandler.ListCategories) // 公开
+			categories.GET("", categoryHandler.ListCategories) // Public
 			categories.POST("", middleware.JWTAuth(), categoryHandler.CreateCategory)
 			categories.DELETE("/:id", middleware.JWTAuth(), categoryHandler.DeleteCategory)
 		}
 
 		tags := v1.Group("/tags")
 		{
-			tags.GET("", tagHandler.ListTags) // 公开
+			tags.GET("", tagHandler.ListTags) // Public
 			tags.POST("", middleware.JWTAuth(), tagHandler.CreateTag)
 			tags.DELETE("/:id", middleware.JWTAuth(), tagHandler.DeleteTag)
 		}
 
-		// 4. Media Assets
+		// Media Assets
 		v1.POST("/upload", middleware.JWTAuth(), mediaHandler.UploadFile)
 
 		files := v1.Group("/files")
@@ -93,11 +93,12 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 			files.DELETE("/:id", mediaHandler.DeleteFile)
 		}
 
-		// 5. Analytics
+		// Analytics
 		analytics := v1.Group("/analytics")
 		{
-			analytics.POST("/visit", analyticsHandler.LogVisit) // 公开
+			analytics.POST("/visit", analyticsHandler.LogVisit) // Public
 			analytics.GET("/logs", middleware.JWTAuth(), analyticsHandler.GetLogs)
+			analytics.GET("/dashboard-overview", middleware.JWTAuth(), analyticsHandler.GetDashboardOverview)
 		}
 	}
 }

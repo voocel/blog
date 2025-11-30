@@ -6,19 +6,19 @@ log_level_addr: :4245
 log_level_pattern: /log/level
 
 app:
-  domain: http://localhost        # 对外访问域名（生产环境可改为实际域名）
+  domain: http://localhost
   static_root_path: static
   runtime_root_path: runtime/
   image_allow_ext: .jpg,.jpeg,.png,.gif,.webp
   image_max_size: 5
   heartbeat: 1000
   jwt_time: 7200
-  jwt_secret: blog-secret-key-2024
+  jwt_secret: blog-secret-key-1024
   upload_path: uploads
-  geoip_db_path: config/GeoLite2-City.mmdb  # GeoIP 数据库文件路径（City 版本）
+  geoip_db_path: config/GeoLite2-City.mmdb
 
 http:
-  addr: :8080                     # HTTP服务器监听端口
+  addr: :8080
 
 postgres:
   host: 127.0.0.1

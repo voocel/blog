@@ -33,14 +33,14 @@ func (r *postRepo) GetByID(ctx context.Context, id string) (*entity.Post, error)
 	return &post, nil
 }
 
-// List 支持多种过滤条件和可选分页
+// List supports multiple filter conditions and optional pagination
 func (r *postRepo) List(ctx context.Context, filters map[string]interface{}, page, limit int) ([]entity.Post, int64, error) {
 	var posts []entity.Post
 	var total int64
 
 	query := r.db.WithContext(ctx).Model(&entity.Post{})
 
-	// 应用过滤条件
+	// Apply filter conditions
 	if categoryID, ok := filters["categoryId"].(string); ok && categoryID != "" {
 		query = query.Where("category_id = ?", categoryID)
 	}
@@ -51,19 +51,19 @@ func (r *postRepo) List(ctx context.Context, filters map[string]interface{}, pag
 		query = query.Where("title LIKE ? OR excerpt LIKE ?", "%"+search+"%", "%"+search+"%")
 	}
 
-	// 获取总数
+	// Get total count
 	err := query.Count(&total).Error
 	if err != nil {
 		return nil, 0, err
 	}
 
-	// 分页查询（如果提供了 page 和 limit）
+	// Paginated query (if page and limit provided)
 	if page > 0 && limit > 0 {
 		offset := (page - 1) * limit
 		query = query.Offset(offset).Limit(limit)
 	}
 
-	// 按日期倒序排列
+	// Order by date descending
 	err = query.Order("date DESC").Find(&posts).Error
 	if err != nil {
 		return nil, 0, err
@@ -77,9 +77,9 @@ func (r *postRepo) Update(ctx context.Context, post *entity.Post) error {
 }
 
 func (r *postRepo) Delete(ctx context.Context, id string) error {
-	// 先删除关联的标签
+	// First delete associated tags
 	r.RemoveTags(ctx, id)
-	// 再删除文章
+	// Then delete the post
 	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Post{}).Error
 }
 
@@ -89,7 +89,7 @@ func (r *postRepo) IncrementViews(ctx context.Context, id string) error {
 		UpdateColumn("views", gorm.Expr("views + 1")).Error
 }
 
-// AddTags 添加文章标签关联
+// AddTags adds post-tag associations
 func (r *postRepo) AddTags(ctx context.Context, postID string, tagIDs []string) error {
 	var postTags []entity.PostTag
 	for _, tagID := range tagIDs {
@@ -101,12 +101,12 @@ func (r *postRepo) AddTags(ctx context.Context, postID string, tagIDs []string) 
 	return r.db.WithContext(ctx).Create(&postTags).Error
 }
 
-// RemoveTags 删除文章的所有标签关联
+// RemoveTags removes all tag associations for a post
 func (r *postRepo) RemoveTags(ctx context.Context, postID string) error {
 	return r.db.WithContext(ctx).Where("post_id = ?", postID).Delete(&entity.PostTag{}).Error
 }
 
-// GetTagIDs 获取文章的标签 ID 列表
+// GetTagIDs gets tag ID list for a post
 func (r *postRepo) GetTagIDs(ctx context.Context, postID string) ([]string, error) {
 	var postTags []entity.PostTag
 	err := r.db.WithContext(ctx).Where("post_id = ?", postID).Find(&postTags).Error
@@ -119,4 +119,22 @@ func (r *postRepo) GetTagIDs(ctx context.Context, postID string) ([]string, erro
 		tagIDs[i] = pt.TagID
 	}
 	return tagIDs, nil
+}
+
+// Count counts total number of posts (including drafts)
+func (r *postRepo) Count(ctx context.Context) (int64, error) {
+	var count int64
+	err := r.db.WithContext(ctx).Model(&entity.Post{}).Count(&count).Error
+	return count, err
+}
+
+// GetRecent gets recent posts
+func (r *postRepo) GetRecent(ctx context.Context, limit int) ([]entity.Post, error) {
+	var posts []entity.Post
+	err := r.db.WithContext(ctx).
+		Model(&entity.Post{}).
+		Order("date DESC").
+		Limit(limit).
+		Find(&posts).Error
+	return posts, err
 }

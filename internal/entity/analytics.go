@@ -4,11 +4,10 @@ import (
 	"time"
 )
 
-// Analytics 访问统计模型
 type Analytics struct {
 	ID        string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	PagePath  string    `gorm:"type:varchar(500);not null;index" json:"pagePath"`
-	PostID    *string   `gorm:"type:uuid;index" json:"postId,omitempty"` // 允许为空，防止空串触发 UUID 解析错误
+	PostID    *string   `gorm:"type:uuid;index" json:"postId,omitempty"` // Allow NULL to prevent empty string UUID parsing error
 	PostTitle string    `gorm:"type:varchar(255)" json:"postTitle,omitempty"`
 	IP        string    `gorm:"type:varchar(45);index" json:"ip"`
 	Location  string    `gorm:"type:varchar(200)" json:"location"`
@@ -17,7 +16,6 @@ type Analytics struct {
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"-"`
 }
 
-// AnalyticsResponse 访问统计响应
 type AnalyticsResponse struct {
 	ID        string  `json:"id"`
 	PagePath  string  `json:"pagePath"`
@@ -29,11 +27,28 @@ type AnalyticsResponse struct {
 	UserAgent string  `json:"userAgent"`
 }
 
-// LogVisitRequest 记录访问请求
 type LogVisitRequest struct {
 	PagePath  string `json:"pagePath" binding:"required"`
 	PostID    string `json:"postId,omitempty"`
 	PostTitle string `json:"postTitle,omitempty"`
+}
+
+type DashboardOverviewResponse struct {
+	Counts       DashboardCounts       `json:"counts"`
+	RecentPosts  []PostResponse        `json:"recentPosts"`
+	SystemStatus DashboardSystemStatus `json:"systemStatus"`
+}
+
+type DashboardCounts struct {
+	Posts      int64 `json:"posts"`      // Total posts including drafts
+	Categories int64 `json:"categories"` // Total categories
+	Tags       int64 `json:"tags"`       // Total tags
+	Files      int64 `json:"files"`      // Total uploaded files
+}
+
+type DashboardSystemStatus struct {
+	StorageUsage int `json:"storageUsage"` // Storage usage percentage 0-100
+	AIQuota      int `json:"aiQuota"`      // AI token usage percentage 0-100
 }
 
 func (Analytics) TableName() string {

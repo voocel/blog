@@ -1,0 +1,81 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer utilities {
+    @keyframes sine {
+
+        0%,
+        100% {
+            transform: translateY(3px);
+        }
+
+        50% {
+            transform: translateY(-3px);
+        }
+    }
+
+    .animate-sine {
+        animation: sine 1.2s ease-in-out infinite;
+    }
+}
+
+/* Markdown Styles for Chat */
+.markdown-content p {
+    margin-bottom: 0.5em;
+}
+
+.markdown-content p:last-child {
+    margin-bottom: 0;
+}
+
+.markdown-content a {
+    text-decoration: underline;
+    color: #14b8a6;
+    /* teal-500 */
+}
+
+.markdown-content ul,
+.markdown-content ol {
+    padding-left: 1.2em;
+    margin-bottom: 0.5em;
+    list-style-type: disc;
+}
+
+.markdown-content ol {
+    list-style-type: decimal;
+}
+
+.markdown-content code {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 0.1em 0.3em;
+    border-radius: 0.2em;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.markdown-content pre {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0.5em;
+    border-radius: 0.4em;
+    overflow-x: auto;
+    margin-bottom: 0.5em;
+}
+
+.markdown-content pre code {
+    background-color: transparent;
+    padding: 0;
+}
+
+/* Dark mode adjustments for user bubble */
+.bg-stone-800 .markdown-content a {
+    color: #5eead4;
+    /* teal-300 */
+}
+
+.bg-stone-800 .markdown-content code {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.bg-stone-800 .markdown-content pre {
+    background-color: rgba(0, 0, 0, 0.3);
+}

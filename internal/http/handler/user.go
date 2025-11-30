@@ -35,7 +35,6 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	// 返回更新后的用户信息
 	user, _ := h.userUseCase.GetByID(c.Request.Context(), userID.(string))
 	c.JSON(http.StatusOK, user)
 }

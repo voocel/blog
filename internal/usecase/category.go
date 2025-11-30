@@ -15,7 +15,7 @@ func NewCategoryUseCase(categoryRepo CategoryRepo) *CategoryUseCase {
 }
 
 func (uc *CategoryUseCase) Create(ctx context.Context, req entity.CreateCategoryRequest) error {
-	// 如果 slug 为空，自动生成
+	// Auto-generate slug if empty
 	slug := req.Slug
 	if slug == "" {
 		slug = generateSlug(req.Name)
@@ -53,7 +53,7 @@ func (uc *CategoryUseCase) Delete(ctx context.Context, id string) error {
 	return uc.categoryRepo.Delete(ctx, id)
 }
 
-// 生成 slug: 转小写，空格替换为 -
+// generateSlug generates slug: convert to lowercase, replace spaces with -
 func generateSlug(name string) string {
 	slug := strings.ToLower(name)
 	slug = strings.ReplaceAll(slug, " ", "-")

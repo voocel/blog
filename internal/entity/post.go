@@ -4,7 +4,6 @@ import (
 	"time"
 )
 
-// Post 博客文章模型
 type Post struct {
 	ID         string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	Title      string    `gorm:"type:varchar(255);not null" json:"title"`
@@ -20,7 +19,6 @@ type Post struct {
 	UpdatedAt  time.Time `gorm:"autoUpdateTime" json:"-"`
 }
 
-// PostTag 文章标签关联表
 type PostTag struct {
 	ID        string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	PostID    string    `gorm:"type:uuid;not null;index" json:"postId"`
@@ -28,7 +26,6 @@ type PostTag struct {
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt"`
 }
 
-// PostResponse 文章响应（包含关联信息）
 type PostResponse struct {
 	ID         string   `json:"id"`
 	Title      string   `json:"title"`
@@ -45,7 +42,6 @@ type PostResponse struct {
 	Status     string   `json:"status"`
 }
 
-// CreatePostRequest 创建文章请求
 type CreatePostRequest struct {
 	Title      string   `json:"title" binding:"required"`
 	Excerpt    string   `json:"excerpt" binding:"required"`
@@ -56,7 +52,6 @@ type CreatePostRequest struct {
 	Status     string   `json:"status"` // published | draft, default: draft
 }
 
-// UpdatePostRequest 更新文章请求
 type UpdatePostRequest struct {
 	Title      string   `json:"title,omitempty"`
 	Excerpt    string   `json:"excerpt,omitempty"`
@@ -67,13 +62,11 @@ type UpdatePostRequest struct {
 	Status     string   `json:"status,omitempty"`
 }
 
-// PaginatedPostsResponse 分页文章响应
 type PaginatedPostsResponse struct {
 	Data       []PostResponse `json:"data"`
 	Pagination Pagination     `json:"pagination"`
 }
 
-// Pagination 分页信息
 type Pagination struct {
 	Total      int `json:"total"`
 	Page       int `json:"page"`

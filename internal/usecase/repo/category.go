@@ -70,3 +70,10 @@ func (r *categoryRepo) DecrementCount(ctx context.Context, id string) error {
 		Where("id = ?", id).
 		UpdateColumn("count", gorm.Expr("CASE WHEN count > 0 THEN count - 1 ELSE 0 END")).Error
 }
+
+// Count counts total number of categories
+func (r *categoryRepo) Count(ctx context.Context) (int64, error) {
+	var count int64
+	err := r.db.WithContext(ctx).Model(&entity.Category{}).Count(&count).Error
+	return count, err
+}

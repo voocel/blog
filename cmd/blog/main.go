@@ -1,13 +1,6 @@
 package main
 
 import (
-	"blog/config"
-	"blog/internal/entity"
-	"blog/internal/http"
-	"blog/internal/repository/postgres"
-	"blog/pkg/geoip"
-	"blog/pkg/log"
-	"blog/pkg/util"
 	"context"
 	"flag"
 	"fmt"
@@ -15,34 +8,42 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"blog/config"
+	"blog/internal/entity"
+	"blog/internal/http"
+	"blog/internal/repository/postgres"
+	"blog/pkg/geoip"
+	"blog/pkg/log"
+	"blog/pkg/util"
 )
 
 var (
-	createAdmin = flag.Bool("create-admin", false, "创建管理员账号")
+	createAdmin = flag.Bool("create-admin", false, "Create admin account")
 )
 
 func main() {
 	config.LoadConfig()
-	flag.BoolVar(&config.Conf.Postgres.Migrate, "migrate", true, "是否自动迁移数据库")
+	flag.BoolVar(&config.Conf.Postgres.Migrate, "migrate", true, "Auto migrate database")
 	flag.Parse()
 
 	log.Init("http", "debug")
 
 	if config.Conf.App.GeoIPDBPath != "" {
 		if err := geoip.Init(config.Conf.App.GeoIPDBPath); err != nil {
-			log.Warnf("GeoIP 数据库初始化失败（将使用 'Unknown' 作为位置）: %v", err)
+			log.Warnf("GeoIP database initialization failed (will use 'Unknown' as location): %v", err)
 		} else {
-			log.Info("GeoIP 数据库初始化成功")
+			log.Info("GeoIP database initialized successfully")
 		}
 	}
 
-	// 如果设置了创建管理员账号参数
+	// If create admin account parameter is set
 	if *createAdmin {
 		if err := createAdminAccount(); err != nil {
-			log.Errorf("创建管理员账号失败: %v", err)
+			log.Errorf("Failed to create admin account: %v", err)
 			os.Exit(1)
 		}
-		log.Info("管理员账号创建成功!")
+		log.Info("Admin account created successfully!")
 		os.Exit(0)
 	}
 
@@ -72,11 +73,11 @@ func main() {
 	}
 }
 
-// createAdminAccount 创建管理员账号
+// createAdminAccount creates admin account
 func createAdminAccount() error {
 	dbRepo, err := postgres.New()
 	if err != nil {
-		return fmt.Errorf("数据库连接失败: %w", err)
+		return fmt.Errorf("database connection failed: %w", err)
 	}
 	defer func() {
 		dbRepo.DbWClose()
@@ -85,20 +86,17 @@ func createAdminAccount() error {
 
 	db := dbRepo.GetDbW()
 
-	// 检查是否已存在管理员账号
 	var existingUser entity.User
 	err = db.Where("email = ? OR role = ?", "admin@example.com", "admin").First(&existingUser).Error
 	if err == nil {
-		return fmt.Errorf("管理员账号已存在: %s", existingUser.Email)
+		return fmt.Errorf("admin account already exists: %s", existingUser.Email)
 	}
 
-	// 加密密码
 	hashedPassword, err := util.HashPassword("admin123")
 	if err != nil {
-		return fmt.Errorf("密码加密失败: %w", err)
+		return fmt.Errorf("password encryption failed: %w", err)
 	}
 
-	// 创建管理员用户
 	admin := &entity.User{
 		Username: "admin",
 		Email:    "admin@example.com",
@@ -107,16 +105,15 @@ func createAdminAccount() error {
 		Bio:      "Administrator",
 	}
 
-	// 保存到数据库
 	if err := db.Create(admin).Error; err != nil {
-		return fmt.Errorf("保存管理员账号失败: %w", err)
+		return fmt.Errorf("failed to save admin account: %w", err)
 	}
 
-	fmt.Printf("\n=== 管理员账号创建成功 ===\n")
-	fmt.Printf("邮箱: %s\n", admin.Email)
-	fmt.Printf("密码: admin123\n")
-	fmt.Printf("角色: %s\n", admin.Role)
-	fmt.Printf("========================\n\n")
+	fmt.Printf("\n=== Admin Account Created Successfully ===\n")
+	fmt.Printf("Email: %s\n", admin.Email)
+	fmt.Printf("Password: admin123\n")
+	fmt.Printf("Role: %s\n", admin.Role)
+	fmt.Printf("==========================================\n\n")
 
 	return nil
 }

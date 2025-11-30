@@ -23,53 +23,40 @@ func NewMediaUseCase(mediaRepo MediaRepo) *MediaUseCase {
 }
 
 func (uc *MediaUseCase) Upload(ctx context.Context, file *multipart.FileHeader, baseURL string) (*entity.MediaResponse, error) {
-	// 判断文件类型
 	mediaType := getMediaType(file.Header.Get("Content-Type"))
-
-	// 获取上传路径配置
 	uploadPath := config.Conf.App.UploadPath
 	if uploadPath == "" {
 		uploadPath = "uploads"
 	}
 
-	// 完整的上传目录路径
 	fullUploadPath := filepath.Join("static", uploadPath)
-
-	// 确保上传目录存在
 	if err := os.MkdirAll(fullUploadPath, 0755); err != nil {
 		return nil, fmt.Errorf("failed to create upload directory: %w", err)
 	}
 
-	// 生成唯一文件名：UUID + 原始扩展名
+	// Generate unique filename: UUID + original extension
 	ext := filepath.Ext(file.Filename)
 	uniqueFilename := uuid.New().String() + ext
-
-	// 文件保存路径
 	savePath := filepath.Join(fullUploadPath, uniqueFilename)
 
-	// 打开上传的文件
 	src, err := file.Open()
 	if err != nil {
 		return nil, fmt.Errorf("failed to open uploaded file: %w", err)
 	}
 	defer src.Close()
 
-	// 创建目标文件
 	dst, err := os.Create(savePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create destination file: %w", err)
 	}
 	defer dst.Close()
 
-	// 复制文件内容
 	if _, err := dst.ReadFrom(src); err != nil {
 		return nil, fmt.Errorf("failed to save file: %w", err)
 	}
 
-	// 构建访问 URL
 	url := fmt.Sprintf("%s/static/%s/%s", baseURL, uploadPath, uniqueFilename)
 
-	// 创建数据库记录
 	media := &entity.Media{
 		URL:      url,
 		Name:     file.Filename,
@@ -81,7 +68,7 @@ func (uc *MediaUseCase) Upload(ctx context.Context, file *multipart.FileHeader, 
 	}
 
 	if err := uc.mediaRepo.Create(ctx, media); err != nil {
-		// 如果数据库保存失败，删除已上传的文件
+		// If database save fails, delete uploaded file
 		os.Remove(savePath)
 		return nil, err
 	}
@@ -116,22 +103,20 @@ func (uc *MediaUseCase) List(ctx context.Context) ([]entity.MediaResponse, error
 }
 
 func (uc *MediaUseCase) Delete(ctx context.Context, id string) error {
-	// 先获取文件信息
 	media, err := uc.mediaRepo.GetByID(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	// 从数据库删除记录
 	if err := uc.mediaRepo.Delete(ctx, id); err != nil {
 		return err
 	}
 
-	// 删除磁盘上的文件
+	// Delete file from disk
 	if media.Path != "" {
 		if err := os.Remove(media.Path); err != nil {
-			// 如果文件不存在或删除失败，只记录但不返回错误
-			// 因为数据库记录已经删除了
+			// If file doesn't exist or deletion fails, only log but don't return error
+			// Because database record has been deleted
 			fmt.Printf("Warning: failed to delete file %s: %v\n", media.Path, err)
 		}
 	}
@@ -139,7 +124,7 @@ func (uc *MediaUseCase) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-// 根据 MIME 类型判断文件类型
+// getMediaType determines file type based on MIME type
 func getMediaType(contentType string) string {
 	if strings.HasPrefix(contentType, "image/") {
 		return "image"
@@ -150,7 +135,7 @@ func getMediaType(contentType string) string {
 	return "document"
 }
 
-// 获取文件扩展名
+// getFileExtension gets file extension
 func getFileExtension(filename string) string {
 	return strings.ToLower(filepath.Ext(filename))
 }

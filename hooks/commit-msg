@@ -2,7 +2,7 @@
 
 MSG=`awk '{printf("%s",$0)}' $1`
 
-# Merge或Rebase跳过检测
+# Skip detection for Merge or Rebase
 if [[ $MSG =~ ^(Merge|Rebase).+.* ]]
   then
     exit 0
@@ -11,9 +11,9 @@ fi
 if [ ${#MSG} -lt 10 ]
   then
     echo "-------------------------------------------------------------------"
-    echo "提交代码失败! 原因: 提交信息的长度不能小于10, 当前长度为:${#MSG}"
-    echo "正确范例:feat: #API-001 新增会员列表接口"
-    echo "提交信息: ${#MSG}"
+    echo "Commit failed! Reason: Commit message length cannot be less than 10, current length: ${#MSG}"
+    echo "Correct example: feat: #API-001 Add member list API"
+    echo "Commit message: ${MSG}"
     echo "-------------------------------------------------------------------"
     exit 1
 fi
@@ -50,9 +50,9 @@ if [[ $MSG =~ ^feat:[[:blank:]].* ]] ||
     :
   else
     echo "-------------------------------------------------------------------"
-    echo "提交代码失败! 原因: 提交信息不符合Commit Message规范"
-    echo "正确范例:feat: #API-001 新增会员列表接口"
-    echo "提交信息: ${#MSG}"
+    echo "Commit failed! Reason: Commit message does not conform to Commit Message specification"
+    echo "Correct example: feat: #API-001 Add member list API"
+    echo "Commit message: ${MSG}"
     echo "-------------------------------------------------------------------"
     exit 1
 fi
@@ -62,9 +62,9 @@ if [[ $MSG =~ ^.+#.+-.* ]]
    :
  else
    echo "-------------------------------------------------------------------"
-   echo "提交代码失败! 原因: 提交信息未附上问题编号或问题编号不合法"
-   echo "正确范例:feat: #API-001 新增会员列表接口"
-   echo "提交信息: ${#MSG}"
+   echo "Commit failed! Reason: Commit message does not include issue number or issue number is invalid"
+   echo "Correct example: feat: #API-001 Add member list API"
+   echo "Commit message: ${MSG}"
    echo "-------------------------------------------------------------------"
    exit 1;
 fi

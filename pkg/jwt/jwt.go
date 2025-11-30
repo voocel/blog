@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	jwtSecret     = "blog-secret-key-2024" // TODO: 从配置文件读取
+	jwtSecret     = "blog-secret-key-2024" // TODO: get from config
 	tokenDuration = 24 * time.Hour
 )
 
@@ -19,7 +19,6 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-// GenerateToken 生成 JWT token
 func GenerateToken(user *entity.User) (string, error) {
 	claims := Claims{
 		UserID:   user.ID,

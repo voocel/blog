@@ -23,7 +23,6 @@ func (h *MediaHandler) UploadFile(c *gin.Context) {
 		return
 	}
 
-	// 获取基础 URL
 	baseURL := "http://" + c.Request.Host
 
 	media, err := h.mediaUseCase.Upload(c.Request.Context(), file, baseURL)
