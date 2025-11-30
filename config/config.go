@@ -35,6 +35,7 @@ type AppConfig struct {
 	JwtTime         int    `mapstructure:"jwt_time"`
 	JwtSecret       string `mapstructure:"jwt_secret"`
 	UploadPath      string `mapstructure:"upload_path"`
+	GeoIPDBPath     string `mapstructure:"geoip_db_path"`
 }
 
 type HttpConfig struct {

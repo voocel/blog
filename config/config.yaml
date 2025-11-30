@@ -15,6 +15,7 @@ app:
   jwt_time: 7200
   jwt_secret: blog-secret-key-2024
   upload_path: uploads
+  geoip_db_path: config/GeoLite2-City.mmdb  # GeoIP 数据库文件路径（City 版本）
 
 http:
   addr: :8080                     # HTTP服务器监听端口

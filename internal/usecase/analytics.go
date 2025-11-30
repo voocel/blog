@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"blog/internal/entity"
+	"blog/pkg/geoip"
 	"context"
 	"time"
 )
@@ -15,8 +16,8 @@ func NewAnalyticsUseCase(analyticsRepo AnalyticsRepo) *AnalyticsUseCase {
 }
 
 func (uc *AnalyticsUseCase) LogVisit(ctx context.Context, req entity.LogVisitRequest, ip, userAgent string) error {
-	// 简单的地理位置解析（实际项目中可以使用 GeoIP 库）
-	location := parseLocation(ip)
+	// 使用 GeoIP 查询地理位置
+	location := geoip.Lookup(ip)
 
 	// 如果未提供文章 ID，保存为 NULL 避免空字符串触发 UUID 解析错误
 	var postID *string
@@ -62,13 +63,4 @@ func (uc *AnalyticsUseCase) GetLogs(ctx context.Context, startDate, endDate stri
 	}
 
 	return responses, nil
-}
-
-// 简单的地理位置解析（实际应该使用 GeoIP 数据库）
-func parseLocation(ip string) string {
-	// TODO: 集成 GeoIP 库进行真实的地理位置解析
-	if ip == "127.0.0.1" || ip == "::1" {
-		return "Local"
-	}
-	return "Unknown"
 }

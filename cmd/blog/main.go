@@ -5,6 +5,7 @@ import (
 	"blog/internal/entity"
 	"blog/internal/http"
 	"blog/internal/repository/postgres"
+	"blog/pkg/geoip"
 	"blog/pkg/log"
 	"blog/pkg/util"
 	"context"
@@ -27,6 +28,14 @@ func main() {
 
 	log.Init("http", "debug")
 
+	if config.Conf.App.GeoIPDBPath != "" {
+		if err := geoip.Init(config.Conf.App.GeoIPDBPath); err != nil {
+			log.Warnf("GeoIP 数据库初始化失败（将使用 'Unknown' 作为位置）: %v", err)
+		} else {
+			log.Info("GeoIP 数据库初始化成功")
+		}
+	}
+
 	// 如果设置了创建管理员账号参数
 	if *createAdmin {
 		if err := createAdminAccount(); err != nil {
@@ -40,7 +49,6 @@ func main() {
 	srv := http.NewServer()
 	srv.Run()
 
-	// 优雅关闭
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT, syscall.SIGHUP)
 	for {
@@ -52,6 +60,7 @@ func main() {
 			if err := srv.Stop(ctx); err != nil {
 				panic(err)
 			}
+			geoip.Close()
 			log.Sync()
 			cancel()
 			return
