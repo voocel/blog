@@ -44,8 +44,8 @@ interface BlogContextType {
   updateUser: (user: User) => Promise<void>;
 
   // Navigation
-  activePostId: string | null;
-  setActivePostId: (id: string | null) => void;
+  // activePostId: string | null; // Deprecated in favor of URL routing
+  // setActivePostId: (id: string | null) => void; // Deprecated
 
   // Logging
   logVisit: (path: string, postId?: string, postTitle?: string) => void;
@@ -73,7 +73,6 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [error, setError] = useState<string | null>(null);
 
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
-  const [activePostId, setActivePostId] = useState<string | null>(null);
   const [visitLogs, setVisitLogs] = useState<VisitLog[]>([]);
   const [dashboardStats, setDashboardStats] = useState<DashboardOverview | null>(null);
 
@@ -327,7 +326,6 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       addTag, deleteTag,
       addFile, deleteFile,
       login, logout, updateUser, register,
-      activePostId, setActivePostId,
       logVisit,
       refreshAdminData,
       refreshPosts,

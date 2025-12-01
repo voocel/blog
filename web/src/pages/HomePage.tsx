@@ -1,11 +1,11 @@
 
 import React, { useState, useRef, useEffect, type ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useBlog } from '../context/BlogContext';
-import { getAssetUrl } from '../utils/urlUtils';
 import { HERO_CONTENT } from '../constants';
 import PostCard from '../components/PostCard';
-import PostDetail from '../components/PostDetail';
 import { IconArrowDown, IconArrowLeft } from '../components/Icons';
+import SEO from '../components/SEO';
 
 // --- Reusable Scroll Reveal Component ---
 interface RevealProps {
@@ -49,8 +49,9 @@ const Reveal: React.FC<RevealProps> = ({ children, className = "", delay = 0, th
 };
 
 const HomePage: React.FC = () => {
-  const { posts, activePostId, setActivePostId, logVisit, isLoading } = useBlog();
+  const { posts, logVisit, isLoading } = useBlog();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const navigate = useNavigate();
 
   // Track visit
   useEffect(() => {
@@ -80,17 +81,10 @@ const HomePage: React.FC = () => {
     currentPage * itemsPerPage
   );
 
-  const activePost = posts.find(p => p.id === activePostId);
-
   // Reset page when category changes
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory]);
-
-  // Scroll to top when post opens
-  useEffect(() => {
-    if (activePostId) window.scrollTo(0, 0);
-  }, [activePostId]);
 
   const scrollToContent = () => {
     const element = document.getElementById('journal-feed');
@@ -128,20 +122,12 @@ const HomePage: React.FC = () => {
     );
   }
 
-
-  if (activePostId && activePost) {
-    return (
-      <div className="pt-20">
-        <PostDetail post={activePost} onBack={() => setActivePostId(null)} />
-      </div>
-    );
-  }
-
   // Hero Post (Static Content)
   const heroPost = HERO_CONTENT;
 
   return (
     <div className="min-h-screen pb-20 bg-transparent">
+      <SEO title="Voocel Journal" />
 
       {/* Magazine Cover Hero */}
       <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
@@ -231,7 +217,7 @@ const HomePage: React.FC = () => {
         <div className="flex flex-col gap-16 md:gap-20">
           {currentPosts.map((post, index) => (
             <Reveal key={post.id} delay={index * 150} threshold={0.05}>
-              <PostCard post={post} onClick={setActivePostId} />
+              <PostCard post={post} onClick={(id) => navigate(`/post/${id}`)} />
             </Reveal>
           ))}
         </div>
@@ -296,3 +282,4 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
+

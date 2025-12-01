@@ -6,6 +6,7 @@ import { getAssetUrl } from '../utils/urlUtils';
 import { IconArrowLeft, IconSparkles, IconBrain } from './Icons';
 import { useBlog } from '../context/BlogContext';
 import { generateSummary, generateInsight } from '../services/geminiService';
+import SEO from './SEO';
 
 interface PostDetailProps {
     post: BlogPost;
@@ -43,6 +44,12 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
     return (
         <div className="animate-fade-in min-h-screen pl-0 bg-transparent text-ink">
+            <SEO
+                title={post.title}
+                description={post.excerpt}
+                image={getAssetUrl(post.imageUrl)}
+                type="article"
+            />
             {/* Hero Image with Title Overlay */}
             <div className="relative h-[50vh] md:h-[60vh] w-full">
                 <div className="absolute inset-0">

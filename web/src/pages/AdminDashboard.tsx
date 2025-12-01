@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MDEditor from '@uiw/react-md-editor';
 import { useBlog } from '../context/BlogContext';
 import type { AdminSection, BlogPost } from '../types';
@@ -18,13 +19,13 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit }) => {
+    const navigate = useNavigate();
     const {
         posts, categories, tags, files, user,
         addPost, updatePost, deletePost,
         addCategory, deleteCategory,
         addTag, deleteTag,
         addFile, deleteFile,
-        setActivePostId,
         visitLogs,
         refreshPosts,
         refreshCategories,
@@ -340,7 +341,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit }) => {
                     posts={posts}
                     onEditPost={handleEditPost}
                     onDeletePost={deletePost}
-                    onViewPost={(id) => { setActivePostId(id); onExit(); }}
+                    onViewPost={(id) => { navigate(`/post/${id}`); }}
                     requestConfirm={requestConfirm}
                 />
             )}
