@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"blog/config"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -38,7 +39,7 @@ func toZapLevel(l string) zapcore.Level {
 	return zapcore.InfoLevel
 }
 
-func Init(serviceName, level string, logPaths ...string) {
+func Init(level string, logPaths ...string) {
 	var atomicLevel = zap.NewAtomicLevel()
 	atomicLevel.SetLevel(toZapLevel(level))
 
@@ -46,7 +47,6 @@ func Init(serviceName, level string, logPaths ...string) {
 	if len(logPaths) == 0 {
 		_, logPath, _, _ = runtime.Caller(0)
 		logPath = filepath.Dir(filepath.Dir(filepath.Dir(logPath)))
-		logPath = filepath.Join(logPath, "logs", serviceName)
 	} else {
 		logPath = logPaths[0]
 	}
@@ -89,7 +89,7 @@ func Init(serviceName, level string, logPaths ...string) {
 		zap.Development(),
 		//zap.AddStacktrace(zapcore.ErrorLevel),
 		//zap.Fields(zap.String("func", funcName())),
-		zap.Fields(zap.String("usecase", serviceName)),
+		//zap.Fields(zap.String("usecase", serviceName)),
 	)
 	logger = log.Sugar()
 }

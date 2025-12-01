@@ -27,7 +27,7 @@ func main() {
 	flag.BoolVar(&config.Conf.Postgres.Migrate, "migrate", true, "Auto migrate database")
 	flag.Parse()
 
-	log.Init("http", "debug")
+	log.Init(config.Conf.LogLevel, config.Conf.LogPath)
 
 	if config.Conf.App.GeoIPDBPath != "" {
 		if err := geoip.Init(config.Conf.App.GeoIPDBPath); err != nil {

@@ -1,7 +1,7 @@
 mode: debug
 name: http
-log_level: info
-log_path: log
+log_level: debug
+log_path: logs
 log_level_addr: :4245
 log_level_pattern: /log/level
 
