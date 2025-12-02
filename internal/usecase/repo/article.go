@@ -50,6 +50,10 @@ func (r *postRepo) List(ctx context.Context, filters map[string]interface{}, pag
 	if search, ok := filters["search"].(string); ok && search != "" {
 		query = query.Where("title LIKE ? OR excerpt LIKE ?", "%"+search+"%", "%"+search+"%")
 	}
+	// Filter by date (for scheduled publishing: only show posts with date <= current date)
+	if beforeDate, ok := filters["beforeDate"].(string); ok && beforeDate != "" {
+		query = query.Where("date <= ?", beforeDate)
+	}
 
 	// Get total count
 	err := query.Count(&total).Error

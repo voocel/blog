@@ -5,6 +5,7 @@ import (
 	"blog/internal/usecase"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,6 +27,8 @@ func (h *PostHandler) ListPublishedPosts(c *gin.Context) {
 
 	filters := map[string]interface{}{
 		"status": "published",
+		// Only show posts with publish date <= current date (scheduled publishing)
+		"beforeDate": time.Now().Format("2006-01-02"),
 	}
 	if category != "" {
 		filters["categoryId"] = category
@@ -83,6 +86,13 @@ func (h *PostHandler) GetPost(c *gin.Context) {
 	}
 
 	if post.Status != "published" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		return
+	}
+
+	// Check if publish date has arrived (scheduled publishing)
+	currentDate := time.Now().Format("2006-01-02")
+	if post.Date > currentDate {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
 		return
 	}

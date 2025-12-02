@@ -28,12 +28,18 @@ func (uc *PostUseCase) Create(ctx context.Context, req entity.CreatePostRequest,
 		req.Status = "draft"
 	}
 
+	// Use provided date or default to current time
+	date := req.Date
+	if date == "" {
+		date = time.Now().Format("2006-01-02")
+	}
+
 	post := &entity.Post{
 		Title:      req.Title,
 		Excerpt:    req.Excerpt,
 		Content:    req.Content,
 		Author:     author,
-		Date:       time.Now().Format("2006-01-02"),
+		Date:       date,
 		CategoryID: req.CategoryID,
 		ImageUrl:   req.ImageUrl,
 		Status:     req.Status,
@@ -121,6 +127,9 @@ func (uc *PostUseCase) Update(ctx context.Context, id string, req entity.UpdateP
 	}
 	if req.Status != "" {
 		post.Status = req.Status
+	}
+	if req.Date != "" {
+		post.Date = req.Date
 	}
 
 	// Handle category change

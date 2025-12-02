@@ -31,5 +31,6 @@ static
 API.md
 blog
 
+config/config.yaml
 config/GeoLite2-City.mmdb
 config/GeoLite2-Country.mmdb

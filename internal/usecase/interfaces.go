@@ -73,3 +73,12 @@ type AnalyticsRepo interface {
 	Create(ctx context.Context, log *entity.Analytics) error
 	GetLogs(ctx context.Context, startDate, endDate string, limit int) ([]entity.Analytics, error)
 }
+
+// SystemEventRepo system event repository interface for unified event logging
+type SystemEventRepo interface {
+	Create(ctx context.Context, event *entity.SystemEvent) error
+	List(ctx context.Context, filters map[string]interface{}, page, limit int) ([]entity.SystemEvent, int64, error)
+	GetByRequestID(ctx context.Context, requestID string) ([]entity.SystemEvent, error)
+	GetByUserID(ctx context.Context, userID string, limit int) ([]entity.SystemEvent, error)
+	GetByEventType(ctx context.Context, eventType entity.EventType, limit int) ([]entity.SystemEvent, error)
+}

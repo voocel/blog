@@ -6,11 +6,12 @@ interface AdminPostsProps {
     posts: BlogPost[];
     onEditPost: (post?: BlogPost) => void;
     onDeletePost: (id: string) => void;
+    onPublishPost: (id: string) => void;
     onViewPost: (id: string) => void;
-    requestConfirm: (title: string, message: string, onConfirm: () => void) => void;
+    requestConfirm: (title: string, message: string, onConfirm: () => void, options?: { confirmText?: string; isDestructive?: boolean }) => void;
 }
 
-const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost, onViewPost, requestConfirm }) => {
+const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost, onPublishPost, onViewPost, requestConfirm }) => {
     const [postSearch, setPostSearch] = useState('');
     const [postFilter, setPostFilter] = useState<'all' | 'published' | 'draft'>('all');
     const [currentPage, setCurrentPage] = useState(1);
@@ -113,6 +114,23 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
 
                             {/* Actions */}
                             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 duration-300">
+                                {post.status === 'draft' && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            requestConfirm(
+                                                'Publish Entry',
+                                                'Are you sure you want to publish this entry?',
+                                                () => onPublishPost(post.id),
+                                                { confirmText: 'Publish', isDestructive: false }
+                                            );
+                                        }}
+                                        className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100 rounded-lg transition-colors border border-emerald-200 cursor-pointer"
+                                        title="Publish"
+                                    >
+                                        <span className="text-xs font-bold uppercase tracking-wider">Publish</span>
+                                    </button>
+                                )}
                                 <button onClick={(e) => { e.stopPropagation(); onEditPost(post); }} className="flex items-center gap-2 px-4 py-2 bg-stone-50 text-stone-600 hover:text-gold-600 hover:bg-gold-50 rounded-lg transition-colors border border-stone-200 cursor-pointer" title="Edit">
                                     <IconEdit className="w-4 h-4" />
                                     <span className="text-xs font-bold uppercase tracking-wider">Edit</span>

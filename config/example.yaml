@@ -13,7 +13,7 @@ app:
   image_max_size: 5
   heartbeat: 1000
   # JWT Configuration
-  jwt_secret: change-this-to-a-strong-secret-in-production-min-32-chars  # IMPORTANT: Change in production!
+  jwt_secret: xxx  # $(openssl rand -base64 32)
   jwt_access_duration: 15   # Access token duration in minutes (default: 15)
   jwt_refresh_duration: 7   # Refresh token duration in days (default: 7)
   upload_path: uploads

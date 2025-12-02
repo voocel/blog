@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import MDEditor from '@uiw/react-md-editor';
 import { useBlog } from '../context/BlogContext';
 import type { AdminSection, BlogPost } from '../types';
-import { IconX, IconGrid } from '../components/Icons';
+import { IconX, IconGrid, IconClock } from '../components/Icons';
 import { AUTHOR_NAME } from '../constants';
 
 import AdminOverview from '../components/admin/AdminOverview';
@@ -64,11 +64,32 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         isOpen: boolean;
         title: string;
         message: string;
+        confirmText: string;
+        isDestructive: boolean;
         onConfirm: () => void;
-    }>({ isOpen: false, title: '', message: '', onConfirm: () => { } });
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        confirmText: 'Confirm',
+        isDestructive: true,
+        onConfirm: () => { }
+    });
 
-    const requestConfirm = (title: string, message: string, onConfirm: () => void) => {
-        setConfirmModal({ isOpen: true, title, message, onConfirm });
+    const requestConfirm = (
+        title: string,
+        message: string,
+        onConfirm: () => void,
+        options: { confirmText?: string; isDestructive?: boolean } = {}
+    ) => {
+        setConfirmModal({
+            isOpen: true,
+            title,
+            message,
+            onConfirm,
+            confirmText: options.confirmText || 'Confirm Delete',
+            isDestructive: options.isDestructive !== undefined ? options.isDestructive : true
+        });
     };
 
     // --- Handlers ---
@@ -208,6 +229,51 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
 
                         <div className="space-y-8">
                             <div>
+                                <label className="block text-xs uppercase tracking-widest text-stone-500 mb-3 font-bold">Publish Date</label>
+                                <div
+                                    className="relative group cursor-pointer"
+                                    onClick={() => {
+                                        try {
+                                            // @ts-ignore - showPicker is standard but TS might complain depending on version
+                                            document.getElementById('publish-date-picker')?.showPicker();
+                                        } catch (e) {
+                                            console.error("showPicker not supported", e);
+                                            // Fallback: focus the input
+                                            document.getElementById('publish-date-picker')?.focus();
+                                        }
+                                    }}
+                                >
+                                    <div className="w-full bg-white border border-stone-200 group-hover:border-gold-400 rounded-xl p-3 flex items-center justify-between transition-all shadow-sm">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 group-hover:text-gold-500 transition-colors">
+                                                <IconClock className="w-4 h-4" />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-xs text-stone-400 font-medium uppercase tracking-wider">Scheduled For</span>
+                                                <span className={`text-sm font-serif font-medium ${editingPost.date ? 'text-ink' : 'text-stone-300 italic'}`}>
+                                                    {editingPost.date
+                                                        ? new Date(editingPost.date).toLocaleString('en-US', {
+                                                            month: 'short', day: 'numeric', year: 'numeric',
+                                                            hour: 'numeric', minute: 'numeric', hour12: true
+                                                        })
+                                                        : 'Set publish time...'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input
+                                        id="publish-date-picker"
+                                        type="datetime-local"
+                                        className="absolute inset-0 w-full h-full opacity-0 pointer-events-none"
+                                        value={editingPost.date ? new Date(editingPost.date).toISOString().slice(0, 16) : ''}
+                                        onChange={e => {
+                                            setEditingPost({ ...editingPost, date: e.target.value });
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
                                 <label className="block text-xs uppercase tracking-widest text-stone-500 mb-3 font-bold">Category</label>
                                 <div className="relative">
                                     <select
@@ -327,6 +393,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         );
     };
 
+    const handlePublishPost = async (id: string) => {
+        try {
+            await updatePost(id, { status: 'published' });
+            // Refresh posts is handled by updatePost usually updating local state or we trigger refresh
+            refreshPosts();
+        } catch (error) {
+            console.error("Failed to publish post:", error);
+            alert("Failed to publish post.");
+        }
+    };
+
     return (
         <div className="min-h-full bg-[#FDFBF7]">
             {section === 'overview' && (
@@ -341,6 +418,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                     posts={posts}
                     onEditPost={handleEditPost}
                     onDeletePost={deletePost}
+                    onPublishPost={handlePublishPost}
                     onViewPost={(id) => { navigate(`/post/${id}`); }}
                     requestConfirm={requestConfirm}
                 />
@@ -394,9 +472,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                             </button>
                             <button
                                 onClick={() => { confirmModal.onConfirm(); setConfirmModal({ ...confirmModal, isOpen: false }); }}
-                                className="px-6 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors shadow-lg shadow-red-100 cursor-pointer"
+                                className={`px-6 py-2 text-white rounded-lg font-bold transition-colors shadow-lg cursor-pointer ${confirmModal.isDestructive
+                                    ? 'bg-red-600 hover:bg-red-700 shadow-red-100'
+                                    : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-100'
+                                    }`}
                             >
-                                Confirm Delete
+                                {confirmModal.confirmText}
                             </button>
                         </div>
                     </div>

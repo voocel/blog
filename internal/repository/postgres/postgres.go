@@ -135,6 +135,7 @@ func dbConnect(user, pass, addr, dbName, sslMode string) (*gorm.DB, error) {
 			&entity.Tag{},
 			&entity.Media{},
 			&entity.Analytics{},
+			&entity.SystemEvent{},
 		)
 		if err != nil {
 			return nil, err

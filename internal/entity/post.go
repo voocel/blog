@@ -50,6 +50,7 @@ type CreatePostRequest struct {
 	Tags       []string `json:"tags"` // Tag IDs
 	ImageUrl   string   `json:"imageUrl" binding:"required"`
 	Status     string   `json:"status"` // published | draft, default: draft
+	Date       string   `json:"date"`   // ISO 8601 format (optional). If provided, sets custom publish date for scheduling. If omitted, defaults to current time.
 }
 
 type UpdatePostRequest struct {
@@ -60,6 +61,7 @@ type UpdatePostRequest struct {
 	Tags       []string `json:"tags,omitempty"`
 	ImageUrl   string   `json:"imageUrl,omitempty"`
 	Status     string   `json:"status,omitempty"`
+	Date       string   `json:"date,omitempty"` // ISO 8601 format (optional). Allows rescheduling publish date.
 }
 
 type PaginatedPostsResponse struct {

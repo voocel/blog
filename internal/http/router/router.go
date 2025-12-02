@@ -19,6 +19,7 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	tagRepo := repo.NewTagRepo(db)
 	mediaRepo := repo.NewMediaRepo(db)
 	analyticsRepo := repo.NewAnalyticsRepo(db)
+	systemEventRepo := repo.NewSystemEventRepo(db)
 
 	// Create UseCase layer
 	authUseCase := usecase.NewAuthUseCase(userRepo)
@@ -28,6 +29,7 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	tagUseCase := usecase.NewTagUseCase(tagRepo)
 	mediaUseCase := usecase.NewMediaUseCase(mediaRepo)
 	analyticsUseCase := usecase.NewAnalyticsUseCase(analyticsRepo, postRepo, categoryRepo, tagRepo, mediaRepo)
+	systemEventUseCase := usecase.NewSystemEventUseCase(systemEventRepo)
 
 	// Create Handler layer
 	authHandler := handler.NewAuthHandler(authUseCase, userUseCase)
@@ -37,6 +39,11 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	tagHandler := handler.NewTagHandler(tagUseCase)
 	mediaHandler := handler.NewMediaHandler(mediaUseCase)
 	analyticsHandler := handler.NewAnalyticsHandler(analyticsUseCase)
+	systemEventHandler := handler.NewSystemEventHandler(systemEventUseCase)
+
+	// Apply global middleware for request tracing and event logging
+	r.Use(middleware.RequestID())
+	r.Use(middleware.EventLogger(systemEventRepo))
 
 	// API v1 route group
 	v1 := r.Group("/api/v1")
@@ -108,6 +115,17 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 			// Analytics Management
 			admin.GET("/analytics/logs", analyticsHandler.GetLogs)
 			admin.GET("/analytics/dashboard-overview", analyticsHandler.GetDashboardOverview)
+
+			// System Events Management (Unified Event Logging)
+			admin.GET("/events", systemEventHandler.ListEvents)                       // List all events with filters
+			admin.GET("/events/user/:id", systemEventHandler.GetUserEvents)           // User's event history
+			admin.GET("/events/trace/:request_id", systemEventHandler.GetRequestTrace) // Request tracing
+			admin.GET("/events/type/:event_type", systemEventHandler.GetEventsByType) // Events by type
+
+			// Convenience endpoints for specific event types
+			admin.GET("/events/audit", systemEventHandler.GetAuditLogs)         // Audit logs only
+			admin.GET("/events/security", systemEventHandler.GetSecurityEvents) // Security events only
+			admin.GET("/events/errors", systemEventHandler.GetSystemErrors)     // System errors only
 		}
 	}
 }
