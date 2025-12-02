@@ -27,7 +27,7 @@ const PostPage: React.FC = () => {
             // If not in context (e.g. direct link), fetch it
             try {
                 const fetchedPost = await postService.getPost(id);
-                setPost(fetchedPost);
+                setPost(fetchedPost || null);
             } catch (error) {
                 console.error("Failed to load post", error);
                 // navigate('/'); // Optional: redirect to home on error

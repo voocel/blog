@@ -17,7 +17,7 @@ func NewAuthUseCase(userRepo UserRepo) *AuthUseCase {
 	return &AuthUseCase{userRepo: userRepo}
 }
 
-// Login user login
+// Login authenticates user and returns access/refresh tokens
 func (uc *AuthUseCase) Login(ctx context.Context, req entity.LoginRequest) (*entity.LoginResponse, error) {
 	user, err := uc.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
@@ -28,13 +28,15 @@ func (uc *AuthUseCase) Login(ctx context.Context, req entity.LoginRequest) (*ent
 		return nil, errors.New("invalid email or password")
 	}
 
-	token, err := jwt.GenerateToken(user)
+	tokenPair, err := jwt.GenerateTokenPair(user)
 	if err != nil {
 		return nil, err
 	}
 
 	return &entity.LoginResponse{
-		Token: token,
+		AccessToken:  tokenPair.AccessToken,
+		RefreshToken: tokenPair.RefreshToken,
+		ExpiresIn:    tokenPair.ExpiresIn,
 		User: entity.UserResponse{
 			Username: user.Username,
 			Email:    user.Email,
@@ -44,7 +46,7 @@ func (uc *AuthUseCase) Login(ctx context.Context, req entity.LoginRequest) (*ent
 	}, nil
 }
 
-// GetCurrentUser get current user
+// GetCurrentUser retrieves current user info
 func (uc *AuthUseCase) GetCurrentUser(ctx context.Context, userID string) (*entity.UserResponse, error) {
 	user, err := uc.userRepo.GetByID(ctx, userID)
 	if err != nil {
@@ -59,7 +61,7 @@ func (uc *AuthUseCase) GetCurrentUser(ctx context.Context, userID string) (*enti
 	}, nil
 }
 
-// Register user registration
+// Register creates new user account and returns tokens
 func (uc *AuthUseCase) Register(ctx context.Context, req entity.RegisterRequest) (*entity.LoginResponse, error) {
 	existUser, _ := uc.userRepo.GetByEmail(ctx, req.Email)
 	if existUser != nil {
@@ -88,25 +90,53 @@ func (uc *AuthUseCase) Register(ctx context.Context, req entity.RegisterRequest)
 		Username: username,
 		Email:    req.Email,
 		Password: hashedPassword,
-		Role:     "visitor", // Default role is visitor
+		Role:     "visitor", // Default role
 	}
 
 	if err := uc.userRepo.Create(ctx, user); err != nil {
 		return nil, err
 	}
 
-	token, err := jwt.GenerateToken(user)
+	tokenPair, err := jwt.GenerateTokenPair(user)
 	if err != nil {
 		return nil, err
 	}
 
 	return &entity.LoginResponse{
-		Token: token,
+		AccessToken:  tokenPair.AccessToken,
+		RefreshToken: tokenPair.RefreshToken,
+		ExpiresIn:    tokenPair.ExpiresIn,
 		User: entity.UserResponse{
 			Username: user.Username,
 			Email:    user.Email,
 			Role:     user.Role,
 			Avatar:   user.Avatar,
 		},
+	}, nil
+}
+
+// RefreshToken generates new access token using refresh token
+func (uc *AuthUseCase) RefreshToken(ctx context.Context, req entity.RefreshTokenRequest) (*entity.RefreshTokenResponse, error) {
+	claims, err := jwt.ValidateRefreshToken(req.RefreshToken)
+	if err != nil {
+		return nil, errors.New("invalid or expired refresh token")
+	}
+
+	// Get user from database to ensure user still exists and get latest info
+	user, err := uc.userRepo.GetByID(ctx, claims.UserID)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	// Generate new token pair
+	tokenPair, err := jwt.GenerateTokenPair(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entity.RefreshTokenResponse{
+		AccessToken:  tokenPair.AccessToken,
+		RefreshToken: tokenPair.RefreshToken,
+		ExpiresIn:    tokenPair.ExpiresIn,
 	}, nil
 }

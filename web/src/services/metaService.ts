@@ -1,5 +1,5 @@
 import apiClient from './apiClient';
-import { Category, Tag, MediaFile, DashboardOverview } from '../types';
+import type { Category, Tag, MediaFile, DashboardOverview } from '../types';
 
 export const metaService = {
     // Categories
@@ -8,11 +8,11 @@ export const metaService = {
         return response.data;
     },
     addCategory: async (category: Category): Promise<Category> => {
-        const response = await apiClient.post('/categories', category);
+        const response = await apiClient.post('/admin/categories', category);
         return response.data;
     },
     deleteCategory: async (id: string): Promise<void> => {
-        await apiClient.delete(`/categories/${id}`);
+        await apiClient.delete(`/admin/categories/${id}`);
     },
 
     // Tags
@@ -21,16 +21,16 @@ export const metaService = {
         return response.data;
     },
     addTag: async (tag: Tag): Promise<Tag> => {
-        const response = await apiClient.post('/tags', tag);
+        const response = await apiClient.post('/admin/tags', tag);
         return response.data;
     },
     deleteTag: async (id: string): Promise<void> => {
-        await apiClient.delete(`/tags/${id}`);
+        await apiClient.delete(`/admin/tags/${id}`);
     },
 
     // Files (Media)
     getFiles: async (): Promise<MediaFile[]> => {
-        const response = await apiClient.get('/files');
+        const response = await apiClient.get('/admin/files');
         return response.data;
     },
     addFile: async (file: MediaFile): Promise<MediaFile> => {
@@ -40,7 +40,7 @@ export const metaService = {
         return Promise.resolve(file);
     },
     deleteFile: async (id: string): Promise<void> => {
-        await apiClient.delete(`/files/${id}`);
+        await apiClient.delete(`/admin/files/${id}`);
     },
 
     // Analytics
@@ -49,12 +49,12 @@ export const metaService = {
     },
 
     getVisitLogs: async (): Promise<any[]> => {
-        const response = await apiClient.get('/analytics/logs');
+        const response = await apiClient.get('/admin/analytics/logs');
         return response.data;
     },
 
     getDashboardOverview: async (): Promise<DashboardOverview> => {
-        const response = await apiClient.get('/analytics/dashboard-overview');
+        const response = await apiClient.get('/admin/analytics/dashboard-overview');
         return response.data;
     }
 };

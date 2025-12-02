@@ -51,8 +51,20 @@ type RegisterRequest struct {
 }
 
 type LoginResponse struct {
-	Token string       `json:"token"`
-	User  UserResponse `json:"user"`
+	AccessToken  string       `json:"access_token"`
+	RefreshToken string       `json:"refresh_token"`
+	ExpiresIn    int64        `json:"expires_in"` // Access token expiration in seconds
+	User         UserResponse `json:"user"`
+}
+
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token" binding:"required"`
+}
+
+type RefreshTokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpiresIn    int64  `json:"expires_in"`
 }
 
 type UpdateProfileRequest struct {

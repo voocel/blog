@@ -18,7 +18,7 @@ interface AdminDashboardProps {
     onExit: () => void;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExit }) => {
     const navigate = useNavigate();
     const {
         posts, categories, tags, files, user,

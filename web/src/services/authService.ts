@@ -1,14 +1,12 @@
-import apiClient from './apiClient';
-import { User } from '../types';
+import apiClient, { setTokens, clearTokens, getRefreshToken } from './apiClient';
+import type { User, AuthResponse } from '../types';
 
 export const authService = {
     login: async (email: string, password?: string): Promise<User> => {
         try {
             const response = await apiClient.post('/auth/login', { email, password });
-            const { token, user } = response.data;
-            if (token) {
-                localStorage.setItem('authToken', token);
-            }
+            const { access_token, refresh_token, user } = response.data as AuthResponse;
+            setTokens(access_token, refresh_token);
             return user;
         } catch (error) {
             console.error('Login failed:', error);
@@ -19,10 +17,8 @@ export const authService = {
     register: async (email: string, password: string): Promise<User | null> => {
         try {
             const response = await apiClient.post('/auth/register', { email, password });
-            const { token, user } = response.data;
-            if (token) {
-                localStorage.setItem('authToken', token);
-            }
+            const { access_token, refresh_token, user } = response.data as AuthResponse;
+            setTokens(access_token, refresh_token);
             return user;
         } catch (error) {
             console.error('Registration failed:', error);
@@ -32,14 +28,15 @@ export const authService = {
 
     getCurrentUser: async (): Promise<User | null> => {
         try {
-            const token = localStorage.getItem('authToken');
-            if (!token) return null;
-
+            // We use getAccessToken() inside apiClient interceptor, so just making the call is enough.
+            // But we need to check if we even have a token to avoid unnecessary 401s if possible,
+            // though apiClient handles 401s.
+            // Let's just try to fetch.
             const response = await apiClient.get('/auth/me');
             return response.data;
         } catch (error) {
+            // If 401 and refresh failed, apiClient would have cleared tokens.
             console.error('Failed to get current user:', error);
-            localStorage.removeItem('authToken');
             return null;
         }
     },
@@ -50,6 +47,15 @@ export const authService = {
     },
 
     logout: () => {
-        localStorage.removeItem('authToken');
+        clearTokens();
+    },
+
+    refreshToken: async (): Promise<void> => {
+        const refreshToken = getRefreshToken();
+        if (!refreshToken) throw new Error("No refresh token");
+
+        const response = await apiClient.post('/auth/refresh', { refresh_token: refreshToken });
+        const { access_token, refresh_token: new_refresh_token } = response.data as AuthResponse;
+        setTokens(access_token, new_refresh_token);
     }
 };

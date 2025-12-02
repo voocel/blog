@@ -17,23 +17,46 @@ func NewPostHandler(postUseCase *usecase.PostUseCase) *PostHandler {
 	return &PostHandler{postUseCase: postUseCase}
 }
 
-// ListPosts - GET /posts
-func (h *PostHandler) ListPosts(c *gin.Context) {
+// ListPublishedPosts - GET /posts (Public API)
+func (h *PostHandler) ListPublishedPosts(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
 	category := c.Query("category")
-	tag := c.Query("tag")
-	status := c.DefaultQuery("status", "published")
+	search := c.Query("search")
+
+	filters := map[string]interface{}{
+		"status": "published",
+	}
+	if category != "" {
+		filters["categoryId"] = category
+	}
+	if search != "" {
+		filters["search"] = search
+	}
+
+	result, err := h.postUseCase.List(c.Request.Context(), filters, page, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
+}
+
+// ListAllPosts - GET /admin/posts (Admin API)
+func (h *PostHandler) ListAllPosts(c *gin.Context) {
+	page, _ := strconv.Atoi(c.Query("page"))
+	limit, _ := strconv.Atoi(c.Query("limit"))
+	category := c.Query("category")
+	status := c.Query("status") // all | published | draft
 	search := c.Query("search")
 
 	filters := make(map[string]interface{})
 	if category != "" {
 		filters["categoryId"] = category
 	}
-	if tag != "" {
-		filters["tagId"] = tag
-	}
-	if status != "" {
+
+	if status != "" && status != "all" {
 		filters["status"] = status
 	}
 	if search != "" {
@@ -49,8 +72,26 @@ func (h *PostHandler) ListPosts(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// GetPost - GET /posts/:id
+// GetPost - GET /posts/:id (Public API)
 func (h *PostHandler) GetPost(c *gin.Context) {
+	id := c.Param("id")
+
+	post, err := h.postUseCase.GetByID(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		return
+	}
+
+	if post.Status != "published" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, post)
+}
+
+// GetPostAdmin - GET /admin/posts/:id (Admin API)
+func (h *PostHandler) GetPostAdmin(c *gin.Context) {
 	id := c.Param("id")
 
 	post, err := h.postUseCase.GetByID(c.Request.Context(), id)

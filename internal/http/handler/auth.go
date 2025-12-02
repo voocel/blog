@@ -120,3 +120,36 @@ func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, user)
 }
+
+// RefreshToken - POST /auth/refresh
+func (h *AuthHandler) RefreshToken(c *gin.Context) {
+	var req entity.RefreshTokenRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Errorw("RefreshToken bind JSON failed",
+			log.Pair("error", err.Error()),
+			log.Pair("ip", c.ClientIP()),
+		)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
+		return
+	}
+
+	log.Infow("RefreshToken attempt",
+		log.Pair("ip", c.ClientIP()),
+	)
+
+	resp, err := h.authUseCase.RefreshToken(c.Request.Context(), req)
+	if err != nil {
+		log.Errorw("RefreshToken failed",
+			log.Pair("error", err.Error()),
+			log.Pair("ip", c.ClientIP()),
+		)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Infow("RefreshToken success",
+		log.Pair("ip", c.ClientIP()),
+	)
+
+	c.JSON(http.StatusOK, resp)
+}

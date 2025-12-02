@@ -114,7 +114,12 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const refreshPosts = async () => {
     try {
-      const fetchedPosts = await postService.getPosts();
+      let fetchedPosts;
+      if (user?.role === 'admin') {
+        fetchedPosts = await postService.getAdminPosts();
+      } else {
+        fetchedPosts = await postService.getPosts();
+      }
       setPosts(fetchedPosts);
     } catch (err) {
       console.error("Failed to refresh posts", err);

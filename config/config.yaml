@@ -12,8 +12,10 @@ app:
   image_allow_ext: .jpg,.jpeg,.png,.gif,.webp
   image_max_size: 5
   heartbeat: 1000
-  jwt_time: 7200
-  jwt_secret: blog-secret-key-1024
+  # JWT Configuration
+  jwt_secret: change-this-to-a-strong-secret-in-production-min-32-chars  # IMPORTANT: Change in production!
+  jwt_access_duration: 15   # Access token duration in minutes (default: 15)
+  jwt_refresh_duration: 7   # Refresh token duration in days (default: 7)
   upload_path: uploads
   geoip_db_path: config/GeoLite2-City.mmdb
 

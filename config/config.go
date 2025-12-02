@@ -26,16 +26,17 @@ type config struct {
 }
 
 type AppConfig struct {
-	Domain          string
-	StaticRootPath  string `mapstructure:"static_root_path"`
-	RuntimeRootPath string `mapstructure:"runtime_root_path"`
-	ImageAllowExt   string `mapstructure:"image_allow_ext"`
-	ImageMaxSize    int    `mapstructure:"image_max_size"`
-	Heartbeat       int    `mapstructure:"heartbeat"`
-	JwtTime         int    `mapstructure:"jwt_time"`
-	JwtSecret       string `mapstructure:"jwt_secret"`
-	UploadPath      string `mapstructure:"upload_path"`
-	GeoIPDBPath     string `mapstructure:"geoip_db_path"`
+	Domain             string
+	StaticRootPath     string `mapstructure:"static_root_path"`
+	RuntimeRootPath    string `mapstructure:"runtime_root_path"`
+	ImageAllowExt      string `mapstructure:"image_allow_ext"`
+	ImageMaxSize       int    `mapstructure:"image_max_size"`
+	Heartbeat          int    `mapstructure:"heartbeat"`
+	JwtSecret          string `mapstructure:"jwt_secret"`           // JWT signing secret key
+	JwtAccessDuration  int    `mapstructure:"jwt_access_duration"`  // Access token duration in minutes (default: 15)
+	JwtRefreshDuration int    `mapstructure:"jwt_refresh_duration"` // Refresh token duration in days (default: 7)
+	UploadPath         string `mapstructure:"upload_path"`
+	GeoIPDBPath        string `mapstructure:"geoip_db_path"`
 }
 
 type HttpConfig struct {
@@ -92,6 +93,11 @@ func LoadConfig(paths ...string) {
 	viper.SetDefault("atomic_level_addr", "4240")
 
 	viper.SetDefault("http.addr", ":8090")
+
+	// JWT defaults
+	viper.SetDefault("app.jwt_secret", "change-this-secret-in-production")
+	viper.SetDefault("app.jwt_access_duration", 15)  // 15 minutes
+	viper.SetDefault("app.jwt_refresh_duration", 7)  // 7 days
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Panicf("read config error: %v", err)

@@ -49,6 +49,7 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 		{
 			auth.POST("/login", authHandler.Login)
 			auth.POST("/register", authHandler.Register)
+			auth.POST("/refresh", authHandler.RefreshToken) // Refresh access token
 			auth.GET("/me", middleware.JWTAuth(), authHandler.GetCurrentUser)
 		}
 
@@ -58,47 +59,55 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 			users.PUT("/profile", userHandler.UpdateProfile)
 		}
 
-		// Blog Posts
+		// ========== Public APIs (No Authentication) ==========
+
+		// Blog Posts - Public
 		posts := v1.Group("/posts")
 		{
-			posts.GET("", postHandler.ListPosts)   // Public
-			posts.GET("/:id", postHandler.GetPost) // Public
-			posts.POST("", middleware.JWTAuth(), postHandler.CreatePost)
-			posts.PUT("/:id", middleware.JWTAuth(), postHandler.UpdatePost)
-			posts.DELETE("/:id", middleware.JWTAuth(), postHandler.DeletePost)
+			posts.GET("", postHandler.ListPublishedPosts)
+			posts.GET("/:id", postHandler.GetPost)
 		}
 
-		// Taxonomy (Categories & Tags)
+		// Taxonomy (Categories & Tags) - Public Read
 		categories := v1.Group("/categories")
 		{
-			categories.GET("", categoryHandler.ListCategories) // Public
-			categories.POST("", middleware.JWTAuth(), categoryHandler.CreateCategory)
-			categories.DELETE("/:id", middleware.JWTAuth(), categoryHandler.DeleteCategory)
+			categories.GET("", categoryHandler.ListCategories)
 		}
 
 		tags := v1.Group("/tags")
 		{
-			tags.GET("", tagHandler.ListTags) // Public
-			tags.POST("", middleware.JWTAuth(), tagHandler.CreateTag)
-			tags.DELETE("/:id", middleware.JWTAuth(), tagHandler.DeleteTag)
+			tags.GET("", tagHandler.ListTags)
 		}
 
-		// Media Assets
-		v1.POST("/upload", middleware.JWTAuth(), mediaHandler.UploadFile)
+		// Analytics - Public tracking
+		v1.POST("/analytics/visit", analyticsHandler.LogVisit)
 
-		files := v1.Group("/files")
-		files.Use(middleware.JWTAuth())
-		{
-			files.GET("", mediaHandler.ListFiles)
-			files.DELETE("/:id", mediaHandler.DeleteFile)
-		}
+		// ========== Admin APIs (Authentication + Admin Role) ==========
 
-		// Analytics
-		analytics := v1.Group("/analytics")
+		admin := v1.Group("/admin")
+		admin.Use(middleware.JWTAuth(), middleware.AdminOnly())
 		{
-			analytics.POST("/visit", analyticsHandler.LogVisit) // Public
-			analytics.GET("/logs", middleware.JWTAuth(), analyticsHandler.GetLogs)
-			analytics.GET("/dashboard-overview", middleware.JWTAuth(), analyticsHandler.GetDashboardOverview)
+			// Blog Posts Management
+			admin.GET("/posts", postHandler.ListAllPosts)
+			admin.GET("/posts/:id", postHandler.GetPostAdmin)
+			admin.POST("/posts", postHandler.CreatePost)
+			admin.PUT("/posts/:id", postHandler.UpdatePost)
+			admin.DELETE("/posts/:id", postHandler.DeletePost)
+
+			// Taxonomy Management
+			admin.POST("/categories", categoryHandler.CreateCategory)
+			admin.DELETE("/categories/:id", categoryHandler.DeleteCategory)
+			admin.POST("/tags", tagHandler.CreateTag)
+			admin.DELETE("/tags/:id", tagHandler.DeleteTag)
+
+			// Media Management
+			admin.POST("/upload", mediaHandler.UploadFile)
+			admin.GET("/files", mediaHandler.ListFiles)
+			admin.DELETE("/files/:id", mediaHandler.DeleteFile)
+
+			// Analytics Management
+			admin.GET("/analytics/logs", analyticsHandler.GetLogs)
+			admin.GET("/analytics/dashboard-overview", analyticsHandler.GetDashboardOverview)
 		}
 	}
 }

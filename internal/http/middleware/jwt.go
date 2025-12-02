@@ -1,28 +1,16 @@
 package middleware
 
 import (
+	"blog/pkg/jwt"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
 )
 
-const (
-	jwtSecret = "blog-secret-key-2024" // TODO: Read from config file
-)
-
-type Claims struct {
-	UserID   string `json:"user_id"`
-	Username string `json:"username"`
-	Role     string `json:"role"`
-	jwt.RegisteredClaims
-}
-
-// JWTAuth JWT authentication middleware
+// JWTAuth validates JWT access tokens
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Get token from Authorization header
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing authorization header"})
@@ -30,7 +18,6 @@ func JWTAuth() gin.HandlerFunc {
 			return
 		}
 
-		// Bearer token format
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || parts[0] != "Bearer" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization format"})
@@ -39,13 +26,18 @@ func JWTAuth() gin.HandlerFunc {
 		}
 
 		tokenString := parts[1]
-		claims := &Claims{}
-		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-			return []byte(jwtSecret), nil
-		})
 
-		if err != nil || !token.Valid {
+		// Includes signature verification and algorithm validation
+		claims, err := jwt.ParseToken(tokenString)
+		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+			c.Abort()
+			return
+		}
+
+		// Ensure it's an access token (not a refresh token)
+		if claims.TokenType != jwt.TokenTypeAccess {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token type"})
 			c.Abort()
 			return
 		}
