@@ -115,7 +115,11 @@ const Header: React.FC<HeaderProps> = () => {
                     }`}>
                     <div className="w-full h-full rounded-full overflow-hidden bg-white border border-white">
                       {user.avatar ? (
-                        <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
+                        <img
+                          src={user.avatar}
+                          alt={user.username}
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-stone-50 text-stone-400">
                           <IconUserCircle className="w-full h-full opacity-80" />

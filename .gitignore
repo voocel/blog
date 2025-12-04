@@ -30,6 +30,7 @@ logs
 static
 API.md
 blog
+bin
 
 config/config.yaml
 config/GeoLite2-City.mmdb

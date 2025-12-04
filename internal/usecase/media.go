@@ -22,11 +22,18 @@ func NewMediaUseCase(mediaRepo MediaRepo) *MediaUseCase {
 	return &MediaUseCase{mediaRepo: mediaRepo}
 }
 
-func (uc *MediaUseCase) Upload(ctx context.Context, file *multipart.FileHeader, baseURL string) (*entity.MediaResponse, error) {
+func (uc *MediaUseCase) Upload(ctx context.Context, file *multipart.FileHeader, baseURL string, uploadType string) (*entity.MediaResponse, error) {
 	mediaType := getMediaType(file.Header.Get("Content-Type"))
-	uploadPath := config.Conf.App.UploadPath
-	if uploadPath == "" {
-		uploadPath = "uploads"
+
+	// Determine upload directory based on type
+	var uploadPath string
+	if uploadType == "avatar" {
+		uploadPath = "avatar"
+	} else {
+		uploadPath = config.Conf.App.UploadPath
+		if uploadPath == "" {
+			uploadPath = "uploads"
+		}
 	}
 
 	fullUploadPath := filepath.Join("static", uploadPath)

@@ -17,6 +17,14 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onExit }) => {
     const [isSaving, setIsSaving] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
+    // Sync local state with user context when it loads
+    React.useEffect(() => {
+        if (user) {
+            setUsername(user.username);
+            setAvatar(user.avatar || '');
+        }
+    }, [user]);
+
     // ...
 
     // File Upload Ref

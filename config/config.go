@@ -13,7 +13,6 @@ var Conf = new(config)
 
 type config struct {
 	Mode            string
-	Name            string
 	LogLevel        string `mapstructure:"log_level"`
 	LogPath         string `mapstructure:"log_path"`
 	LogLevelAddr    string `mapstructure:"log_level_addr"`
@@ -26,12 +25,6 @@ type config struct {
 }
 
 type AppConfig struct {
-	Domain             string
-	StaticRootPath     string `mapstructure:"static_root_path"`
-	RuntimeRootPath    string `mapstructure:"runtime_root_path"`
-	ImageAllowExt      string `mapstructure:"image_allow_ext"`
-	ImageMaxSize       int    `mapstructure:"image_max_size"`
-	Heartbeat          int    `mapstructure:"heartbeat"`
 	JwtSecret          string `mapstructure:"jwt_secret"`           // JWT signing secret key
 	JwtAccessDuration  int    `mapstructure:"jwt_access_duration"`  // Access token duration in minutes (default: 15)
 	JwtRefreshDuration int    `mapstructure:"jwt_refresh_duration"` // Refresh token duration in days (default: 7)

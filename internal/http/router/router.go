@@ -3,129 +3,116 @@ package router
 import (
 	"blog/internal/http/handler"
 	"blog/internal/http/middleware"
-	"blog/internal/usecase"
-	"blog/internal/usecase/repo"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
-// SetupRoutes configures all routes
-func SetupRoutes(r *gin.Engine, db *gorm.DB) {
-	// Create Repository layer
-	userRepo := repo.NewUserRepo(db)
-	postRepo := repo.NewPostRepo(db)
-	categoryRepo := repo.NewCategoryRepo(db)
-	tagRepo := repo.NewTagRepo(db)
-	mediaRepo := repo.NewMediaRepo(db)
-	analyticsRepo := repo.NewAnalyticsRepo(db)
-	systemEventRepo := repo.NewSystemEventRepo(db)
-
-	// Create UseCase layer
-	authUseCase := usecase.NewAuthUseCase(userRepo)
-	userUseCase := usecase.NewUserUseCase(userRepo)
-	postUseCase := usecase.NewPostUseCase(postRepo, categoryRepo, tagRepo)
-	categoryUseCase := usecase.NewCategoryUseCase(categoryRepo)
-	tagUseCase := usecase.NewTagUseCase(tagRepo)
-	mediaUseCase := usecase.NewMediaUseCase(mediaRepo)
-	analyticsUseCase := usecase.NewAnalyticsUseCase(analyticsRepo, postRepo, categoryRepo, tagRepo, mediaRepo)
-	systemEventUseCase := usecase.NewSystemEventUseCase(systemEventRepo)
-
-	// Create Handler layer
-	authHandler := handler.NewAuthHandler(authUseCase, userUseCase)
-	userHandler := handler.NewUserHandler(userUseCase)
-	postHandler := handler.NewPostHandler(postUseCase)
-	categoryHandler := handler.NewCategoryHandler(categoryUseCase)
-	tagHandler := handler.NewTagHandler(tagUseCase)
-	mediaHandler := handler.NewMediaHandler(mediaUseCase)
-	analyticsHandler := handler.NewAnalyticsHandler(analyticsUseCase)
-	systemEventHandler := handler.NewSystemEventHandler(systemEventUseCase)
-
-	// Apply global middleware for request tracing and event logging
-	r.Use(middleware.RequestID())
-	r.Use(middleware.EventLogger(systemEventRepo))
-
-	// API v1 route group
+// SetupRoutes configures all application routes
+func SetupRoutes(r *gin.Engine, c *Container) {
 	v1 := r.Group("/api/v1")
 	{
-		// System - Health Check
 		v1.GET("/health", handler.HealthCheck)
 
-		// Authentication & User
-		auth := v1.Group("/auth")
-		{
-			auth.POST("/login", authHandler.Login)
-			auth.POST("/register", authHandler.Register)
-			auth.POST("/refresh", authHandler.RefreshToken) // Refresh access token
-			auth.GET("/me", middleware.JWTAuth(), authHandler.GetCurrentUser)
-		}
-
-		users := v1.Group("/users")
-		users.Use(middleware.JWTAuth())
-		{
-			users.PUT("/profile", userHandler.UpdateProfile)
-		}
-
-		// ========== Public APIs (No Authentication) ==========
-
-		// Blog Posts - Public
-		posts := v1.Group("/posts")
-		{
-			posts.GET("", postHandler.ListPublishedPosts)
-			posts.GET("/:id", postHandler.GetPost)
-		}
-
-		// Taxonomy (Categories & Tags) - Public Read
-		categories := v1.Group("/categories")
-		{
-			categories.GET("", categoryHandler.ListCategories)
-		}
-
-		tags := v1.Group("/tags")
-		{
-			tags.GET("", tagHandler.ListTags)
-		}
-
-		// Analytics - Public tracking
-		v1.POST("/analytics/visit", analyticsHandler.LogVisit)
-
-		// ========== Admin APIs (Authentication + Admin Role) ==========
-
-		admin := v1.Group("/admin")
-		admin.Use(middleware.JWTAuth(), middleware.AdminOnly())
-		{
-			// Blog Posts Management
-			admin.GET("/posts", postHandler.ListAllPosts)
-			admin.GET("/posts/:id", postHandler.GetPostAdmin)
-			admin.POST("/posts", postHandler.CreatePost)
-			admin.PUT("/posts/:id", postHandler.UpdatePost)
-			admin.DELETE("/posts/:id", postHandler.DeletePost)
-
-			// Taxonomy Management
-			admin.POST("/categories", categoryHandler.CreateCategory)
-			admin.DELETE("/categories/:id", categoryHandler.DeleteCategory)
-			admin.POST("/tags", tagHandler.CreateTag)
-			admin.DELETE("/tags/:id", tagHandler.DeleteTag)
-
-			// Media Management
-			admin.POST("/upload", mediaHandler.UploadFile)
-			admin.GET("/files", mediaHandler.ListFiles)
-			admin.DELETE("/files/:id", mediaHandler.DeleteFile)
-
-			// Analytics Management
-			admin.GET("/analytics/logs", analyticsHandler.GetLogs)
-			admin.GET("/analytics/dashboard-overview", analyticsHandler.GetDashboardOverview)
-
-			// System Events Management (Unified Event Logging)
-			admin.GET("/events", systemEventHandler.ListEvents)                       // List all events with filters
-			admin.GET("/events/user/:id", systemEventHandler.GetUserEvents)           // User's event history
-			admin.GET("/events/trace/:request_id", systemEventHandler.GetRequestTrace) // Request tracing
-			admin.GET("/events/type/:event_type", systemEventHandler.GetEventsByType) // Events by type
-
-			// Convenience endpoints for specific event types
-			admin.GET("/events/audit", systemEventHandler.GetAuditLogs)         // Audit logs only
-			admin.GET("/events/security", systemEventHandler.GetSecurityEvents) // Security events only
-			admin.GET("/events/errors", systemEventHandler.GetSystemErrors)     // System errors only
-		}
+		// Setup route modules
+		setupAuthRoutes(v1, c)
+		setupUserRoutes(v1, c)
+		setupPublicRoutes(v1, c)
+		setupAdminRoutes(v1, c)
 	}
+}
+
+func setupAuthRoutes(v1 *gin.RouterGroup, c *Container) {
+	auth := v1.Group("/auth")
+	{
+		auth.POST("/login", c.AuthHandler.Login)
+		auth.POST("/register", c.AuthHandler.Register)
+		auth.POST("/refresh", c.AuthHandler.RefreshToken)
+		auth.GET("/me", middleware.JWTAuth(), c.AuthHandler.GetCurrentUser)
+	}
+}
+
+func setupUserRoutes(v1 *gin.RouterGroup, c *Container) {
+	users := v1.Group("/users")
+	users.Use(middleware.JWTAuth())
+	{
+		users.PUT("/profile", c.UserHandler.UpdateProfile)
+		users.POST("/avatar", c.MediaHandler.UploadAvatar)
+	}
+}
+
+func setupPublicRoutes(v1 *gin.RouterGroup, c *Container) {
+	// Blog Posts - Public
+	posts := v1.Group("/posts")
+	{
+		posts.GET("", c.PostHandler.ListPublishedPosts)
+		posts.GET("/:id", c.PostHandler.GetPost)
+	}
+
+	// Taxonomy - Public Read
+	categories := v1.Group("/categories")
+	{
+		categories.GET("", c.CategoryHandler.ListCategories)
+	}
+
+	tags := v1.Group("/tags")
+	{
+		tags.GET("", c.TagHandler.ListTags)
+	}
+
+	// Analytics - Public tracking
+	v1.POST("/analytics/visit", c.AnalyticsHandler.LogVisit)
+}
+
+func setupAdminRoutes(v1 *gin.RouterGroup, c *Container) {
+	admin := v1.Group("/admin")
+	admin.Use(middleware.JWTAuth(), middleware.AdminOnly())
+	{
+		setupAdminPostRoutes(admin, c)
+		setupAdminTaxonomyRoutes(admin, c)
+		setupAdminMediaRoutes(admin, c)
+		setupAdminAnalyticsRoutes(admin, c)
+		setupAdminEventRoutes(admin, c)
+	}
+}
+
+func setupAdminPostRoutes(admin *gin.RouterGroup, c *Container) {
+	admin.GET("/posts", c.PostHandler.ListAllPosts)
+	admin.GET("/posts/:id", c.PostHandler.GetPostAdmin)
+	admin.POST("/posts", c.PostHandler.CreatePost)
+	admin.PUT("/posts/:id", c.PostHandler.UpdatePost)
+	admin.DELETE("/posts/:id", c.PostHandler.DeletePost)
+}
+
+func setupAdminTaxonomyRoutes(admin *gin.RouterGroup, c *Container) {
+	// Categories
+	admin.POST("/categories", c.CategoryHandler.CreateCategory)
+	admin.DELETE("/categories/:id", c.CategoryHandler.DeleteCategory)
+
+	// Tags
+	admin.POST("/tags", c.TagHandler.CreateTag)
+	admin.DELETE("/tags/:id", c.TagHandler.DeleteTag)
+}
+
+func setupAdminMediaRoutes(admin *gin.RouterGroup, c *Container) {
+	admin.POST("/upload", c.MediaHandler.UploadFile)
+	admin.GET("/files", c.MediaHandler.ListFiles)
+	admin.DELETE("/files/:id", c.MediaHandler.DeleteFile)
+}
+
+func setupAdminAnalyticsRoutes(admin *gin.RouterGroup, c *Container) {
+	admin.GET("/analytics/logs", c.AnalyticsHandler.GetLogs)
+	admin.GET("/analytics/dashboard-overview", c.AnalyticsHandler.GetDashboardOverview)
+}
+
+func setupAdminEventRoutes(admin *gin.RouterGroup, c *Container) {
+	// General event queries
+	admin.GET("/events", c.SystemEventHandler.ListEvents)
+	admin.GET("/events/user/:id", c.SystemEventHandler.GetUserEvents)
+	admin.GET("/events/trace/:request_id", c.SystemEventHandler.GetRequestTrace)
+	admin.GET("/events/type/:event_type", c.SystemEventHandler.GetEventsByType)
+
+	// Convenience endpoints for specific event types
+	admin.GET("/events/audit", c.SystemEventHandler.GetAuditLogs)
+	admin.GET("/events/security", c.SystemEventHandler.GetSecurityEvents)
+	admin.GET("/events/errors", c.SystemEventHandler.GetSystemErrors)
 }

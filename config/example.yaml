@@ -1,17 +1,10 @@
 mode: debug
-name: http
 log_level: debug
 log_path: logs
 log_level_addr: :4245
 log_level_pattern: /log/level
 
 app:
-  domain: http://localhost
-  static_root_path: static
-  runtime_root_path: runtime/
-  image_allow_ext: .jpg,.jpeg,.png,.gif,.webp
-  image_max_size: 5
-  heartbeat: 1000
   # JWT Configuration
   jwt_secret: xxx  # $(openssl rand -base64 32)
   jwt_access_duration: 15   # Access token duration in minutes (default: 15)

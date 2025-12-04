@@ -29,10 +29,13 @@ func (s *Server) Run() {
 	g := gin.New()
 	gin.SetMode(config.Conf.Mode)
 
+	container := router.NewContainer(dbRepo.GetDbW())
 	g.Use(
-		gin.Recovery(),
-		middleware.RequestLogger(),
-		middleware.CorsMiddleware(),
+		gin.Recovery(),         // Panic recovery
+		middleware.RequestID(), // Request tracing
+		middleware.EventLogger(container.SystemEventRepo), // Event logging
+		middleware.RequestLogger(),                        // Request logging
+		middleware.CorsMiddleware(),                       // CORS
 	)
 
 	g.NoRoute(func(c *gin.Context) {
@@ -43,7 +46,7 @@ func (s *Server) Run() {
 	g.StaticFS("/static", gin.Dir("static", false))
 	g.StaticFile("/favicon.ico", "./static/favicon.ico")
 
-	router.SetupRoutes(g, dbRepo.GetDbW())
+	router.SetupRoutes(g, container)
 
 	s.srv = http.Server{
 		Addr:    config.Conf.Http.Addr,

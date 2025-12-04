@@ -15,8 +15,33 @@ func NewMediaHandler(mediaUseCase *usecase.MediaUseCase) *MediaHandler {
 	return &MediaHandler{mediaUseCase: mediaUseCase}
 }
 
-// UploadFile - POST /upload
+// UploadFile - POST /upload?type=avatar|post
 func (h *MediaHandler) UploadFile(c *gin.Context) {
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No file uploaded"})
+		return
+	}
+
+	// Get upload type from query parameter: avatar | post | default: post
+	uploadType := c.DefaultQuery("type", "post")
+	if uploadType != "avatar" && uploadType != "post" {
+		uploadType = "post"
+	}
+
+	baseURL := "http://" + c.Request.Host
+
+	media, err := h.mediaUseCase.Upload(c.Request.Context(), file, baseURL, uploadType)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, media)
+}
+
+// UploadAvatar - POST /users/avatar (Dedicated avatar upload endpoint)
+func (h *MediaHandler) UploadAvatar(c *gin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No file uploaded"})
@@ -25,7 +50,7 @@ func (h *MediaHandler) UploadFile(c *gin.Context) {
 
 	baseURL := "http://" + c.Request.Host
 
-	media, err := h.mediaUseCase.Upload(c.Request.Context(), file, baseURL)
+	media, err := h.mediaUseCase.Upload(c.Request.Context(), file, baseURL, "avatar")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
