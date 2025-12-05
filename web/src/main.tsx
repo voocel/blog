@@ -27,7 +27,7 @@ const AppContent: React.FC = () => {
           setSection={setAdminSection}
           onExit={() => window.location.href = '/'}
         />
-        <main className="flex-1 ml-64 bg-transparent overflow-auto">
+        <main className="flex-1 ml-72 bg-transparent overflow-auto">
           <AdminDashboard section={adminSection} onExit={() => window.location.href = '/'} />
         </main>
       </div>

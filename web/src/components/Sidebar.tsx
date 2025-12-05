@@ -23,7 +23,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentSection, setSection, onExit })
     ];
 
     return (
-        <aside className="fixed left-0 top-0 h-full w-72 bg-[#F7F5F3] border-r border-[#E7E5E4] flex flex-col z-50">
+        <aside className="fixed left-0 top-0 h-full w-72 bg-white border-r border-stone-200 flex flex-col z-50">
             {/* Brand - Clickable to Home */}
             <div
                 className="h-24 flex items-center px-8 cursor-pointer group"
@@ -31,7 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentSection, setSection, onExit })
                 title="Return to Site"
             >
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                    <div className="w-8 h-8 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                         <IconSparkles className="w-4 h-4 text-gold-600" />
                     </div>
                     <span className="text-2xl font-serif font-bold text-ink tracking-tight group-hover:text-gold-600 transition-colors">Aether<span className="text-gold-500">.</span></span>
@@ -49,8 +49,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentSection, setSection, onExit })
                             key={item.id}
                             onClick={() => setSection(item.id)}
                             className={`group w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-300 relative overflow-hidden cursor-pointer border focus:outline-none ${isActive
-                                ? 'bg-white text-ink shadow-[0_2px_8px_rgba(0,0,0,0.04)] border-stone-100'
-                                : 'border-transparent text-stone-500 hover:text-stone-700 hover:bg-white/50'
+                                ? 'bg-stone-50 text-ink shadow-sm border-stone-200 font-bold'
+                                : 'border-transparent text-stone-500 hover:text-stone-700 hover:bg-stone-50/50'
                                 }`}
                         >
                             <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-gold-600' : 'text-stone-400 group-hover:text-stone-600'}`} />
@@ -61,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentSection, setSection, onExit })
             </nav>
 
             {/* User & Footer */}
-            <div className="p-4 border-t border-stone-200 bg-[#F5F5F4]/50">
+            <div className="p-4 border-t border-stone-200 bg-stone-50/50">
                 {/* User Mini Profile */}
                 <div className="flex items-center gap-3 mb-6 px-2 group">
                     <div className="w-10 h-10 rounded-full bg-white border border-stone-200 overflow-hidden shadow-sm transition-transform duration-[600ms] ease-in-out group-hover:rotate-[360deg] cursor-pointer">

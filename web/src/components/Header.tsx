@@ -50,11 +50,15 @@ const Header: React.FC<HeaderProps> = () => {
         }`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           {/* Logo */}
+          {/* Logo */}
           <Link
             to="/"
-            className={`text-2xl md:text-3xl font-serif font-bold tracking-tighter cursor-pointer z-50 relative flex items-center gap-1 transition-colors ${scrolled ? 'text-ink' : 'text-ink'}`}
+            className={`text-2xl md:text-3xl font-serif font-bold tracking-tighter cursor-pointer z-50 relative flex items-center gap-1 group`}
           >
-            Voocel<span className="text-gold-500">.</span>
+            <span className={`bg-clip-text text-transparent bg-gradient-to-r from-ink to-stone-600 group-hover:from-gold-600 group-hover:to-gold-400 transition-all duration-500 ${scrolled ? '' : ''}`}>
+              Voocel
+            </span>
+            <span className="text-gold-500 group-hover:animate-bounce">.</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
