@@ -35,3 +35,22 @@ bin
 config/config.yaml
 config/GeoLite2-City.mmdb
 config/GeoLite2-Country.mmdb
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Backup files
+*.sql
+*.tar.gz
+*.zip
+*_backup*
+backup_*
+
+# Docker volumes
+postgres_data/
+
+# SSL certificates
+ssl/
+nginx/certbot/

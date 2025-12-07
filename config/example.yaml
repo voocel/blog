@@ -1,14 +1,14 @@
-mode: debug
-log_level: debug
+mode: release
+log_level: info
 log_path: logs
 log_level_addr: :4245
 log_level_pattern: /log/level
 
 app:
-  # JWT Configuration
-  jwt_secret: xxx  # $(openssl rand -base64 32)
-  jwt_access_duration: 15   # Access token duration in minutes (default: 15)
-  jwt_refresh_duration: 7   # Refresh token duration in days (default: 7)
+  # JWT Configuration (will be overridden by environment variables)
+  jwt_secret: change-this-in-production  # Override with BLOG_APP_JWT_SECRET
+  jwt_access_duration: 15   # Access token duration in minutes
+  jwt_refresh_duration: 7   # Refresh token duration in days
   upload_path: uploads
   geoip_db_path: config/GeoLite2-City.mmdb
 
@@ -16,11 +16,12 @@ http:
   addr: :8080
 
 postgres:
-  host: 127.0.0.1
-  port: 5433
-  username: postgres
-  password: 123456
-  dbname: blog
+  # Docker environment (will be overridden by environment variables)
+  host: postgres           # Override with BLOG_POSTGRES_HOST
+  port: 5432              # Override with BLOG_POSTGRES_PORT
+  username: postgres      # Override with BLOG_POSTGRES_USERNAME
+  password: changeme      # Override with BLOG_POSTGRES_PASSWORD (MUST CHANGE!)
+  dbname: blog           # Override with BLOG_POSTGRES_DBNAME
   ssl_mode: disable
   migrate: true
   max_open_conns: 100

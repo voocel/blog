@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: blog-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: blog
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-your_secure_password}
+      TZ: Asia/Shanghai
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - blog-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: blog-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Database Configuration
+      BLOG_POSTGRES_HOST: postgres
+      BLOG_POSTGRES_PORT: 5432
+      BLOG_POSTGRES_USERNAME: postgres
+      BLOG_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-your_secure_password}
+      BLOG_POSTGRES_DBNAME: blog
+      BLOG_POSTGRES_SSL_MODE: disable
+
+      # JWT Configuration
+      BLOG_APP_JWT_SECRET: ${JWT_SECRET:-PhhHBxvBLw3dofezHqVbZZKREJzzn63sXwtXLPN0DEg=}
+      BLOG_APP_JWT_ACCESS_DURATION: 15
+      BLOG_APP_JWT_REFRESH_DURATION: 7
+
+      # Server Configuration
+      BLOG_HTTP_ADDR: :8080
+      BLOG_MODE: release
+      BLOG_LOG_LEVEL: info
+    volumes:
+      - ./logs:/app/logs
+      - ./static/uploads:/app/static/uploads
+      - ./static/avatar:/app/static/avatar
+      - ./config/GeoLite2-City.mmdb:/app/config/GeoLite2-City.mmdb:ro
+    networks:
+      - blog-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Web
+  frontend:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: blog-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - blog-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # Nginx Reverse Proxy (HTTPS)
+  nginx:
+    image: nginx:alpine
+    container_name: blog-nginx
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - ./nginx/certbot:/var/www/certbot:ro
+    networks:
+      - blog-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  blog-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local

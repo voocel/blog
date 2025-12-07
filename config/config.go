@@ -92,6 +92,8 @@ func LoadConfig(paths ...string) {
 	viper.SetDefault("app.jwt_access_duration", 15)  // 15 minutes
 	viper.SetDefault("app.jwt_refresh_duration", 7)  // 7 days
 
+	// Read config.yaml (required)
+	viper.SetConfigName("config")
 	if err := viper.ReadInConfig(); err != nil {
 		log.Panicf("read config error: %v", err)
 	}
