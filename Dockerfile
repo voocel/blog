@@ -1,10 +1,14 @@
 # Stage 1: Build
-FROM golang:1.25-alpine AS builder
+FROM docker.m.daocloud.io/golang:1.25-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache git
 
 WORKDIR /app
+
+# Set Go proxy for China (use Aliyun mirror)
+ENV GOPROXY=https://goproxy.cn,direct
+ENV GO111MODULE=on
 
 # Copy go mod files
 COPY go.mod go.sum ./
@@ -17,7 +21,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /app/bin/blog ./cmd/blog
 
 # Stage 2: Runtime
-FROM alpine:latest
+FROM docker.m.daocloud.io/alpine:latest
 
 # Install ca-certificates for HTTPS
 RUN apk --no-cache add ca-certificates tzdata
