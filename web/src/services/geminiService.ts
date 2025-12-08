@@ -1,14 +1,29 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import type { ChatMessage } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
+const apiKey = import.meta.env.VITE_API_KEY;
+let ai: GoogleGenAI | null = null;
 
-const MODEL_NAME = 'gemini-2.5-flash';
+const getClient = () => {
+    if (!apiKey) {
+        return null;
+    }
+    if (!ai) {
+        ai = new GoogleGenAI({ apiKey });
+    }
+    return ai;
+};
+
+const MODEL_NAME = "gemini-2.5-flash";
 
 export const generateSummary = async (content: string): Promise<string> => {
     try {
+        const client = getClient();
+        if (!client) {
+            return "AI disabled: missing VITE_API_KEY.";
+        }
         const prompt = `Summarize the following blog post content in 2-3 concise sentences. Capture the main essence. \n\nContent: ${content.substring(0, 5000)}`; // Truncate to avoid huge context if necessary
-        const response = await ai.models.generateContent({
+        const response = await client.models.generateContent({
             model: MODEL_NAME,
             contents: prompt,
         });
@@ -21,8 +36,12 @@ export const generateSummary = async (content: string): Promise<string> => {
 
 export const generateInsight = async (content: string): Promise<string> => {
     try {
+        const client = getClient();
+        if (!client) {
+            return "AI disabled: missing VITE_API_KEY.";
+        }
         const prompt = `Provide a unique, thought-provoking insight or a counter-point related to this blog post. Keep it brief (under 50 words) and engaging. \n\nContent: ${content.substring(0, 5000)}`;
-        const response = await ai.models.generateContent({
+        const response = await client.models.generateContent({
             model: MODEL_NAME,
             contents: prompt,
         });
@@ -40,6 +59,11 @@ export const streamChatResponse = async (
     onChunk: (text: string) => void
 ): Promise<void> => {
     try {
+        const client = getClient();
+        if (!client) {
+            onChunk("AI disabled: missing VITE_API_KEY.");
+            return;
+        }
         const systemInstruction = `You are Lumina, an intelligent AI assistant for a personal blog. 
         You have access to the context of the blog posts the user is reading or asking about.
         
@@ -54,7 +78,7 @@ export const streamChatResponse = async (
         Do not answer questions unrelated to the blog topics, technology, lifestyle, or general knowledge.
         `;
 
-        const chat = ai.chats.create({
+        const chat = client.chats.create({
             model: MODEL_NAME,
             config: {
                 systemInstruction,
