@@ -17,7 +17,8 @@ export const clearTokens = () => {
 
 // Create an axios instance
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1',
+    // Use relative path by default so it works behind reverse proxy
+    baseURL: import.meta.env.VITE_API_URL || '/api/v1',
     headers: {
         'Content-Type': 'application/json',
     },
