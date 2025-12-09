@@ -6,9 +6,17 @@
 
 ## 技术栈
 
-**后端：** Go 1.25 + Gin + PostgreSQL 16 + GORM + JWT
+**后端：** Go 1.25 + Gin + PostgreSQL 18 + GORM + JWT
 
 **前端：** React 19 + Vite + TailwindCSS + TypeScript
+
+## 效果图
+![首页](screenshot/img1.png)
+![文章详情](screenshot/img2.png)
+![后台概览](screenshot/img3.png)
+![后台文章](screenshot/img4.png)
+![文件管理](screenshot/img5.png)
+![媒体文件](screenshot/img6.png)
 
 ---
 

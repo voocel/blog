@@ -5,8 +5,16 @@
 A modern blog built with Go + React + PostgreSQL. Docker-first deployment.
 
 ## Tech Stack
-- Backend: Go 1.25, Gin, PostgreSQL 16, GORM, JWT
+- Backend: Go 1.25, Gin, PostgreSQL 18, GORM, JWT
 - Frontend: React 19, Vite, TailwindCSS, TypeScript
+
+## Screenshots
+![Home](screenshot/img1.png)
+![Post Detail](screenshot/img2.png)
+![Admin Dashboard](screenshot/img3.png)
+![Admin Posts](screenshot/img4.png)
+![Admin Files](screenshot/img5.png)
+![Admin Assets](screenshot/img6.png)
 
 ---
 
