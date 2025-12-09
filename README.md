@@ -9,12 +9,12 @@ A modern blog built with Go + React + PostgreSQL. Docker-first deployment.
 - Frontend: React 19, Vite, TailwindCSS, TypeScript
 
 ## Screenshots
-![Home](screenshot/img1.png)
-![Post Detail](screenshot/img2.png)
-![Admin Dashboard](screenshot/img3.png)
-![Admin Posts](screenshot/img4.png)
-![Admin Files](screenshot/img5.png)
-![Admin Assets](screenshot/img6.png)
+<img src="screenshot/img1.png" alt="Home" width="900">
+<img src="screenshot/img2.png" alt="Post Detail" width="900">
+<img src="screenshot/img3.png" alt="AI Chat" width="900">
+<img src="screenshot/img4.png" alt="Admin Dashboard" width="900">
+<img src="screenshot/img5.png" alt="Admin Post" width="900">
+<img src="screenshot/img6.png" alt="Admin Assets" width="900">
 
 ---
 
@@ -37,7 +37,7 @@ vim .env  # set POSTGRES_PASSWORD, JWT_SECRET; optional VITE_API_KEY
 docker compose up -d
 
 # 5. Create admin
-docker compose exec backend ./blog -create-admin
+docker compose run --rm backend ./blog -create-admin
 
 # 6. Visit
 # http://localhost or http://your-server-ip

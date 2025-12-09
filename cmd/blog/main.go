@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"flag"
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -75,6 +77,15 @@ func main() {
 
 // createAdminAccount creates admin account
 func createAdminAccount() error {
+	reader := bufio.NewReader(os.Stdin)
+
+	username := promptInput(reader, "Enter admin username (default: admin): ", "admin")
+	email := promptInput(reader, "Enter admin email (default: admin@example.com): ", "admin@example.com")
+	password := promptInput(reader, "Enter admin password (required): ", "")
+	if password == "" {
+		return fmt.Errorf("password cannot be empty")
+	}
+
 	dbRepo, err := postgres.New()
 	if err != nil {
 		return fmt.Errorf("database connection failed: %w", err)
@@ -87,19 +98,19 @@ func createAdminAccount() error {
 	db := dbRepo.GetDbW()
 
 	var existingUser entity.User
-	err = db.Where("email = ? OR role = ?", "admin@example.com", "admin").First(&existingUser).Error
+	err = db.Where("email = ?", email).First(&existingUser).Error
 	if err == nil {
 		return fmt.Errorf("admin account already exists: %s", existingUser.Email)
 	}
 
-	hashedPassword, err := util.HashPassword("admin123")
+	hashedPassword, err := util.HashPassword(password)
 	if err != nil {
 		return fmt.Errorf("password encryption failed: %w", err)
 	}
 
 	admin := &entity.User{
-		Username: "admin",
-		Email:    "admin@example.com",
+		Username: username,
+		Email:    email,
 		Password: hashedPassword,
 		Role:     "admin",
 		Bio:      "Administrator",
@@ -111,9 +122,19 @@ func createAdminAccount() error {
 
 	fmt.Printf("\n=== Admin Account Created Successfully ===\n")
 	fmt.Printf("Email: %s\n", admin.Email)
-	fmt.Printf("Password: admin123\n")
+	fmt.Printf("Username: %s\n", admin.Username)
 	fmt.Printf("Role: %s\n", admin.Role)
 	fmt.Printf("==========================================\n\n")
 
 	return nil
+}
+
+func promptInput(reader *bufio.Reader, label, def string) string {
+	fmt.Print(label)
+	text, _ := reader.ReadString('\n')
+	text = strings.TrimSpace(text)
+	if text == "" {
+		return def
+	}
+	return text
 }

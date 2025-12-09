@@ -11,12 +11,12 @@
 **前端：** React 19 + Vite + TailwindCSS + TypeScript
 
 ## 效果图
-![首页](screenshot/img1.png)
-![文章详情](screenshot/img2.png)
-![后台概览](screenshot/img3.png)
-![后台文章](screenshot/img4.png)
-![文件管理](screenshot/img5.png)
-![媒体文件](screenshot/img6.png)
+<img src="screenshot/img1.png" alt="首页" width="900">
+<img src="screenshot/img2.png" alt="文章详情" width="900">
+<img src="screenshot/img3.png" alt="AI聊天" width="900">
+<img src="screenshot/img4.png" alt="后台概览" width="900">
+<img src="screenshot/img5.png" alt="后台文章" width="900">
+<img src="screenshot/img6.png" alt="媒体文件" width="900">
 
 ---
 
@@ -52,7 +52,7 @@ vim .env  # 设置 POSTGRES_PASSWORD、JWT_SECRET，若需 AI 填 VITE_API_KEY
 docker compose up -d
 
 # 5. 创建管理员账号
-docker compose exec backend ./blog -create-admin
+docker compose run --rm backend ./blog -create-admin
 
 # 6. 访问
 # http://localhost 或 http://your-server-ip

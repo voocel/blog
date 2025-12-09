@@ -71,7 +71,7 @@ services:
       context: ./web
       dockerfile: Dockerfile
       args:
-        VITE_API_KEY: ${VITE_API_KEY:?set_your_gemini_key}
+        VITE_API_KEY: ${VITE_API_KEY:-}
     container_name: blog-frontend
     restart: unless-stopped
     depends_on:
