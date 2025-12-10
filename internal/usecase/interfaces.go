@@ -82,3 +82,11 @@ type SystemEventRepo interface {
 	GetByUserID(ctx context.Context, userID string, limit int) ([]entity.SystemEvent, error)
 	GetByEventType(ctx context.Context, eventType entity.EventType, limit int) ([]entity.SystemEvent, error)
 }
+
+// CommentRepo comment repository interface
+type CommentRepo interface {
+	Create(ctx context.Context, comment *entity.Comment) error
+	GetByID(ctx context.Context, id string) (*entity.Comment, error)
+	ListTopLevel(ctx context.Context, postID string, page, limit int, order string) ([]entity.Comment, int64, error)
+	ListReplies(ctx context.Context, postID string, parentIDs []string, order string) ([]entity.Comment, error)
+}

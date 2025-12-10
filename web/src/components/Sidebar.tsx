@@ -91,7 +91,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentSection, setSection, onExit })
                         <span className="text-[10px] uppercase tracking-wider font-medium">Site</span>
                     </button>
                     <button
-                        onClick={logout}
+                        onClick={() => {
+                            logout();
+                            onExit();
+                        }}
                         className="flex flex-col items-center justify-center gap-1 p-3 rounded-lg bg-white border border-stone-200 text-stone-500 hover:text-red-600 hover:border-red-200 hover:shadow-sm transition-all cursor-pointer"
                     >
                         <IconLogOut className="w-4 h-4" />

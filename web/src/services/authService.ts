@@ -1,4 +1,4 @@
-import apiClient, { setTokens, clearTokens, getRefreshToken } from './apiClient';
+import apiClient, { setTokens, clearTokens, getRefreshToken, getAccessToken } from './apiClient';
 import type { User, AuthResponse } from '../types';
 
 export const authService = {
@@ -27,15 +27,15 @@ export const authService = {
     },
 
     getCurrentUser: async (): Promise<User | null> => {
+        const token = getAccessToken();
+        if (!token) {
+            return null;
+        }
+
         try {
-            // We use getAccessToken() inside apiClient interceptor, so just making the call is enough.
-            // But we need to check if we even have a token to avoid unnecessary 401s if possible,
-            // though apiClient handles 401s.
-            // Let's just try to fetch.
             const response = await apiClient.get('/auth/me');
             return response.data;
         } catch (error) {
-            // If 401 and refresh failed, apiClient would have cleared tokens.
             console.error('Failed to get current user:', error);
             return null;
         }

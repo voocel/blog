@@ -6,7 +6,7 @@ import { IconX, IconLock, IconUser } from './Icons';
 const AuthModal: React.FC = () => {
     const { isAuthModalOpen, setAuthModalOpen, login, register, user } = useBlog();
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('123');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
 
@@ -129,14 +129,7 @@ const AuthModal: React.FC = () => {
                         </button>
                     </form>
 
-                    <div className="mt-6 text-center space-y-1">
-                        <p className="text-xs text-stone-500">
-                            <span className="font-semibold text-gold-600">Admin:</span> admin / 123
-                        </p>
-                        <p className="text-xs text-stone-500">
-                            <span className="font-semibold text-stone-600">Visitor:</span> test / 123
-                        </p>
-                    </div>
+
                 </div>
             </div>
         </div>

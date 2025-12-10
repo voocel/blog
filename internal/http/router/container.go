@@ -19,6 +19,7 @@ type Container struct {
 	MediaRepo       usecase.MediaRepo
 	AnalyticsRepo   usecase.AnalyticsRepo
 	SystemEventRepo usecase.SystemEventRepo
+	CommentRepo     usecase.CommentRepo
 
 	// UseCases
 	AuthUseCase        *usecase.AuthUseCase
@@ -29,6 +30,7 @@ type Container struct {
 	MediaUseCase       *usecase.MediaUseCase
 	AnalyticsUseCase   *usecase.AnalyticsUseCase
 	SystemEventUseCase *usecase.SystemEventUseCase
+	CommentUseCase     *usecase.CommentUseCase
 
 	// Handlers
 	AuthHandler        *handler.AuthHandler
@@ -39,6 +41,7 @@ type Container struct {
 	MediaHandler       *handler.MediaHandler
 	AnalyticsHandler   *handler.AnalyticsHandler
 	SystemEventHandler *handler.SystemEventHandler
+	CommentHandler     *handler.CommentHandler
 }
 
 // NewContainer creates and initializes all application dependencies
@@ -54,6 +57,7 @@ func NewContainer(db *gorm.DB) *Container {
 	c.MediaRepo = repo.NewMediaRepo(db)
 	c.AnalyticsRepo = repo.NewAnalyticsRepo(db)
 	c.SystemEventRepo = repo.NewSystemEventRepo(db)
+	c.CommentRepo = repo.NewCommentRepo(db)
 
 	// Initialize UseCases
 	c.AuthUseCase = usecase.NewAuthUseCase(c.UserRepo)
@@ -64,6 +68,7 @@ func NewContainer(db *gorm.DB) *Container {
 	c.MediaUseCase = usecase.NewMediaUseCase(c.MediaRepo)
 	c.AnalyticsUseCase = usecase.NewAnalyticsUseCase(c.AnalyticsRepo, c.PostRepo, c.CategoryRepo, c.TagRepo, c.MediaRepo)
 	c.SystemEventUseCase = usecase.NewSystemEventUseCase(c.SystemEventRepo)
+	c.CommentUseCase = usecase.NewCommentUseCase(c.CommentRepo, c.PostRepo, c.UserRepo)
 
 	// Initialize Handlers
 	c.AuthHandler = handler.NewAuthHandler(c.AuthUseCase, c.UserUseCase)
@@ -74,6 +79,7 @@ func NewContainer(db *gorm.DB) *Container {
 	c.MediaHandler = handler.NewMediaHandler(c.MediaUseCase)
 	c.AnalyticsHandler = handler.NewAnalyticsHandler(c.AnalyticsUseCase)
 	c.SystemEventHandler = handler.NewSystemEventHandler(c.SystemEventUseCase)
+	c.CommentHandler = handler.NewCommentHandler(c.CommentUseCase)
 
 	return c
 }

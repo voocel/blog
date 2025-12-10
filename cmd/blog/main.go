@@ -80,7 +80,10 @@ func createAdminAccount() error {
 	reader := bufio.NewReader(os.Stdin)
 
 	username := promptInput(reader, "Enter admin username (default: admin): ", "admin")
-	email := promptInput(reader, "Enter admin email (default: admin@example.com): ", "admin@example.com")
+	email := promptInput(reader, "Enter admin email (required): ", "")
+	if email == "" {
+		return fmt.Errorf("email cannot be empty")
+	}
 	password := promptInput(reader, "Enter admin password (required): ", "")
 	if password == "" {
 		return fmt.Errorf("password cannot be empty")
@@ -109,11 +112,13 @@ func createAdminAccount() error {
 	}
 
 	admin := &entity.User{
-		Username: username,
-		Email:    email,
-		Password: hashedPassword,
-		Role:     "admin",
-		Bio:      "Administrator",
+		Username:   username,
+		Email:      email,
+		Password:   hashedPassword,
+		Provider:   "email",
+		ProviderID: email,
+		Role:       "admin",
+		Bio:        "Administrator",
 	}
 
 	if err := db.Create(admin).Error; err != nil {

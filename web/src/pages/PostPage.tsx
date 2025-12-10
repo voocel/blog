@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBlog } from '../context/BlogContext';
 import PostDetail from '../components/PostDetail';
+import CommentSection from '../components/CommentSection';
 import { postService } from '../services/postService';
 import type { BlogPost } from '../types';
 
@@ -67,7 +68,14 @@ const PostPage: React.FC = () => {
         );
     }
 
-    return <PostDetail post={post} onBack={() => navigate('/')} />;
+    return (
+        <>
+            <PostDetail post={post} onBack={() => navigate('/')} />
+            <div className="bg-[#FDFBF7] pb-24 px-4">
+                <CommentSection postId={post.id} />
+            </div>
+        </>
+    );
 };
 
 export default PostPage;

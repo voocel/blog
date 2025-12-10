@@ -41,6 +41,22 @@ export interface ChatMessage {
   isError?: boolean;
 }
 
+export interface Comment {
+  id: string;
+  parentId: string | null;
+  content: string;
+  createdAt: string;
+  user: {
+    username: string;
+    avatar?: string;
+  };
+  replies?: Comment[];
+  replyToUser?: {
+    username: string;
+    avatar?: string;
+  };
+}
+
 export interface User {
   username: string;
   email: string;

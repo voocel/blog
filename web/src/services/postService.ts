@@ -6,10 +6,14 @@ export const postService = {
     getPosts: async (params?: { category?: string; tag?: string; search?: string; page?: number; limit?: number }): Promise<BlogPost[]> => {
         // Public API: /posts (always published)
         const response = await apiClient.get('/posts', { params });
-        if (response.data.data && Array.isArray(response.data.data)) {
+        if (response.data?.data && Array.isArray(response.data.data)) {
             return response.data.data;
         }
-        return response.data;
+        if (Array.isArray(response.data)) {
+            return response.data;
+        }
+        console.warn('getPosts: Expected array result, got:', response.data);
+        return [];
     },
 
     getPost: async (id: string): Promise<BlogPost | undefined> => {
@@ -27,10 +31,14 @@ export const postService = {
     getAdminPosts: async (params?: { category?: string; status?: string; search?: string; page?: number; limit?: number }): Promise<BlogPost[]> => {
         // Admin API: /admin/posts (all statuses)
         const response = await apiClient.get('/admin/posts', { params });
-        if (response.data.data && Array.isArray(response.data.data)) {
+        if (response.data?.data && Array.isArray(response.data.data)) {
             return response.data.data;
         }
-        return response.data;
+        if (Array.isArray(response.data)) {
+            return response.data;
+        }
+        console.warn('getAdminPosts: Expected array result, got:', response.data);
+        return [];
     },
 
     getAdminPost: async (id: string): Promise<BlogPost | undefined> => {
