@@ -62,6 +62,7 @@ docker compose run --rm backend ./blog -create-admin
 ```bash
 git pull
 docker compose up -d --build
+docker compose up -d --build --no-deps backend frontend
 ```
 
 **配置说明：**

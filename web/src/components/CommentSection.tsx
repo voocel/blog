@@ -38,10 +38,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
         setIsSubmitting(true);
         try {
             const parentId = replyingTo ? replyingTo.id : undefined;
-            const created = await commentService.createComment(postId, newComment, {
-                username: user.username,
-                avatar: user.avatar
-            }, parentId);
+            const created = await commentService.createComment(postId, newComment, parentId);
 
             if (parentId) {
                 // Optimistically update replies
@@ -116,6 +113,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
                         <textarea
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSubmit(e);
+                                }
+                            }}
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
                             disabled={!user || isSubmitting}
