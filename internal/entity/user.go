@@ -8,10 +8,11 @@ import (
 
 type User struct {
 	ID         string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	Username   string    `gorm:"type:varchar(50);not null" json:"username"`               // Nickname, non-unique
-	Email      string    `gorm:"type:varchar(100);uniqueIndex;not null" json:"email"`     // Unique identifier
-	Password   string    `gorm:"type:varchar(255)" json:"-"`                              // Optional, can be empty for OAuth users
-	Role       string    `gorm:"type:varchar(20);not null;default:'visitor'" json:"role"` // admin | visitor
+	Username   string    `gorm:"type:varchar(50);not null" json:"username"`                // Nickname, non-unique
+	Email      string    `gorm:"type:varchar(100);uniqueIndex;not null" json:"email"`      // Unique identifier
+	Password   string    `gorm:"type:varchar(255)" json:"-"`                               // Optional, can be empty for OAuth users
+	Status     string    `gorm:"type:varchar(20);not null;default:'active'" json:"status"` // active | banned
+	Role       string    `gorm:"type:varchar(20);not null;default:'visitor'" json:"role"`  // admin | visitor
 	Avatar     string    `gorm:"type:varchar(500)" json:"avatar,omitempty"`
 	Bio        string    `gorm:"type:text" json:"bio,omitempty"`
 	Provider   string    `gorm:"type:varchar(20);not null;default:'email';uniqueIndex:idx_provider_user" json:"provider"` // email | google | github | apple
@@ -37,6 +38,18 @@ type UserResponse struct {
 	Email    string `json:"email"`
 	Role     string `json:"role"`
 	Avatar   string `json:"avatar,omitempty"`
+}
+
+// AdminUserResponse is returned in admin user listing/status endpoints.
+type AdminUserResponse struct {
+	ID       string `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Role     string `json:"role"`
+	Status   string `json:"status"`
+	Provider string `json:"provider"`
+	Avatar   string `json:"avatar,omitempty"`
+	JoinedAt string `json:"joinedAt,omitempty"`
 }
 
 type LoginRequest struct {

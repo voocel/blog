@@ -44,5 +44,15 @@ export const commentService = {
         }
         const response = await apiClient.post(`/posts/${postId}/comments`, payload);
         return response.data;
+    },
+
+    // Admin Methods
+    getAllComments: async (): Promise<Comment[]> => {
+        const response = await apiClient.get('/admin/comments');
+        return response.data;
+    },
+
+    deleteComment: async (id: string): Promise<void> => {
+        await apiClient.delete(`/admin/comments/${id}`);
     }
 };

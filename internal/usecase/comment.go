@@ -199,6 +199,73 @@ func (uc *CommentUseCase) List(ctx context.Context, postID string, page, limit i
 	}, nil
 }
 
+// ListAllAdmin returns all comments with user and post context for moderation.
+func (uc *CommentUseCase) ListAllAdmin(ctx context.Context) ([]entity.AdminCommentResponse, error) {
+	comments, err := uc.commentRepo.ListAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Simple caching maps using existing repo methods (per-item fetch)
+	userCache := make(map[string]entity.CommentUser)
+	getUser := func(id string) (entity.CommentUser, error) {
+		if u, ok := userCache[id]; ok {
+			return u, nil
+		}
+		user, err := uc.userRepo.GetByID(ctx, id)
+		if err != nil {
+			return entity.CommentUser{}, err
+		}
+		cu := entity.CommentUser{Username: user.Username, Avatar: user.Avatar}
+		userCache[id] = cu
+		return cu, nil
+	}
+
+	postCache := make(map[string]string)
+	getPostTitle := func(id string) (string, error) {
+		if t, ok := postCache[id]; ok {
+			return t, nil
+		}
+		post, err := uc.postRepo.GetByID(ctx, id)
+		if err != nil {
+			return "", err
+		}
+		postCache[id] = post.Title
+		return post.Title, nil
+	}
+
+	resp := make([]entity.AdminCommentResponse, 0, len(comments))
+	for _, c := range comments {
+		user, err := getUser(c.UserID)
+		if err != nil {
+			continue
+		}
+		title, err := getPostTitle(c.PostID)
+		if err != nil {
+			continue
+		}
+		resp = append(resp, entity.AdminCommentResponse{
+			ID:        c.ID,
+			Content:   c.Content,
+			CreatedAt: c.CreatedAt,
+			PostID:    c.PostID,
+			PostTitle: title,
+			User:      user,
+		})
+	}
+
+	return resp, nil
+}
+
+// DeleteAdmin deletes a comment and its direct replies.
+func (uc *CommentUseCase) DeleteAdmin(ctx context.Context, id string) error {
+	// Ensure exists
+	if _, err := uc.commentRepo.GetByID(ctx, id); err != nil {
+		return err
+	}
+	return uc.commentRepo.DeleteCascade(ctx, id)
+}
+
 func containsHTML(content string) bool {
 	// Lightweight guard: reject if HTML tag markers appear.
 	return strings.Contains(content, "<") || strings.Contains(content, ">")

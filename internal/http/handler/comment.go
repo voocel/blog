@@ -65,3 +65,27 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, comment)
 }
+
+// ListAllCommentsAdmin - GET /admin/comments
+func (h *CommentHandler) ListAllCommentsAdmin(c *gin.Context) {
+	comments, err := h.commentUseCase.ListAllAdmin(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, comments)
+}
+
+// DeleteCommentAdmin - DELETE /admin/comments/:id
+func (h *CommentHandler) DeleteCommentAdmin(c *gin.Context) {
+	id := c.Param("id")
+	if err := h.commentUseCase.DeleteAdmin(c.Request.Context(), id); err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
+			return
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.Status(http.StatusNoContent)
+}

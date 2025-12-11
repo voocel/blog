@@ -57,5 +57,14 @@ export const authService = {
         const response = await apiClient.post('/auth/refresh', { refresh_token: refreshToken });
         const { access_token, refresh_token: new_refresh_token } = response.data as AuthResponse;
         setTokens(access_token, new_refresh_token);
+    },
+
+    getUsers: async (): Promise<User[]> => {
+        const response = await apiClient.get('/admin/users');
+        return response.data;
+    },
+
+    updateUserStatus: async (userId: string, status: 'active' | 'banned'): Promise<void> => {
+        await apiClient.patch(`/admin/users/${userId}/status`, { status });
     }
 };

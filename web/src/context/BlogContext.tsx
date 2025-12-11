@@ -58,6 +58,12 @@ interface BlogContextType {
   refreshFiles: () => Promise<void>;
   refreshVisitLogs: () => Promise<void>;
   refreshDashboardOverview: () => Promise<void>;
+
+  // Admin Management
+  adminUsers: User[];
+  allComments: any[];
+  refreshAdminUsers: () => Promise<void>;
+  refreshAllComments: () => Promise<void>;
 }
 
 const BlogContext = createContext<BlogContextType | undefined>(undefined);
@@ -168,6 +174,28 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setDashboardStats(stats);
     } catch (err) {
       console.error("Failed to refresh dashboard overview", err);
+    }
+  };
+  // --- Admin Users & Comments Logic ---
+  const [adminUsers, setAdminUsers] = useState<User[]>([]);
+  const [allComments, setAllComments] = useState<any[]>([]); // Using any[] temporarily if Comment type doesn't have post context, but for list view we usually need post title. We will check Comment type.
+
+  const refreshAdminUsers = async () => {
+    try {
+      const users = await authService.getUsers();
+      setAdminUsers(users);
+    } catch (err) {
+      console.error("Failed to refresh users", err);
+    }
+  };
+
+  const refreshAllComments = async () => {
+    try {
+      // @ts-ignore - Assuming postService or commentService has this method
+      const comments = await import('../services/commentService').then(m => m.commentService.getAllComments());
+      setAllComments(comments);
+    } catch (err) {
+      console.error("Failed to refresh all comments", err);
     }
   };
 
@@ -339,7 +367,12 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       refreshFiles,
       refreshVisitLogs,
       dashboardStats,
-      refreshDashboardOverview
+      refreshDashboardOverview,
+      // Admin Users & Comments
+      adminUsers,
+      allComments,
+      refreshAdminUsers,
+      refreshAllComments
     }}>
       {children}
     </BlogContext.Provider>

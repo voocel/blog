@@ -12,6 +12,8 @@ import AdminCategories from '../components/admin/AdminCategories';
 import AdminTags from '../components/admin/AdminTags';
 import AdminFiles from '../components/admin/AdminFiles';
 import AdminEchoes from '../components/admin/AdminEchoes';
+import AdminUsers from '../components/admin/AdminUsers';
+import AdminComments from '../components/admin/AdminComments';
 
 interface AdminDashboardProps {
     section: AdminSection;
@@ -33,7 +35,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         refreshFiles,
         refreshVisitLogs,
         dashboardStats,
-        refreshDashboardOverview
+        refreshDashboardOverview,
+        // Admin Lists
+        adminUsers, refreshAdminUsers,
+        allComments, refreshAllComments
     } = useBlog();
 
     // Refresh data when switching sections
@@ -50,6 +55,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
             refreshFiles();
         } else if (section === 'echoes') {
             refreshVisitLogs();
+        } else if (section === 'users') {
+            refreshAdminUsers();
+        } else if (section === 'comments') {
+            refreshAllComments();
         }
     }, [section]);
 
@@ -451,6 +460,40 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                 <AdminEchoes
                     visitLogs={visitLogs}
                     posts={posts}
+                />
+            )}
+            {section === 'users' && (
+                <AdminUsers users={adminUsers} />
+            )}
+            {section === 'comments' && (
+                <AdminComments
+                    comments={allComments}
+                    onDeleteComment={(id) => requestConfirm(
+                        'Delete Comment?',
+                        'Are you sure you want to remove this comment? This action cannot be undone.',
+                        async () => {
+                            // Import logically since we don't have this in useBlog yet fully wrapped or just use service direct?
+                            // Good practice: Wrap in context, but for now specific
+                            // const { commentService } = await import('../services/commentService');
+                            // await commentService.deleteComment(id);
+                            // refreshAllComments();
+
+                            // Better: We should add deleteComment to BlogContext really if we want consistency, 
+                            // BUT I can just do it here or better yet add it to context in next step if I forgot.
+                            // Checking context... I didn't add deleteComment to context interface.
+                            // I will do sloppy dynamic import here or I should update Context. 
+                            // Creating a handle here is cleaner.
+
+                            try {
+                                const { commentService } = await import('../services/commentService');
+                                await commentService.deleteComment(id);
+                                refreshAllComments();
+                            } catch (e) {
+                                console.error(e);
+                                alert("Failed to delete comment");
+                            }
+                        }
+                    )}
                 />
             )}
 

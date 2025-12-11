@@ -58,9 +58,12 @@ export interface Comment {
 }
 
 export interface User {
+  id: string; // Ensure ID is present for management
   username: string;
   email: string;
   role: 'admin' | 'visitor';
+  status?: 'active' | 'banned'; // Optional for backward compatibility if backend doesn't always send
+  provider?: 'email' | 'google' | 'github'; // Auth provider
   avatar?: string;
 }
 
@@ -71,7 +74,7 @@ export const Theme = {
 
 export type Theme = typeof Theme[keyof typeof Theme];
 
-export type AdminSection = 'overview' | 'posts' | 'categories' | 'tags' | 'files' | 'echoes';
+export type AdminSection = 'overview' | 'posts' | 'categories' | 'tags' | 'files' | 'echoes' | 'users' | 'comments';
 
 export interface VisitLog {
   id: string;

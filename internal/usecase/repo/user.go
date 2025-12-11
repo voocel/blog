@@ -64,3 +64,11 @@ func (r *userRepo) Update(ctx context.Context, user *entity.User) error {
 func (r *userRepo) Delete(ctx context.Context, id string) error {
 	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.User{}).Error
 }
+
+func (r *userRepo) List(ctx context.Context) ([]entity.User, error) {
+	var users []entity.User
+	if err := r.db.WithContext(ctx).Order("created_at DESC").Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
+}

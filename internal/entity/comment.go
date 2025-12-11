@@ -34,6 +34,16 @@ type CommentResponse struct {
 	Replies     []CommentResponse `json:"replies,omitempty"`
 }
 
+// AdminCommentResponse is used by admin moderation endpoints.
+type AdminCommentResponse struct {
+	ID        string      `json:"id"`
+	Content   string      `json:"content"`
+	CreatedAt time.Time   `json:"createdAt"`
+	PostID    string      `json:"postId"`
+	PostTitle string      `json:"postTitle"`
+	User      CommentUser `json:"user"`
+}
+
 type PaginatedCommentsResponse struct {
 	Data       []CommentResponse `json:"data"`
 	Pagination Pagination        `json:"pagination"`

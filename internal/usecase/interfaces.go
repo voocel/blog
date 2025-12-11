@@ -11,6 +11,7 @@ type UserRepo interface {
 	GetByID(ctx context.Context, id string) (*entity.User, error)
 	GetByEmail(ctx context.Context, email string) (*entity.User, error)
 	GetByUsername(ctx context.Context, username string) (*entity.User, error)
+	List(ctx context.Context) ([]entity.User, error)
 	Update(ctx context.Context, user *entity.User) error
 	Delete(ctx context.Context, id string) error
 }
@@ -89,4 +90,6 @@ type CommentRepo interface {
 	GetByID(ctx context.Context, id string) (*entity.Comment, error)
 	ListTopLevel(ctx context.Context, postID string, page, limit int, order string) ([]entity.Comment, int64, error)
 	ListReplies(ctx context.Context, postID string, parentIDs []string, order string) ([]entity.Comment, error)
+	ListAll(ctx context.Context) ([]entity.Comment, error)
+	DeleteCascade(ctx context.Context, id string) error
 }

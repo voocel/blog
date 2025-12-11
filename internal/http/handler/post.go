@@ -123,6 +123,8 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 
 	var req entity.CreatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		// 把校验错误写入 gin.Errors，便于日志记录
+		c.Error(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid request",
 			"details": err.Error(),
@@ -131,6 +133,7 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 	}
 
 	if err := h.postUseCase.Create(c.Request.Context(), req, username.(string)); err != nil {
+		c.Error(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

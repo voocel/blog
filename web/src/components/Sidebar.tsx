@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { IconHome, IconGrid, IconLayers, IconTag, IconImage, IconLogOut, IconArrowLeft, IconSparkles, IconUserCircle, IconActivity } from './Icons';
+import { IconHome, IconGrid, IconLayers, IconTag, IconImage, IconLogOut, IconArrowLeft, IconSparkles, IconUserCircle, IconActivity, IconUser, IconMessageSquare } from './Icons';
 import type { AdminSection } from '../types';
 import { useBlog } from '../context/BlogContext';
 
@@ -16,6 +16,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentSection, setSection, onExit })
     const menuItems: { id: AdminSection; label: string; icon: React.FC<any> }[] = [
         { id: 'overview', label: 'Command Center', icon: IconHome },
         { id: 'echoes', label: 'Echoes (Analytics)', icon: IconActivity },
+        { id: 'users', label: 'Sanctuary Members', icon: IconUser },
+        { id: 'comments', label: 'Discussions', icon: IconMessageSquare },
         { id: 'posts', label: 'Journal Entries', icon: IconGrid },
         { id: 'categories', label: 'Categories', icon: IconLayers },
         { id: 'tags', label: 'Topics & Tags', icon: IconTag },

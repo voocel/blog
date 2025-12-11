@@ -81,3 +81,15 @@ func normalizeOrder(order string) string {
 		return "DESC"
 	}
 }
+
+func (r *commentRepo) ListAll(ctx context.Context) ([]entity.Comment, error) {
+	var comments []entity.Comment
+	err := r.db.WithContext(ctx).
+		Order("created_at DESC").
+		Find(&comments).Error
+	return comments, err
+}
+
+func (r *commentRepo) DeleteCascade(ctx context.Context, id string) error {
+	return r.db.WithContext(ctx).Where("id = ? OR parent_id = ?", id, id).Delete(&entity.Comment{}).Error
+}

@@ -80,6 +80,8 @@ func setupAdminRoutes(v1 *gin.RouterGroup, c *Container) {
 		setupAdminMediaRoutes(admin, c)
 		setupAdminAnalyticsRoutes(admin, c)
 		setupAdminEventRoutes(admin, c)
+		setupAdminUserRoutes(admin, c)
+		setupAdminCommentRoutes(admin, c)
 	}
 }
 
@@ -105,6 +107,16 @@ func setupAdminMediaRoutes(admin *gin.RouterGroup, c *Container) {
 	admin.POST("/upload", c.MediaHandler.UploadFile)
 	admin.GET("/files", c.MediaHandler.ListFiles)
 	admin.DELETE("/files/:id", c.MediaHandler.DeleteFile)
+}
+
+func setupAdminUserRoutes(admin *gin.RouterGroup, c *Container) {
+	admin.GET("/users", c.UserHandler.ListUsersAdmin)
+	admin.PATCH("/users/:id/status", c.UserHandler.UpdateUserStatus)
+}
+
+func setupAdminCommentRoutes(admin *gin.RouterGroup, c *Container) {
+	admin.GET("/comments", c.CommentHandler.ListAllCommentsAdmin)
+	admin.DELETE("/comments/:id", c.CommentHandler.DeleteCommentAdmin)
 }
 
 func setupAdminAnalyticsRoutes(admin *gin.RouterGroup, c *Container) {
