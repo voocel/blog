@@ -20,7 +20,7 @@ func NewTagHandler(tagUseCase *usecase.TagUseCase) *TagHandler {
 func (h *TagHandler) ListTags(c *gin.Context) {
 	tags, err := h.tagUseCase.List(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -31,12 +31,12 @@ func (h *TagHandler) ListTags(c *gin.Context) {
 func (h *TagHandler) CreateTag(c *gin.Context) {
 	var req entity.CreateTagRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		JSONError(c, http.StatusBadRequest, "Invalid request", err)
 		return
 	}
 
 	if err := h.tagUseCase.Create(c.Request.Context(), req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -48,7 +48,7 @@ func (h *TagHandler) DeleteTag(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := h.tagUseCase.Delete(c.Request.Context(), id); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 

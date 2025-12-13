@@ -6,10 +6,16 @@ import type { User } from '../../types';
 
 interface AdminUsersProps {
     users: User[];
+    requestConfirm: (title: string, message: string, onConfirm: () => void, options?: { confirmText?: string; isDestructive?: boolean }) => void;
 }
 
-const AdminUsers: React.FC<AdminUsersProps> = ({ users }) => {
+import { useToast } from '../../components/Toast';
+
+// ...
+
+const AdminUsers: React.FC<AdminUsersProps> = ({ users, requestConfirm }) => {
     const { refreshAdminUsers } = useBlog();
+    const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [processingId, setProcessingId] = useState<string | null>(null);
 
@@ -18,11 +24,11 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ users }) => {
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const handleToggleStatus = async (user: User) => {
+    const handleToggleStatus = (user: User) => {
         if (!user.id) return;
-        // Don't ban admins themselves for safety, or at least warn? Assuming backend handles simple "cannot ban self"
+        // Don't ban admins themselves for safety
         if (user.role === 'admin') {
-            alert("Cannot ban administrators.");
+            showToast("Cannot ban administrators", "error");
             return;
         }
 
@@ -31,18 +37,27 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ users }) => {
             ? `Are you sure you want to BAN ${user.username}? They will no longer be able to log in.`
             : `Unban ${user.username}?`;
 
-        if (!window.confirm(confirmMsg)) return;
-
-        setProcessingId(user.id);
-        try {
-            await authService.updateUserStatus(user.id, newStatus);
-            await refreshAdminUsers();
-        } catch (error) {
-            console.error("Failed to update status", error);
-            alert("Failed to update user status.");
-        } finally {
-            setProcessingId(null);
-        }
+        requestConfirm(
+            newStatus === 'banned' ? 'Ban User?' : 'Unban User?',
+            confirmMsg,
+            async () => {
+                setProcessingId(user.id);
+                try {
+                    await authService.updateUserStatus(user.id!, newStatus);
+                    await refreshAdminUsers();
+                    showToast(`User ${user.username} has been ${newStatus === 'banned' ? 'banned' : 'unbanned'}`, "success");
+                } catch (error) {
+                    console.error("Failed to update status", error);
+                    showToast("Failed to update user status", "error");
+                } finally {
+                    setProcessingId(null);
+                }
+            },
+            {
+                confirmText: newStatus === 'banned' ? 'Ban User' : 'Unban',
+                isDestructive: newStatus === 'banned'
+            }
+        );
     };
 
     return (
@@ -107,8 +122,8 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ users }) => {
                                         </td>
                                         <td className="py-4 px-6">
                                             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${user.role === 'admin'
-                                                    ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
-                                                    : 'bg-stone-100 text-stone-500 border border-stone-200'
+                                                ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+                                                : 'bg-stone-100 text-stone-500 border border-stone-200'
                                                 }`}>
                                                 {user.role === 'admin' && <IconShield className="w-3 h-3" />}
                                                 {user.role}
@@ -135,7 +150,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ users }) => {
                                                 <button
                                                     onClick={() => handleToggleStatus(user)}
                                                     disabled={processingId === user.id}
-                                                    className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all ${user.status === 'banned'
+                                                    className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${user.status === 'banned'
                                                         ? 'border-stone-200 text-stone-500 hover:border-stone-400 hover:text-stone-700 bg-white'
                                                         : 'border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 bg-white'
                                                         } ${processingId === user.id ? 'opacity-50 cursor-not-allowed' : ''}`}

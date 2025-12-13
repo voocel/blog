@@ -9,19 +9,26 @@ import (
 type UserRepo interface {
 	Create(ctx context.Context, user *entity.User) error
 	GetByID(ctx context.Context, id string) (*entity.User, error)
+	GetByIDs(ctx context.Context, ids []string) ([]entity.User, error)
 	GetByEmail(ctx context.Context, email string) (*entity.User, error)
 	GetByUsername(ctx context.Context, username string) (*entity.User, error)
 	List(ctx context.Context) ([]entity.User, error)
 	Update(ctx context.Context, user *entity.User) error
+	BumpTokenVersion(ctx context.Context, id string) error
 	Delete(ctx context.Context, id string) error
 }
 
 // PostRepo post repository interface
 type PostRepo interface {
 	Create(ctx context.Context, post *entity.Post) error
+	// CreateWithTags creates the post and its tag associations atomically.
+	CreateWithTags(ctx context.Context, post *entity.Post, tagIDs []string) error
 	GetByID(ctx context.Context, id string) (*entity.Post, error)
+	GetByIDs(ctx context.Context, ids []string) ([]entity.Post, error)
 	List(ctx context.Context, filters map[string]interface{}, page, limit int) ([]entity.Post, int64, error)
 	Update(ctx context.Context, post *entity.Post) error
+	// UpdateWithTags updates the post and replaces tag associations atomically.
+	UpdateWithTags(ctx context.Context, post *entity.Post, tagIDs []string) error
 	Delete(ctx context.Context, id string) error
 	IncrementViews(ctx context.Context, id string) error
 
@@ -29,6 +36,7 @@ type PostRepo interface {
 	AddTags(ctx context.Context, postID string, tagIDs []string) error
 	RemoveTags(ctx context.Context, postID string) error
 	GetTagIDs(ctx context.Context, postID string) ([]string, error)
+	GetTagIDsByPostIDs(ctx context.Context, postIDs []string) (map[string][]string, error)
 
 	// Statistics
 	Count(ctx context.Context) (int64, error)
@@ -39,6 +47,7 @@ type PostRepo interface {
 type CategoryRepo interface {
 	Create(ctx context.Context, category *entity.Category) error
 	GetByID(ctx context.Context, id string) (*entity.Category, error)
+	GetByIDs(ctx context.Context, ids []string) ([]entity.Category, error)
 	GetBySlug(ctx context.Context, slug string) (*entity.Category, error)
 	List(ctx context.Context) ([]entity.Category, error)
 	Update(ctx context.Context, category *entity.Category) error

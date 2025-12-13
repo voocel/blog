@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"blog/internal/entity"
+	"blog/pkg/log"
 	"context"
 	"fmt"
 	"math"
@@ -27,6 +28,9 @@ func (uc *PostUseCase) Create(ctx context.Context, req entity.CreatePostRequest,
 	if req.Status == "" {
 		req.Status = "draft"
 	}
+	if strings.TrimSpace(req.Excerpt) == "" {
+		req.Excerpt = deriveExcerpt(req.Content, 180)
+	}
 
 	// Use provided date or default to current time
 	date := req.Date
@@ -46,19 +50,36 @@ func (uc *PostUseCase) Create(ctx context.Context, req entity.CreatePostRequest,
 		Views:      0,
 	}
 
-	if err := uc.postRepo.Create(ctx, post); err != nil {
+	if err := uc.postRepo.CreateWithTags(ctx, post, req.Tags); err != nil {
 		return err
 	}
 
-	if len(req.Tags) > 0 {
-		if err := uc.postRepo.AddTags(ctx, post.ID, req.Tags); err != nil {
-			return err
-		}
+	if err := uc.categoryRepo.IncrementCount(ctx, req.CategoryID); err != nil {
+		// Non-critical counter update: log and continue.
+		log.Warnw("Increment category count failed",
+			log.Pair("category_id", req.CategoryID),
+			log.Pair("error", err.Error()),
+		)
 	}
 
-	uc.categoryRepo.IncrementCount(ctx, req.CategoryID)
-
 	return nil
+}
+
+func deriveExcerpt(content string, maxRunes int) string {
+	// Best-effort excerpt: collapse whitespace, then truncate by runes.
+	s := strings.TrimSpace(content)
+	if s == "" {
+		return ""
+	}
+	s = strings.Join(strings.Fields(s), " ")
+	if maxRunes <= 0 {
+		return s
+	}
+	r := []rune(s)
+	if len(r) <= maxRunes {
+		return s
+	}
+	return strings.TrimSpace(string(r[:maxRunes])) + "…"
 }
 
 func (uc *PostUseCase) GetByID(ctx context.Context, id string) (*entity.PostResponse, error) {
@@ -79,13 +100,9 @@ func (uc *PostUseCase) List(ctx context.Context, filters map[string]interface{},
 		return nil, err
 	}
 
-	responses := make([]entity.PostResponse, 0, len(posts))
-	for _, post := range posts {
-		resp, err := uc.assemblePostResponse(ctx, &post)
-		if err != nil {
-			continue
-		}
-		responses = append(responses, *resp)
+	responses, err := uc.assemblePostResponsesBatch(ctx, posts)
+	if err != nil {
+		return nil, err
 	}
 
 	// Return paginated response if pagination parameters provided
@@ -103,6 +120,94 @@ func (uc *PostUseCase) List(ctx context.Context, filters map[string]interface{},
 	}
 
 	// Otherwise return array directly
+	return responses, nil
+}
+
+func (uc *PostUseCase) assemblePostResponsesBatch(ctx context.Context, posts []entity.Post) ([]entity.PostResponse, error) {
+	if len(posts) == 0 {
+		return []entity.PostResponse{}, nil
+	}
+
+	postIDs := make([]string, 0, len(posts))
+	categoryIDSet := make(map[string]struct{}, len(posts))
+	for i := range posts {
+		postIDs = append(postIDs, posts[i].ID)
+		if posts[i].CategoryID != "" {
+			categoryIDSet[posts[i].CategoryID] = struct{}{}
+		}
+	}
+
+	// Batch load categories
+	categoryIDs := make([]string, 0, len(categoryIDSet))
+	for id := range categoryIDSet {
+		categoryIDs = append(categoryIDs, id)
+	}
+	categories, err := uc.categoryRepo.GetByIDs(ctx, categoryIDs)
+	if err != nil {
+		return nil, err
+	}
+	categoryNameByID := make(map[string]string, len(categories))
+	for i := range categories {
+		categoryNameByID[categories[i].ID] = categories[i].Name
+	}
+
+	// Batch load post->tagIDs
+	tagIDsByPostID, err := uc.postRepo.GetTagIDsByPostIDs(ctx, postIDs)
+	if err != nil {
+		return nil, err
+	}
+	tagIDSet := make(map[string]struct{})
+	for _, ids := range tagIDsByPostID {
+		for _, id := range ids {
+			if id != "" {
+				tagIDSet[id] = struct{}{}
+			}
+		}
+	}
+	allTagIDs := make([]string, 0, len(tagIDSet))
+	for id := range tagIDSet {
+		allTagIDs = append(allTagIDs, id)
+	}
+
+	// Batch load tags
+	tagNameByID := make(map[string]string)
+	if len(allTagIDs) > 0 {
+		tags, err := uc.tagRepo.GetByIDs(ctx, allTagIDs)
+		if err != nil {
+			return nil, err
+		}
+		tagNameByID = make(map[string]string, len(tags))
+		for i := range tags {
+			tagNameByID[tags[i].ID] = tags[i].Name
+		}
+	}
+
+	responses := make([]entity.PostResponse, 0, len(posts))
+	for i := range posts {
+		p := posts[i]
+		resp := entity.PostResponse{
+			ID:         p.ID,
+			Title:      p.Title,
+			Excerpt:    p.Excerpt,
+			Content:    p.Content,
+			Author:     p.Author,
+			Date:       p.Date,
+			CategoryID: p.CategoryID,
+			Category:   categoryNameByID[p.CategoryID],
+			ReadTime:   calculateReadTime(p.Content),
+			ImageUrl:   p.ImageUrl,
+			Views:      p.Views,
+			Status:     p.Status,
+			Tags:       []string{},
+		}
+
+		for _, tagID := range tagIDsByPostID[p.ID] {
+			if name := tagNameByID[tagID]; name != "" {
+				resp.Tags = append(resp.Tags, name)
+			}
+		}
+		responses = append(responses, resp)
+	}
 	return responses, nil
 }
 
@@ -134,20 +239,29 @@ func (uc *PostUseCase) Update(ctx context.Context, id string, req entity.UpdateP
 
 	// Handle category change
 	if req.CategoryID != "" && req.CategoryID != post.CategoryID {
-		uc.categoryRepo.DecrementCount(ctx, post.CategoryID)
-		uc.categoryRepo.IncrementCount(ctx, req.CategoryID)
+		if err := uc.categoryRepo.DecrementCount(ctx, post.CategoryID); err != nil {
+			log.Warnw("Decrement category count failed",
+				log.Pair("category_id", post.CategoryID),
+				log.Pair("error", err.Error()),
+			)
+		}
+		if err := uc.categoryRepo.IncrementCount(ctx, req.CategoryID); err != nil {
+			log.Warnw("Increment category count failed",
+				log.Pair("category_id", req.CategoryID),
+				log.Pair("error", err.Error()),
+			)
+		}
 		post.CategoryID = req.CategoryID
 	}
 
-	if err := uc.postRepo.Update(ctx, post); err != nil {
-		return err
-	}
-
-	// Update tags
+	// Update post (and tags optionally)
 	if req.Tags != nil {
-		uc.postRepo.RemoveTags(ctx, id)
-		if len(req.Tags) > 0 {
-			uc.postRepo.AddTags(ctx, id, req.Tags)
+		if err := uc.postRepo.UpdateWithTags(ctx, post, req.Tags); err != nil {
+			return err
+		}
+	} else {
+		if err := uc.postRepo.Update(ctx, post); err != nil {
+			return err
 		}
 	}
 
@@ -164,7 +278,12 @@ func (uc *PostUseCase) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
-	uc.categoryRepo.DecrementCount(ctx, post.CategoryID)
+	if err := uc.categoryRepo.DecrementCount(ctx, post.CategoryID); err != nil {
+		log.Warnw("Decrement category count failed",
+			log.Pair("category_id", post.CategoryID),
+			log.Pair("error", err.Error()),
+		)
+	}
 
 	return nil
 }

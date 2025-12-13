@@ -39,7 +39,7 @@ func (h *PostHandler) ListPublishedPosts(c *gin.Context) {
 
 	result, err := h.postUseCase.List(c.Request.Context(), filters, page, limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -68,7 +68,7 @@ func (h *PostHandler) ListAllPosts(c *gin.Context) {
 
 	result, err := h.postUseCase.List(c.Request.Context(), filters, page, limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -81,19 +81,19 @@ func (h *PostHandler) GetPost(c *gin.Context) {
 
 	post, err := h.postUseCase.GetByID(c.Request.Context(), id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		JSONError(c, http.StatusNotFound, "Post not found", err)
 		return
 	}
 
 	if post.Status != "published" {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		JSONError(c, http.StatusNotFound, "Post not found", nil)
 		return
 	}
 
 	// Check if publish date has arrived (scheduled publishing)
 	currentDate := time.Now().Format("2006-01-02")
 	if post.Date > currentDate {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		JSONError(c, http.StatusNotFound, "Post not found", nil)
 		return
 	}
 
@@ -106,7 +106,7 @@ func (h *PostHandler) GetPostAdmin(c *gin.Context) {
 
 	post, err := h.postUseCase.GetByID(c.Request.Context(), id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		JSONError(c, http.StatusNotFound, "Post not found", err)
 		return
 	}
 
@@ -117,24 +117,18 @@ func (h *PostHandler) GetPostAdmin(c *gin.Context) {
 func (h *PostHandler) CreatePost(c *gin.Context) {
 	username, exists := c.Get("username")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		JSONError(c, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
 
 	var req entity.CreatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		// 把校验错误写入 gin.Errors，便于日志记录
-		c.Error(err)
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid request",
-			"details": err.Error(),
-		})
+		JSONError(c, http.StatusBadRequest, "Invalid request", err)
 		return
 	}
 
 	if err := h.postUseCase.Create(c.Request.Context(), req, username.(string)); err != nil {
-		c.Error(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -147,15 +141,12 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 
 	var req entity.UpdatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid request",
-			"details": err.Error(),
-		})
+		JSONError(c, http.StatusBadRequest, "Invalid request", err)
 		return
 	}
 
 	if err := h.postUseCase.Update(c.Request.Context(), id, req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -168,7 +159,7 @@ func (h *PostHandler) DeletePost(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := h.postUseCase.Delete(c.Request.Context(), id); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 

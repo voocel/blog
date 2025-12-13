@@ -21,7 +21,7 @@ func NewAnalyticsHandler(analyticsUseCase *usecase.AnalyticsUseCase) *AnalyticsH
 func (h *AnalyticsHandler) LogVisit(c *gin.Context) {
 	var req entity.LogVisitRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		JSONError(c, http.StatusBadRequest, "Invalid request", err)
 		return
 	}
 
@@ -29,7 +29,7 @@ func (h *AnalyticsHandler) LogVisit(c *gin.Context) {
 	userAgent := c.GetHeader("User-Agent")
 
 	if err := h.analyticsUseCase.LogVisit(c.Request.Context(), req, ip, userAgent); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -44,7 +44,7 @@ func (h *AnalyticsHandler) GetLogs(c *gin.Context) {
 
 	logs, err := h.analyticsUseCase.GetLogs(c.Request.Context(), startDate, endDate, limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -55,7 +55,7 @@ func (h *AnalyticsHandler) GetLogs(c *gin.Context) {
 func (h *AnalyticsHandler) GetDashboardOverview(c *gin.Context) {
 	overview, err := h.analyticsUseCase.GetDashboardOverview(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 

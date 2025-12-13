@@ -4,6 +4,7 @@ import (
 	"blog/internal/entity"
 	"blog/internal/usecase"
 	"bytes"
+	"context"
 	"io"
 	"strings"
 	"time"
@@ -23,7 +24,12 @@ func EventLogger(eventRepo usecase.SystemEventRepo) gin.HandlerFunc {
 
 		// Capture request body for important operations
 		var metadata string
-		if c.Request.Method != "GET" && c.Request.Body != nil {
+		contentType := strings.ToLower(c.GetHeader("Content-Type"))
+		if c.Request.Method != "GET" &&
+			c.Request.Body != nil &&
+			!strings.HasPrefix(c.Request.URL.Path, "/api/v1/auth/") &&
+			strings.Contains(contentType, "application/json") &&
+			c.Request.ContentLength > 0 && c.Request.ContentLength <= maxLogBodyBytes {
 			bodyBytes, _ := io.ReadAll(c.Request.Body)
 			c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 			metadata = string(bodyBytes)
@@ -82,7 +88,10 @@ func EventLogger(eventRepo usecase.SystemEventRepo) gin.HandlerFunc {
 
 		// Async logging to avoid blocking response
 		go func() {
-			_ = eventRepo.Create(c.Request.Context(), event)
+			// Do not use request context here; it may be cancelled after the response ends.
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+			defer cancel()
+			_ = eventRepo.Create(ctx, event)
 		}()
 	}
 }

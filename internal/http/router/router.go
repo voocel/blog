@@ -27,13 +27,13 @@ func setupAuthRoutes(v1 *gin.RouterGroup, c *Container) {
 		auth.POST("/login", c.AuthHandler.Login)
 		auth.POST("/register", c.AuthHandler.Register)
 		auth.POST("/refresh", c.AuthHandler.RefreshToken)
-		auth.GET("/me", middleware.JWTAuth(), c.AuthHandler.GetCurrentUser)
+		auth.GET("/me", middleware.JWTAuth(c.UserRepo), c.AuthHandler.GetCurrentUser)
 	}
 }
 
 func setupUserRoutes(v1 *gin.RouterGroup, c *Container) {
 	users := v1.Group("/users")
-	users.Use(middleware.JWTAuth())
+	users.Use(middleware.JWTAuth(c.UserRepo))
 	{
 		users.PUT("/profile", c.UserHandler.UpdateProfile)
 		users.POST("/avatar", c.MediaHandler.UploadAvatar)
@@ -51,7 +51,7 @@ func setupPublicRoutes(v1 *gin.RouterGroup, c *Container) {
 
 	// Comments - Authenticated create
 	authComments := v1.Group("/posts")
-	authComments.Use(middleware.JWTAuth())
+	authComments.Use(middleware.JWTAuth(c.UserRepo))
 	{
 		authComments.POST("/:id/comments", c.CommentHandler.CreateComment)
 	}
@@ -73,7 +73,7 @@ func setupPublicRoutes(v1 *gin.RouterGroup, c *Container) {
 
 func setupAdminRoutes(v1 *gin.RouterGroup, c *Container) {
 	admin := v1.Group("/admin")
-	admin.Use(middleware.JWTAuth(), middleware.AdminOnly())
+	admin.Use(middleware.JWTAuth(c.UserRepo), middleware.AdminOnly())
 	{
 		setupAdminPostRoutes(admin, c)
 		setupAdminTaxonomyRoutes(admin, c)

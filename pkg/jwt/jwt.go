@@ -16,10 +16,11 @@ const (
 
 // Claims represents JWT claims structure
 type Claims struct {
-	UserID    string `json:"user_id"`
-	Username  string `json:"username"`
-	Role      string `json:"role"`
-	TokenType string `json:"token_type"` // "access" or "refresh"
+	UserID       string `json:"user_id"`
+	Username     string `json:"username"`
+	Role         string `json:"role"`
+	TokenType    string `json:"token_type"` // "access" or "refresh"
+	TokenVersion int    `json:"tv"`         // Token revocation version
 	jwt.RegisteredClaims
 }
 
@@ -58,11 +59,16 @@ func GenerateToken(user *entity.User) (string, error) {
 // generateToken is the internal token generation function
 func generateToken(user *entity.User, tokenType string, duration time.Duration) (string, error) {
 	now := time.Now()
+	tv := user.TokenVersion
+	if tv <= 0 {
+		tv = 1
+	}
 	claims := Claims{
-		UserID:    user.ID,
-		Username:  user.Username,
-		Role:      user.Role,
-		TokenType: tokenType,
+		UserID:       user.ID,
+		Username:     user.Username,
+		Role:         user.Role,
+		TokenType:    tokenType,
+		TokenVersion: tv,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(now.Add(duration)),
 			IssuedAt:  jwt.NewNumericDate(now),

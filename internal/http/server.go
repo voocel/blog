@@ -13,7 +13,8 @@ import (
 )
 
 type Server struct {
-	srv http.Server
+	srv    http.Server
+	dbRepo postgres.Repo
 }
 
 func NewServer() *Server {
@@ -25,9 +26,10 @@ func (s *Server) Run() {
 	if err != nil {
 		panic(err)
 	}
+	s.dbRepo = dbRepo
 
-	g := gin.New()
 	gin.SetMode(config.Conf.Mode)
+	g := gin.New()
 
 	container := router.NewContainer(dbRepo.GetDbW())
 	g.Use(
@@ -61,5 +63,13 @@ func (s *Server) Run() {
 }
 
 func (s *Server) Stop(ctx context.Context) error {
-	return s.srv.Shutdown(ctx)
+	if err := s.srv.Shutdown(ctx); err != nil {
+		return err
+	}
+	// Close DB connections
+	if s.dbRepo != nil {
+		_ = s.dbRepo.DbRClose()
+		_ = s.dbRepo.DbWClose()
+	}
+	return nil
 }

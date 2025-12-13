@@ -33,6 +33,17 @@ func (r *userRepo) GetByID(ctx context.Context, id string) (*entity.User, error)
 	return &user, nil
 }
 
+func (r *userRepo) GetByIDs(ctx context.Context, ids []string) ([]entity.User, error) {
+	if len(ids) == 0 {
+		return []entity.User{}, nil
+	}
+	var users []entity.User
+	if err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func (r *userRepo) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
 	var user entity.User
 	err := r.db.WithContext(ctx).Where("email = ?", email).First(&user).Error
@@ -59,6 +70,12 @@ func (r *userRepo) GetByUsername(ctx context.Context, username string) (*entity.
 
 func (r *userRepo) Update(ctx context.Context, user *entity.User) error {
 	return r.db.WithContext(ctx).Save(user).Error
+}
+
+func (r *userRepo) BumpTokenVersion(ctx context.Context, id string) error {
+	return r.db.WithContext(ctx).Model(&entity.User{}).
+		Where("id = ?", id).
+		UpdateColumn("token_version", gorm.Expr("token_version + 1")).Error
 }
 
 func (r *userRepo) Delete(ctx context.Context, id string) error {

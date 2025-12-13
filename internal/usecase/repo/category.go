@@ -33,6 +33,17 @@ func (r *categoryRepo) GetByID(ctx context.Context, id string) (*entity.Category
 	return &category, nil
 }
 
+func (r *categoryRepo) GetByIDs(ctx context.Context, ids []string) ([]entity.Category, error) {
+	if len(ids) == 0 {
+		return []entity.Category{}, nil
+	}
+	var categories []entity.Category
+	if err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&categories).Error; err != nil {
+		return nil, err
+	}
+	return categories, nil
+}
+
 func (r *categoryRepo) GetBySlug(ctx context.Context, slug string) (*entity.Category, error) {
 	var category entity.Category
 	err := r.db.WithContext(ctx).Where("slug = ?", slug).First(&category).Error

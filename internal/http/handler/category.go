@@ -20,7 +20,7 @@ func NewCategoryHandler(categoryUseCase *usecase.CategoryUseCase) *CategoryHandl
 func (h *CategoryHandler) ListCategories(c *gin.Context) {
 	categories, err := h.categoryUseCase.List(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -31,12 +31,12 @@ func (h *CategoryHandler) ListCategories(c *gin.Context) {
 func (h *CategoryHandler) CreateCategory(c *gin.Context) {
 	var req entity.CreateCategoryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		JSONError(c, http.StatusBadRequest, "Invalid request", err)
 		return
 	}
 
 	if err := h.categoryUseCase.Create(c.Request.Context(), req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -48,7 +48,7 @@ func (h *CategoryHandler) DeleteCategory(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := h.categoryUseCase.Delete(c.Request.Context(), id); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 

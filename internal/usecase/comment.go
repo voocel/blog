@@ -206,42 +206,52 @@ func (uc *CommentUseCase) ListAllAdmin(ctx context.Context) ([]entity.AdminComme
 		return nil, err
 	}
 
-	// Simple caching maps using existing repo methods (per-item fetch)
-	userCache := make(map[string]entity.CommentUser)
-	getUser := func(id string) (entity.CommentUser, error) {
-		if u, ok := userCache[id]; ok {
-			return u, nil
+	// Batch load users and posts to avoid N+1 queries.
+	userIDSet := make(map[string]struct{})
+	postIDSet := make(map[string]struct{})
+	for _, c := range comments {
+		if c.UserID != "" {
+			userIDSet[c.UserID] = struct{}{}
 		}
-		user, err := uc.userRepo.GetByID(ctx, id)
-		if err != nil {
-			return entity.CommentUser{}, err
+		if c.PostID != "" {
+			postIDSet[c.PostID] = struct{}{}
 		}
-		cu := entity.CommentUser{Username: user.Username, Avatar: user.Avatar}
-		userCache[id] = cu
-		return cu, nil
+	}
+	userIDs := make([]string, 0, len(userIDSet))
+	for id := range userIDSet {
+		userIDs = append(userIDs, id)
+	}
+	postIDs := make([]string, 0, len(postIDSet))
+	for id := range postIDSet {
+		postIDs = append(postIDs, id)
 	}
 
-	postCache := make(map[string]string)
-	getPostTitle := func(id string) (string, error) {
-		if t, ok := postCache[id]; ok {
-			return t, nil
-		}
-		post, err := uc.postRepo.GetByID(ctx, id)
-		if err != nil {
-			return "", err
-		}
-		postCache[id] = post.Title
-		return post.Title, nil
+	users, err := uc.userRepo.GetByIDs(ctx, userIDs)
+	if err != nil {
+		return nil, err
+	}
+	userByID := make(map[string]entity.CommentUser, len(users))
+	for i := range users {
+		userByID[users[i].ID] = entity.CommentUser{Username: users[i].Username, Avatar: users[i].Avatar}
+	}
+
+	posts, err := uc.postRepo.GetByIDs(ctx, postIDs)
+	if err != nil {
+		return nil, err
+	}
+	postTitleByID := make(map[string]string, len(posts))
+	for i := range posts {
+		postTitleByID[posts[i].ID] = posts[i].Title
 	}
 
 	resp := make([]entity.AdminCommentResponse, 0, len(comments))
 	for _, c := range comments {
-		user, err := getUser(c.UserID)
-		if err != nil {
+		user, ok := userByID[c.UserID]
+		if !ok {
 			continue
 		}
-		title, err := getPostTitle(c.PostID)
-		if err != nil {
+		title := postTitleByID[c.PostID]
+		if title == "" {
 			continue
 		}
 		resp = append(resp, entity.AdminCommentResponse{

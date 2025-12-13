@@ -21,6 +21,25 @@ func (r *postRepo) Create(ctx context.Context, post *entity.Post) error {
 	return r.db.WithContext(ctx).Create(post).Error
 }
 
+func (r *postRepo) CreateWithTags(ctx context.Context, post *entity.Post, tagIDs []string) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(post).Error; err != nil {
+			return err
+		}
+		if len(tagIDs) == 0 {
+			return nil
+		}
+		postTags := make([]entity.PostTag, 0, len(tagIDs))
+		for _, tagID := range tagIDs {
+			postTags = append(postTags, entity.PostTag{
+				PostID: post.ID,
+				TagID:  tagID,
+			})
+		}
+		return tx.Create(&postTags).Error
+	})
+}
+
 func (r *postRepo) GetByID(ctx context.Context, id string) (*entity.Post, error) {
 	var post entity.Post
 	err := r.db.WithContext(ctx).Where("id = ?", id).First(&post).Error
@@ -31,6 +50,17 @@ func (r *postRepo) GetByID(ctx context.Context, id string) (*entity.Post, error)
 		return nil, err
 	}
 	return &post, nil
+}
+
+func (r *postRepo) GetByIDs(ctx context.Context, ids []string) ([]entity.Post, error) {
+	if len(ids) == 0 {
+		return []entity.Post{}, nil
+	}
+	var posts []entity.Post
+	if err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&posts).Error; err != nil {
+		return nil, err
+	}
+	return posts, nil
 }
 
 // List supports multiple filter conditions and optional pagination
@@ -80,11 +110,39 @@ func (r *postRepo) Update(ctx context.Context, post *entity.Post) error {
 	return r.db.WithContext(ctx).Save(post).Error
 }
 
+func (r *postRepo) UpdateWithTags(ctx context.Context, post *entity.Post, tagIDs []string) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Save(post).Error; err != nil {
+			return err
+		}
+		// Replace all tag associations
+		if err := tx.Where("post_id = ?", post.ID).Delete(&entity.PostTag{}).Error; err != nil {
+			return err
+		}
+		if len(tagIDs) == 0 {
+			return nil
+		}
+		postTags := make([]entity.PostTag, 0, len(tagIDs))
+		for _, tagID := range tagIDs {
+			postTags = append(postTags, entity.PostTag{
+				PostID: post.ID,
+				TagID:  tagID,
+			})
+		}
+		return tx.Create(&postTags).Error
+	})
+}
+
 func (r *postRepo) Delete(ctx context.Context, id string) error {
-	// First delete associated tags
-	r.RemoveTags(ctx, id)
-	// Then delete the post
-	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Post{}).Error
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("post_id = ?", id).Delete(&entity.Comment{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("post_id = ?", id).Delete(&entity.PostTag{}).Error; err != nil {
+			return err
+		}
+		return tx.Where("id = ?", id).Delete(&entity.Post{}).Error
+	})
 }
 
 func (r *postRepo) IncrementViews(ctx context.Context, id string) error {
@@ -123,6 +181,21 @@ func (r *postRepo) GetTagIDs(ctx context.Context, postID string) ([]string, erro
 		tagIDs[i] = pt.TagID
 	}
 	return tagIDs, nil
+}
+
+func (r *postRepo) GetTagIDsByPostIDs(ctx context.Context, postIDs []string) (map[string][]string, error) {
+	if len(postIDs) == 0 {
+		return map[string][]string{}, nil
+	}
+	var postTags []entity.PostTag
+	if err := r.db.WithContext(ctx).Where("post_id IN ?", postIDs).Find(&postTags).Error; err != nil {
+		return nil, err
+	}
+	out := make(map[string][]string, len(postIDs))
+	for _, pt := range postTags {
+		out[pt.PostID] = append(out[pt.PostID], pt.TagID)
+	}
+	return out, nil
 }
 
 // Count counts total number of posts (including drafts)

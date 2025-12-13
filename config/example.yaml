@@ -14,6 +14,9 @@ app:
 
 http:
   addr: :8080
+  # CORS allowlist (recommended in production; if empty, release mode denies CORS by default)
+  # allowed_origins:
+  #   - https://your-frontend.example.com
 
 postgres:
   # Docker environment (will be overridden by environment variables)

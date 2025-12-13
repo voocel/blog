@@ -7,18 +7,19 @@ import (
 )
 
 type User struct {
-	ID         string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	Username   string    `gorm:"type:varchar(50);not null" json:"username"`                // Nickname, non-unique
-	Email      string    `gorm:"type:varchar(100);uniqueIndex;not null" json:"email"`      // Unique identifier
-	Password   string    `gorm:"type:varchar(255)" json:"-"`                               // Optional, can be empty for OAuth users
-	Status     string    `gorm:"type:varchar(20);not null;default:'active'" json:"status"` // active | banned
-	Role       string    `gorm:"type:varchar(20);not null;default:'visitor'" json:"role"`  // admin | visitor
-	Avatar     string    `gorm:"type:varchar(500)" json:"avatar,omitempty"`
-	Bio        string    `gorm:"type:text" json:"bio,omitempty"`
-	Provider   string    `gorm:"type:varchar(20);not null;default:'email';uniqueIndex:idx_provider_user" json:"provider"` // email | google | github | apple
-	ProviderID string    `gorm:"type:varchar(255);uniqueIndex:idx_provider_user" json:"-"`                                // Third-party platform user ID, unique with provider
-	CreatedAt  time.Time `gorm:"autoCreateTime" json:"createdAt"`
-	UpdatedAt  time.Time `gorm:"autoUpdateTime" json:"updatedAt"`
+	ID           string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	Username     string    `gorm:"type:varchar(50);not null" json:"username"`                // Nickname, non-unique
+	Email        string    `gorm:"type:varchar(100);uniqueIndex;not null" json:"email"`      // Unique identifier
+	Password     string    `gorm:"type:varchar(255)" json:"-"`                               // Optional, can be empty for OAuth users
+	Status       string    `gorm:"type:varchar(20);not null;default:'active'" json:"status"` // active | banned
+	Role         string    `gorm:"type:varchar(20);not null;default:'visitor'" json:"role"`  // admin | visitor
+	TokenVersion int       `gorm:"type:int;not null;default:1" json:"-"`                     // Token revocation version
+	Avatar       string    `gorm:"type:varchar(500)" json:"avatar,omitempty"`
+	Bio          string    `gorm:"type:text" json:"bio,omitempty"`
+	Provider     string    `gorm:"type:varchar(20);not null;default:'email';uniqueIndex:idx_provider_user" json:"provider"` // email | google | github | apple
+	ProviderID   string    `gorm:"type:varchar(255);uniqueIndex:idx_provider_user" json:"-"`                                // Third-party platform user ID, unique with provider
+	CreatedAt    time.Time `gorm:"autoCreateTime" json:"createdAt"`
+	UpdatedAt    time.Time `gorm:"autoUpdateTime" json:"updatedAt"`
 }
 
 func (User) TableName() string {

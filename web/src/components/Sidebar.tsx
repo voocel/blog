@@ -15,12 +15,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentSection, setSection, onExit })
 
     const menuItems: { id: AdminSection; label: string; icon: React.FC<any> }[] = [
         { id: 'overview', label: 'Command Center', icon: IconHome },
-        { id: 'echoes', label: 'Echoes (Analytics)', icon: IconActivity },
-        { id: 'users', label: 'Sanctuary Members', icon: IconUser },
-        { id: 'comments', label: 'Discussions', icon: IconMessageSquare },
         { id: 'posts', label: 'Journal Entries', icon: IconGrid },
         { id: 'categories', label: 'Categories', icon: IconLayers },
         { id: 'tags', label: 'Topics & Tags', icon: IconTag },
+        { id: 'comments', label: 'Discussions', icon: IconMessageSquare },
+        { id: 'users', label: 'Sanctuary Members', icon: IconUser },
+        { id: 'echoes', label: 'Echoes (Analytics)', icon: IconActivity },
         { id: 'files', label: 'Media Assets', icon: IconImage },
     ];
 

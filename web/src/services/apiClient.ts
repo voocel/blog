@@ -59,9 +59,27 @@ apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
+        const status = error.response?.status as number | undefined;
+        const data = error.response?.data as any;
+        const msg: string = (() => {
+            if (!data) return '';
+            if (typeof data === 'string') return data;
+            if (typeof data?.error === 'string') return data.error;
+            if (typeof data?.message === 'string') return data.message;
+            return '';
+        })();
+        const msgLower = msg.toLowerCase();
+
+        // Token revoked / user banned: clear tokens and stop retrying.
+        // Backend may return either standardized { error: "..." } or gin.H{"error": "..."}.
+        if ((status === 401 && msgLower.includes('token revoked')) || (status === 403 && msgLower.includes('banned'))) {
+            clearTokens();
+            // window.location.href = '/login'; // Optional: redirect
+            return Promise.reject(error);
+        }
 
         // If error is 401 and we haven't retried yet
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (status === 401 && !originalRequest._retry) {
             if (isRefreshing) {
                 // If already refreshing, queue this request
                 return new Promise(function (resolve, reject) {

@@ -4,10 +4,13 @@ import (
 	"blog/pkg/log"
 	"bytes"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+const maxLogBodyBytes = 64 * 1024 // 64KB
 
 // RequestLogger request logging middleware
 func RequestLogger() gin.HandlerFunc {
@@ -17,7 +20,10 @@ func RequestLogger() gin.HandlerFunc {
 		method := c.Request.Method
 
 		var bodyBytes []byte
-		if c.Request.Body != nil {
+		if c.Request.Body != nil &&
+			!strings.HasPrefix(path, "/api/v1/auth/") &&
+			strings.Contains(strings.ToLower(c.GetHeader("Content-Type")), "application/json") &&
+			c.Request.ContentLength > 0 && c.Request.ContentLength <= maxLogBodyBytes {
 			bodyBytes, _ = io.ReadAll(c.Request.Body)
 			// Reset request body as it's consumed after reading
 			c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))

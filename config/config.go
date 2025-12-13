@@ -33,7 +33,8 @@ type AppConfig struct {
 }
 
 type HttpConfig struct {
-	Addr string
+	Addr           string
+	AllowedOrigins []string `mapstructure:"allowed_origins"` // CORS allowlist, e.g. ["http://localhost:5173"]
 }
 
 type PostgresConfig struct {
@@ -86,11 +87,15 @@ func LoadConfig(paths ...string) {
 	viper.SetDefault("atomic_level_addr", "4240")
 
 	viper.SetDefault("http.addr", ":8090")
+	// CORS defaults:
+	// - In non-release mode: if allowed_origins is not configured, keep legacy behavior (reflect Origin).
+	// - In release mode: it is recommended to configure an allowlist; if empty, CORS is denied by default.
+	viper.SetDefault("http.allowed_origins", []string{})
 
 	// JWT defaults
 	viper.SetDefault("app.jwt_secret", "change-this-secret-in-production")
-	viper.SetDefault("app.jwt_access_duration", 15)  // 15 minutes
-	viper.SetDefault("app.jwt_refresh_duration", 7)  // 7 days
+	viper.SetDefault("app.jwt_access_duration", 15) // 15 minutes
+	viper.SetDefault("app.jwt_refresh_duration", 7) // 7 days
 
 	// Read config.yaml (required)
 	viper.SetConfigName("config")

@@ -23,6 +23,9 @@ func (uc *AuthUseCase) Login(ctx context.Context, req entity.LoginRequest) (*ent
 	if err != nil {
 		return nil, errors.New("invalid email or password")
 	}
+	if user.Status == "banned" {
+		return nil, errors.New("user is banned")
+	}
 
 	if !util.CheckPasswordHash(req.Password, user.Password) {
 		return nil, errors.New("invalid email or password")
@@ -126,6 +129,20 @@ func (uc *AuthUseCase) RefreshToken(ctx context.Context, req entity.RefreshToken
 	user, err := uc.userRepo.GetByID(ctx, claims.UserID)
 	if err != nil {
 		return nil, errors.New("user not found")
+	}
+	if user.Status == "banned" {
+		return nil, errors.New("user is banned")
+	}
+	tokenTV := claims.TokenVersion
+	if tokenTV <= 0 {
+		tokenTV = 1
+	}
+	userTV := user.TokenVersion
+	if userTV <= 0 {
+		userTV = 1
+	}
+	if tokenTV != userTV {
+		return nil, errors.New("token revoked")
 	}
 
 	// Generate new token pair

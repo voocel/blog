@@ -21,18 +21,18 @@ func NewUserHandler(userUseCase *usecase.UserUseCase) *UserHandler {
 func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		JSONError(c, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
 
 	var req entity.UpdateProfileRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		JSONError(c, http.StatusBadRequest, "Invalid request", err)
 		return
 	}
 
 	if err := h.userUseCase.UpdateProfile(c.Request.Context(), userID.(string), req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -44,7 +44,7 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 func (h *UserHandler) ListUsersAdmin(c *gin.Context) {
 	users, err := h.userUseCase.ListAll(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 	c.JSON(http.StatusOK, users)
@@ -57,17 +57,17 @@ func (h *UserHandler) UpdateUserStatus(c *gin.Context) {
 		Status string `json:"status"`
 	}
 	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		JSONError(c, http.StatusBadRequest, "Invalid request", err)
 		return
 	}
 	status := strings.ToLower(payload.Status)
 	updated, err := h.userUseCase.UpdateStatus(c.Request.Context(), userID, status)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			JSONError(c, http.StatusNotFound, "User not found", err)
 			return
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusBadRequest, err.Error(), err)
 		return
 	}
 	c.JSON(http.StatusOK, updated)

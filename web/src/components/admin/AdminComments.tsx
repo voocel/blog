@@ -95,7 +95,7 @@ const AdminComments: React.FC<AdminCommentsProps> = ({ comments, onDeleteComment
                                         <td className="py-4 px-6 align-top text-right">
                                             <button
                                                 onClick={() => onDeleteComment(comment.id)}
-                                                className="text-stone-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
+                                                className="text-stone-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
                                                 title="Delete Comment"
                                             >
                                                 <IconTrash className="w-4 h-4" />

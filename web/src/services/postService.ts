@@ -3,17 +3,18 @@ import type { BlogPost } from '../types';
 
 export const postService = {
     // Public Endpoints
-    getPosts: async (params?: { category?: string; tag?: string; search?: string; page?: number; limit?: number }): Promise<BlogPost[]> => {
-        // Public API: /posts (always published)
+    getPosts: async (params?: { category?: string; tag?: string; search?: string; page?: number; limit?: number }): Promise<{ data: BlogPost[]; pagination?: { total: number; page: number; limit: number; totalPages: number } }> => {
+        // Public API: /posts
         const response = await apiClient.get('/posts', { params });
         if (response.data?.data && Array.isArray(response.data.data)) {
-            return response.data.data;
-        }
-        if (Array.isArray(response.data)) {
             return response.data;
         }
+        if (Array.isArray(response.data)) {
+            // Unpaginated response (legacy or no page param)
+            return { data: response.data, pagination: undefined };
+        }
         console.warn('getPosts: Expected array result, got:', response.data);
-        return [];
+        return { data: [], pagination: undefined };
     },
 
     getPost: async (id: string): Promise<BlogPost | undefined> => {

@@ -73,16 +73,22 @@ const AppContent: React.FC = () => {
   );
 };
 
+import { ToastProvider } from './components/Toast';
+
+// ... imports
+
 const App: React.FC = () => {
   return (
     <HelmetProvider>
-      <BlogProvider>
-        <Router>
-          <ErrorBoundary>
-            <AppContent />
-          </ErrorBoundary>
-        </Router>
-      </BlogProvider>
+      <ToastProvider>
+        <BlogProvider>
+          <Router>
+            <ErrorBoundary>
+              <AppContent />
+            </ErrorBoundary>
+          </Router>
+        </BlogProvider>
+      </ToastProvider>
     </HelmetProvider>
   );
 };

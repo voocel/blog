@@ -48,79 +48,83 @@ const Reveal: React.FC<RevealProps> = ({ children, className = "", delay = 0, th
   );
 };
 
+import { postService } from '../services/postService';
+import type { BlogPost } from '../types';
+
+// ... (Reveal Component stays same)
+
 const HomePage: React.FC = () => {
-  const { posts, logVisit, isLoading } = useBlog();
+  const { categories, logVisit } = useBlog(); // Removed posts from here
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
   const navigate = useNavigate();
+
+  const itemsPerPage = 5;
 
   // Track visit
   useEffect(() => {
     logVisit('/');
   }, []);
 
-
-  // Pagination State
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
-  const publishedPosts = posts.filter(p => p.status === 'published');
-
-  // Extract unique categories
-  const uniqueCategories: string[] = Array.from(new Set(publishedPosts.map(p => p.category)));
-  // Add "All" to the start
-  const categoryList = ['All', ...uniqueCategories];
-
-  const filteredPosts = selectedCategory === 'All'
-    ? publishedPosts
-    : publishedPosts.filter(p => p.category === selectedCategory);
-
-  // Pagination Logic
-  const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
-  const currentPosts = filteredPosts.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  // Reset page when category changes
+  // Fetch Posts Server-Side
   useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory]);
+    const fetchPosts = async () => {
+      setIsLoadingPosts(true);
+      try {
+        const params: any = {
+          page: pagination.page,
+          limit: itemsPerPage
+        };
+
+        if (selectedCategory !== 'All') {
+          // Find category ID from name
+          const cat = categories.find(c => c.name === selectedCategory);
+          if (cat) params.category = cat.id;
+        }
+
+        const { data, pagination: meta } = await postService.getPosts(params);
+        setPosts(data);
+        if (meta) {
+          setPagination(prev => ({ ...prev, totalPages: meta.totalPages, total: meta.total }));
+        }
+      } catch (error) {
+        console.error("Failed to fetch posts", error);
+      } finally {
+        setIsLoadingPosts(false);
+      }
+    };
+
+    fetchPosts();
+  }, [selectedCategory, pagination.page, categories]); // Depends on categories to resolve ID
+
+  // Extract unique categories for filter bar (Using Context Categories is better/source of truth, but user might want only categories with posts? API returns all categories. Let's use Context Categories + All)
+  const categoryList = ['All', ...categories.map(c => c.name)];
 
   const scrollToContent = () => {
     const element = document.getElementById('journal-feed');
     if (element) {
-      // Offset for sticky header
       const y = element.getBoundingClientRect().top + window.scrollY - 80;
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
   };
 
   const toggleCategory = (cat: string) => {
-    if (cat === 'All') {
-      setSelectedCategory('All');
-    } else if (selectedCategory === cat) {
-      setSelectedCategory('All');
-    } else {
-      setSelectedCategory(cat);
-    }
+    if (selectedCategory === cat) return; // No op if same
+    setSelectedCategory(cat);
+    setPagination(prev => ({ ...prev, page: 1 })); // Reset to page 1
   };
 
   const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      setPagination(prev => ({ ...prev, page: newPage }));
       scrollToContent();
     }
   };
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-stone-200 border-t-gold-600 rounded-full animate-spin"></div>
-          <p className="text-stone-400 font-serif italic tracking-widest text-sm animate-pulse">Loading Journal...</p>
-        </div>
-      </div>
-    );
-  }
+
+  // Skip global loading check, handle local loading
+  // if (isLoading) ... (removed)
 
   // Hero Post (Static Content)
   const heroPost = HERO_CONTENT;
@@ -213,27 +217,34 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* Content Grid (Wider Layout) */}
-      <main className="max-w-6xl mx-auto px-6">
-        <div className="flex flex-col gap-16 md:gap-20">
-          {currentPosts.map((post, index) => (
-            <Reveal key={post.id} delay={index * 150} threshold={0.05}>
-              <PostCard post={post} onClick={(id) => navigate(`/post/${id}`)} />
-            </Reveal>
-          ))}
-        </div>
+      <main className="max-w-6xl mx-auto px-6 min-h-[500px]">
+        {isLoadingPosts ? (
+          <div className="flex flex-col items-center justify-center py-32 opacity-50">
+            <div className="w-8 h-8 border-2 border-stone-200 border-t-gold-600 rounded-full animate-spin mb-4"></div>
+            <span className="text-stone-400 font-serif text-sm tracking-widest italic">Fetching entries...</span>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-16 md:gap-20">
+            {posts.map((post, index) => (
+              <Reveal key={post.id} delay={index * 150} threshold={0.05}>
+                <PostCard post={post} onClick={(id) => navigate(`/post/${id}`)} />
+              </Reveal>
+            ))}
+          </div>
+        )}
 
-        {filteredPosts.length === 0 && (
+        {!isLoadingPosts && posts.length === 0 && (
           <div className="py-20 text-center text-stone-400 italic font-serif text-lg">
             No entries found in this collection.
           </div>
         )}
 
         {/* Pagination Controls */}
-        {totalPages > 1 && (
+        {pagination.totalPages > 1 && (
           <div className="mt-24 flex items-center justify-center gap-8 text-sm font-serif border-t border-stone-200 pt-12 max-w-lg mx-auto">
             <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
+              onClick={() => handlePageChange(pagination.page - 1)}
+              disabled={pagination.page === 1}
               className="flex items-center gap-2 text-stone-400 hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors uppercase tracking-widest text-xs"
             >
               <IconArrowLeft className="w-4 h-4" />
@@ -241,11 +252,11 @@ const HomePage: React.FC = () => {
             </button>
 
             <div className="flex items-center gap-2">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`w-8 h-8 flex items-center justify-center rounded-full transition-all leading-none cursor-pointer ${currentPage === page
+                  className={`w-8 h-8 flex items-center justify-center rounded-full transition-all leading-none cursor-pointer ${pagination.page === page
                     ? 'bg-gold-600 text-white shadow-sm'
                     : 'text-stone-500 hover:bg-stone-100'
                     }`}
@@ -256,8 +267,8 @@ const HomePage: React.FC = () => {
             </div>
 
             <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(pagination.page + 1)}
+              disabled={pagination.page === pagination.totalPages}
               className="flex items-center gap-2 text-stone-400 hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors uppercase tracking-widest text-xs"
             >
               Next

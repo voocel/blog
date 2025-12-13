@@ -106,11 +106,11 @@ func newCore(logPath string, atomicLevel zap.AtomicLevel) zapcore.Core {
 	filename := time.Now().Format("2006-01-02") + ".log"
 	logPath = filepath.Join(logPath, filename)
 	fileWriteSyncer := &lumberjack.Logger{
-		Filename:   logPath, // 日志文件存放目录
-		MaxSize:    100,     // 文件大小限制,单位MB
-		MaxBackups: 30,      // 最大保留日志文件数量
-		MaxAge:     7,       // 日志文件保留天数
-		Compress:   true,    // 是否压缩
+		Filename:   logPath, // Log file path
+		MaxSize:    100,     // Max size per file (MB)
+		MaxBackups: 30,      // Max number of backup files
+		MaxAge:     7,       // Max age (days)
+		Compress:   true,    // Compress rotated files
 	}
 
 	encoderConfig := zapcore.EncoderConfig{

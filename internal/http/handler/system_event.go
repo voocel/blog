@@ -54,7 +54,7 @@ func (h *SystemEventHandler) ListEvents(c *gin.Context) {
 
 	result, err := h.eventUseCase.List(c.Request.Context(), filters, page, limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -71,7 +71,7 @@ func (h *SystemEventHandler) GetUserEvents(c *gin.Context) {
 
 	events, err := h.eventUseCase.GetByUserID(c.Request.Context(), userID, limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -88,7 +88,7 @@ func (h *SystemEventHandler) GetRequestTrace(c *gin.Context) {
 
 	events, err := h.eventUseCase.GetByRequestID(c.Request.Context(), requestID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -106,7 +106,7 @@ func (h *SystemEventHandler) GetAuditLogs(c *gin.Context) {
 
 	result, err := h.eventUseCase.GetAuditLogs(c.Request.Context(), page, limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -120,7 +120,7 @@ func (h *SystemEventHandler) GetSecurityEvents(c *gin.Context) {
 
 	result, err := h.eventUseCase.GetSecurityEvents(c.Request.Context(), page, limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -136,7 +136,7 @@ func (h *SystemEventHandler) GetSystemErrors(c *gin.Context) {
 
 	events, err := h.eventUseCase.GetSystemErrors(c.Request.Context(), limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -157,7 +157,7 @@ func (h *SystemEventHandler) GetEventsByType(c *gin.Context) {
 
 	events, err := h.eventUseCase.GetByEventType(c.Request.Context(), eventType, limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 

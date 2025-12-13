@@ -33,7 +33,7 @@ func (h *CommentHandler) ListComments(c *gin.Context) {
 
 	resp, err := h.commentUseCase.List(c.Request.Context(), postID, page, limit, order, withReplies)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusBadRequest, err.Error(), err)
 		return
 	}
 
@@ -46,20 +46,20 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 
 	userIDVal, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		JSONError(c, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
 	userID := userIDVal.(string)
 
 	var req entity.CreateCommentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		JSONError(c, http.StatusBadRequest, "Invalid request", err)
 		return
 	}
 
 	comment, err := h.commentUseCase.Create(c.Request.Context(), postID, userID, req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusBadRequest, err.Error(), err)
 		return
 	}
 
@@ -70,7 +70,7 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 func (h *CommentHandler) ListAllCommentsAdmin(c *gin.Context) {
 	comments, err := h.commentUseCase.ListAllAdmin(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 	c.JSON(http.StatusOK, comments)
@@ -81,10 +81,10 @@ func (h *CommentHandler) DeleteCommentAdmin(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.commentUseCase.DeleteAdmin(c.Request.Context(), id); err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
+			JSONError(c, http.StatusNotFound, "Comment not found", err)
 			return
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusBadRequest, err.Error(), err)
 		return
 	}
 	c.Status(http.StatusNoContent)

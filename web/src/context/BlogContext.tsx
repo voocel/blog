@@ -87,12 +87,16 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [fetchedPosts, fetchedUser] = await Promise.all([
+        const [fetchedPostsResponse, fetchedUser, fetchedCategories, fetchedTags] = await Promise.all([
           postService.getPosts(),
-          authService.getCurrentUser()
+          authService.getCurrentUser(),
+          metaService.getCategories(),
+          metaService.getTags()
         ]);
-        setPosts(fetchedPosts);
+        setPosts(fetchedPostsResponse.data);
         setUser(fetchedUser);
+        setCategories(fetchedCategories);
+        setTags(fetchedTags);
       } catch (err) {
         setError('Failed to load blog data');
         console.error(err);
@@ -120,11 +124,12 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const refreshPosts = async () => {
     try {
-      let fetchedPosts;
+      let fetchedPosts: BlogPost[] = [];
       if (user?.role === 'admin') {
         fetchedPosts = await postService.getAdminPosts();
       } else {
-        fetchedPosts = await postService.getPosts();
+        const response = await postService.getPosts();
+        fetchedPosts = response.data;
       }
       setPosts(fetchedPosts);
     } catch (err) {
@@ -204,10 +209,9 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       // AdminDashboard now sends the correct payload structure (CreatePostDTO)
       // cast to any to avoid strict type checking against BlogPost interface which might differ slightly
-      const newPost = await postService.createPost(post);
-      setPosts(prev => [newPost, ...prev]);
+      await postService.createPost(post);
       // Refresh to ensure consistency
-      refreshPosts();
+      await refreshPosts();
     } catch (err) {
       console.error("Failed to create post", err);
       throw err;

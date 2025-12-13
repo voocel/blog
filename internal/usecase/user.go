@@ -82,9 +82,15 @@ func (uc *UserUseCase) UpdateStatus(ctx context.Context, id, status string) (*en
 		return nil, err
 	}
 
-	user.Status = status
-	if err := uc.userRepo.Update(ctx, user); err != nil {
-		return nil, err
+	if user.Status != status {
+		user.Status = status
+		if err := uc.userRepo.Update(ctx, user); err != nil {
+			return nil, err
+		}
+		// Revoke existing tokens on status change (ban/unban).
+		if err := uc.userRepo.BumpTokenVersion(ctx, id); err != nil {
+			return nil, err
+		}
 	}
 
 	return &entity.AdminUserResponse{

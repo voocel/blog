@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import MDEditor from '@uiw/react-md-editor';
 import { useBlog } from '../context/BlogContext';
 import type { AdminSection, BlogPost } from '../types';
+import { useToast } from '../components/Toast';
 import { IconX, IconGrid, IconClock } from '../components/Icons';
 import { AUTHOR_NAME } from '../constants';
 
@@ -134,10 +135,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         setIsEditorOpen(true);
     };
 
+    const { showToast } = useToast();
+
+    // ... imports
+
     const savePost = async () => {
         if (!editingPost || !editingPost.title) return;
 
-        // Construct payload with IDs
+        // ... (payload construction)
         const payload: any = {
             ...editingPost,
             categoryId: editingPost.categoryId, // Ensure this is set
@@ -162,14 +167,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
             const existing = posts.find(p => p.id === editingPost.id);
             if (existing && editingPost.id) {
                 await updatePost(editingPost.id, payload);
+                showToast("Entry updated successfully", "success");
             } else {
                 await addPost(payload as BlogPost);
+                showToast("New entry created", "success");
             }
             setIsEditorOpen(false);
             setEditingPost(null);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to save post:", error);
-            alert("Failed to save post. Please try again.\n" + (error instanceof Error ? error.message : String(error)));
+            const errorMessage = error.response?.data?.error || "Failed to save post";
+            const errorDetails = error.response?.data?.details || error.message;
+            showToast(errorMessage, "error", errorDetails);
         }
     };
 
@@ -407,9 +416,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
             await updatePost(id, { status: 'published' });
             // Refresh posts is handled by updatePost usually updating local state or we trigger refresh
             refreshPosts();
+            showToast("Entry published successfully", "success");
         } catch (error) {
             console.error("Failed to publish post:", error);
-            alert("Failed to publish post.");
+            showToast("Failed to publish post", "error");
         }
     };
 
@@ -463,7 +473,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                 />
             )}
             {section === 'users' && (
-                <AdminUsers users={adminUsers} />
+                <AdminUsers users={adminUsers} requestConfirm={requestConfirm} />
             )}
             {section === 'comments' && (
                 <AdminComments
@@ -487,10 +497,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                             try {
                                 const { commentService } = await import('../services/commentService');
                                 await commentService.deleteComment(id);
-                                refreshAllComments();
+                                await refreshAllComments();
+                                showToast("Comment deleted", "success");
                             } catch (e) {
                                 console.error(e);
-                                alert("Failed to delete comment");
+                                showToast("Failed to delete comment", "error");
                             }
                         }
                     )}

@@ -44,7 +44,7 @@ type PostResponse struct {
 
 type CreatePostRequest struct {
 	Title      string   `json:"title" binding:"required"`
-	Excerpt    string   `json:"excerpt" binding:"required"`
+	Excerpt    string   `json:"excerpt"` // Optional: if empty, backend will derive from content
 	Content    string   `json:"content" binding:"required"`
 	CategoryID string   `json:"categoryId" binding:"required"`
 	Tags       []string `json:"tags"` // Tag IDs

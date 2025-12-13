@@ -29,7 +29,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 			log.Pair("error", err.Error()),
 			log.Pair("ip", c.ClientIP()),
 		)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
+		JSONError(c, http.StatusBadRequest, "Invalid request", err)
 		return
 	}
 
@@ -45,7 +45,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 			log.Pair("error", err.Error()),
 			log.Pair("ip", c.ClientIP()),
 		)
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusUnauthorized, err.Error(), err)
 		return
 	}
 
@@ -66,7 +66,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 			log.Pair("error", err.Error()),
 			log.Pair("ip", c.ClientIP()),
 		)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
+		JSONError(c, http.StatusBadRequest, "Invalid request", err)
 		return
 	}
 
@@ -83,7 +83,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 			log.Pair("error", err.Error()),
 			log.Pair("ip", c.ClientIP()),
 		)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusBadRequest, err.Error(), err)
 		return
 	}
 
@@ -103,7 +103,7 @@ func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
 		log.Errorw("GetCurrentUser: user_id not found in context",
 			log.Pair("ip", c.ClientIP()),
 		)
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		JSONError(c, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
 
@@ -114,7 +114,7 @@ func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
 			log.Pair("error", err.Error()),
 			log.Pair("ip", c.ClientIP()),
 		)
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		JSONError(c, http.StatusNotFound, "User not found", err)
 		return
 	}
 
@@ -129,7 +129,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 			log.Pair("error", err.Error()),
 			log.Pair("ip", c.ClientIP()),
 		)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
+		JSONError(c, http.StatusBadRequest, "Invalid request", err)
 		return
 	}
 
@@ -143,7 +143,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 			log.Pair("error", err.Error()),
 			log.Pair("ip", c.ClientIP()),
 		)
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusUnauthorized, err.Error(), err)
 		return
 	}
 

@@ -19,7 +19,7 @@ func NewMediaHandler(mediaUseCase *usecase.MediaUseCase) *MediaHandler {
 func (h *MediaHandler) UploadFile(c *gin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No file uploaded"})
+		JSONError(c, http.StatusBadRequest, "No file uploaded", err)
 		return
 	}
 
@@ -33,7 +33,7 @@ func (h *MediaHandler) UploadFile(c *gin.Context) {
 
 	media, err := h.mediaUseCase.Upload(c.Request.Context(), file, baseURL, uploadType)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -44,7 +44,7 @@ func (h *MediaHandler) UploadFile(c *gin.Context) {
 func (h *MediaHandler) UploadAvatar(c *gin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No file uploaded"})
+		JSONError(c, http.StatusBadRequest, "No file uploaded", err)
 		return
 	}
 
@@ -52,7 +52,7 @@ func (h *MediaHandler) UploadAvatar(c *gin.Context) {
 
 	media, err := h.mediaUseCase.Upload(c.Request.Context(), file, baseURL, "avatar")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (h *MediaHandler) UploadAvatar(c *gin.Context) {
 func (h *MediaHandler) ListFiles(c *gin.Context) {
 	files, err := h.mediaUseCase.List(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -75,7 +75,7 @@ func (h *MediaHandler) DeleteFile(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := h.mediaUseCase.Delete(c.Request.Context(), id); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
