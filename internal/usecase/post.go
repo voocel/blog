@@ -25,17 +25,18 @@ func NewPostUseCase(postRepo PostRepo, categoryRepo CategoryRepo, tagRepo TagRep
 }
 
 func (uc *PostUseCase) Create(ctx context.Context, req entity.CreatePostRequest, author string) error {
-	if req.Status == "" {
-		req.Status = "draft"
+	status, err := normalizePostStatus(req.Status)
+	if err != nil {
+		return err
 	}
+
 	if strings.TrimSpace(req.Excerpt) == "" {
 		req.Excerpt = deriveExcerpt(req.Content, 180)
 	}
 
-	// Use provided date or default to current time
-	date := req.Date
-	if date == "" {
-		date = time.Now().Format("2006-01-02")
+	publishAt, err := normalizePublishAt(req.PublishAt, time.Now())
+	if err != nil {
+		return err
 	}
 
 	post := &entity.Post{
@@ -43,10 +44,10 @@ func (uc *PostUseCase) Create(ctx context.Context, req entity.CreatePostRequest,
 		Excerpt:    req.Excerpt,
 		Content:    req.Content,
 		Author:     author,
-		Date:       date,
+		PublishAt:  publishAt,
 		CategoryID: req.CategoryID,
-		ImageUrl:   req.ImageUrl,
-		Status:     req.Status,
+		Cover:      req.Cover,
+		Status:     status,
 		Views:      0,
 	}
 
@@ -191,11 +192,11 @@ func (uc *PostUseCase) assemblePostResponsesBatch(ctx context.Context, posts []e
 			Excerpt:    p.Excerpt,
 			Content:    p.Content,
 			Author:     p.Author,
-			Date:       p.Date,
+			PublishAt:  p.PublishAt,
 			CategoryID: p.CategoryID,
 			Category:   categoryNameByID[p.CategoryID],
 			ReadTime:   calculateReadTime(p.Content),
-			ImageUrl:   p.ImageUrl,
+			Cover:      p.Cover,
 			Views:      p.Views,
 			Status:     p.Status,
 			Tags:       []string{},
@@ -227,14 +228,22 @@ func (uc *PostUseCase) Update(ctx context.Context, id string, req entity.UpdateP
 	if req.Content != "" {
 		post.Content = req.Content
 	}
-	if req.ImageUrl != "" {
-		post.ImageUrl = req.ImageUrl
+	if req.Cover != "" {
+		post.Cover = req.Cover
 	}
 	if req.Status != "" {
-		post.Status = req.Status
+		status, err := normalizePostStatus(req.Status)
+		if err != nil {
+			return err
+		}
+		post.Status = status
 	}
-	if req.Date != "" {
-		post.Date = req.Date
+	if req.PublishAt != "" {
+		publishAt, err := normalizePublishAt(req.PublishAt, time.Now())
+		if err != nil {
+			return err
+		}
+		post.PublishAt = publishAt
 	}
 
 	// Handle category change
@@ -295,9 +304,9 @@ func (uc *PostUseCase) assemblePostResponse(ctx context.Context, post *entity.Po
 		Excerpt:    post.Excerpt,
 		Content:    post.Content,
 		Author:     post.Author,
-		Date:       post.Date,
+		PublishAt:  post.PublishAt,
 		CategoryID: post.CategoryID,
-		ImageUrl:   post.ImageUrl,
+		Cover:      post.Cover,
 		Views:      post.Views,
 		Status:     post.Status,
 		ReadTime:   calculateReadTime(post.Content),
@@ -327,4 +336,34 @@ func calculateReadTime(content string) string {
 		return "1 min read"
 	}
 	return fmt.Sprintf("%d min read", minutes)
+}
+
+func normalizePostStatus(s string) (string, error) {
+	v := strings.ToLower(strings.TrimSpace(s))
+	if v == "" {
+		return "draft", nil
+	}
+	switch v {
+	case "draft", "published":
+		return v, nil
+	default:
+		return "", fmt.Errorf("%w: invalid status: must be 'draft' or 'published'", ErrInvalidArgument)
+	}
+}
+
+// normalizePublishAt returns a concrete scheduled publish time.
+// It accepts RFC3339 / RFC3339Nano strings; if omitted, defaults to now.
+func normalizePublishAt(input string, now time.Time) (time.Time, error) {
+	s := strings.TrimSpace(input)
+	if s == "" {
+		return now, nil
+	}
+
+	if t, err := time.Parse(time.RFC3339Nano, s); err == nil {
+		return t, nil
+	}
+	if t, err := time.Parse(time.RFC3339, s); err == nil {
+		return t, nil
+	}
+	return time.Time{}, fmt.Errorf("%w: invalid publishAt: expected RFC3339 time, e.g. 2025-12-14T16:30:00+08:00", ErrInvalidArgument)
 }

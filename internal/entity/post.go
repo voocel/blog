@@ -5,14 +5,16 @@ import (
 )
 
 type Post struct {
-	ID         string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	Title      string    `gorm:"type:varchar(255);not null" json:"title"`
-	Excerpt    string    `gorm:"type:varchar(500);not null" json:"excerpt"`
-	Content    string    `gorm:"type:text;not null" json:"content"` // Markdown
-	Author     string    `gorm:"type:varchar(100);not null" json:"author"`
-	Date       string    `gorm:"type:varchar(20);not null" json:"date"` // ISO 8601 format: '2024-05-15'
+	ID      string `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	Title   string `gorm:"type:varchar(255);not null" json:"title"`
+	Excerpt string `gorm:"type:varchar(500);not null" json:"excerpt"`
+	Content string `gorm:"type:text;not null" json:"content"` // Markdown
+	Author  string `gorm:"type:varchar(100);not null" json:"author"`
+	// PublishAt is the scheduled publish time (supports second-level scheduling).
+	// Public APIs only return posts where status=published and publish_at <= now().
+	PublishAt  time.Time `gorm:"not null;index" json:"publishAt"`
 	CategoryID string    `gorm:"type:uuid;not null;index" json:"categoryId"`
-	ImageUrl   string    `gorm:"type:varchar(500);not null" json:"imageUrl"`
+	Cover      string    `gorm:"type:varchar(500);not null" json:"cover"`
 	Views      int       `gorm:"type:int;default:0" json:"views"`
 	Status     string    `gorm:"type:varchar(20);not null;default:'draft'" json:"status"` // published | draft
 	CreatedAt  time.Time `gorm:"autoCreateTime" json:"-"`
@@ -27,19 +29,19 @@ type PostTag struct {
 }
 
 type PostResponse struct {
-	ID         string   `json:"id"`
-	Title      string   `json:"title"`
-	Excerpt    string   `json:"excerpt"`
-	Content    string   `json:"content"`
-	Author     string   `json:"author"`
-	Date       string   `json:"date"`
-	CategoryID string   `json:"categoryId"`
-	Category   string   `json:"category"` // Category name
-	ReadTime   string   `json:"readTime"`
-	ImageUrl   string   `json:"imageUrl"`
-	Tags       []string `json:"tags"` // Tag names
-	Views      int      `json:"views"`
-	Status     string   `json:"status"`
+	ID         string    `json:"id"`
+	Title      string    `json:"title"`
+	Excerpt    string    `json:"excerpt"`
+	Content    string    `json:"content"`
+	Author     string    `json:"author"`
+	PublishAt  time.Time `json:"publishAt"`
+	CategoryID string    `json:"categoryId"`
+	Category   string    `json:"category"` // Category name
+	ReadTime   string    `json:"readTime"`
+	Cover      string    `json:"cover"`
+	Tags       []string  `json:"tags"` // Tag names
+	Views      int       `json:"views"`
+	Status     string    `json:"status"`
 }
 
 type CreatePostRequest struct {
@@ -48,9 +50,11 @@ type CreatePostRequest struct {
 	Content    string   `json:"content" binding:"required"`
 	CategoryID string   `json:"categoryId" binding:"required"`
 	Tags       []string `json:"tags"` // Tag IDs
-	ImageUrl   string   `json:"imageUrl" binding:"required"`
+	Cover      string   `json:"cover" binding:"required"`
 	Status     string   `json:"status"` // published | draft, default: draft
-	Date       string   `json:"date"`   // ISO 8601 format (optional). If provided, sets custom publish date for scheduling. If omitted, defaults to current time.
+	// PublishAt should be RFC3339 (e.g. 2025-12-14T16:30:00+08:00).
+	// If omitted, defaults to server current time.
+	PublishAt string `json:"publishAt"`
 }
 
 type UpdatePostRequest struct {
@@ -59,9 +63,9 @@ type UpdatePostRequest struct {
 	Content    string   `json:"content,omitempty"`
 	CategoryID string   `json:"categoryId,omitempty"`
 	Tags       []string `json:"tags,omitempty"`
-	ImageUrl   string   `json:"imageUrl,omitempty"`
+	Cover      string   `json:"cover,omitempty"`
 	Status     string   `json:"status,omitempty"`
-	Date       string   `json:"date,omitempty"` // ISO 8601 format (optional). Allows rescheduling publish date.
+	PublishAt  string   `json:"publishAt,omitempty"` // RFC3339
 }
 
 type PaginatedPostsResponse struct {

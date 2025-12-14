@@ -3,7 +3,11 @@ package usecase
 import (
 	"blog/internal/entity"
 	"context"
+	"errors"
 )
+
+// ErrInvalidArgument indicates request parameters are invalid and should map to HTTP 400.
+var ErrInvalidArgument = errors.New("invalid argument")
 
 // UserRepo user repository interface
 type UserRepo interface {

@@ -47,13 +47,13 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, onBack }) => {
             <SEO
                 title={post.title}
                 description={post.excerpt}
-                image={getAssetUrl(post.imageUrl)}
+                image={getAssetUrl(post.cover)}
                 type="article"
             />
             {/* Hero Image with Title Overlay */}
             <div className="relative h-[50vh] md:h-[60vh] w-full">
                 <div className="absolute inset-0">
-                    <img src={getAssetUrl(post.imageUrl)} alt={post.title} className="w-full h-full object-cover" />
+                    <img src={getAssetUrl(post.cover)} alt={post.title} className="w-full h-full object-cover" />
                 </div>
                 {/* Light overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-stone-900/10 via-stone-900/20 to-[#FDFBF7]" />
@@ -70,7 +70,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, onBack }) => {
                     <div className="flex items-center gap-4 mb-4">
                         <span className="text-gold-600 uppercase tracking-widest text-sm font-bold bg-white/80 px-2 py-1">{post.category}</span>
                         <div className="w-px h-4 bg-ink/30" />
-                        <span className="text-ink font-medium text-sm">{post.date}</span>
+                        <span className="text-ink font-medium text-sm">{new Date(post.publishAt).toLocaleString()}</span>
                     </div>
 
                     <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-ink leading-tight mb-6 drop-shadow-sm">

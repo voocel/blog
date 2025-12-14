@@ -5,6 +5,7 @@ import (
 	"blog/internal/usecase"
 	"context"
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -81,8 +82,8 @@ func (r *postRepo) List(ctx context.Context, filters map[string]interface{}, pag
 		query = query.Where("title LIKE ? OR excerpt LIKE ?", "%"+search+"%", "%"+search+"%")
 	}
 	// Filter by date (for scheduled publishing: only show posts with date <= current date)
-	if beforeDate, ok := filters["beforeDate"].(string); ok && beforeDate != "" {
-		query = query.Where("date <= ?", beforeDate)
+	if beforePublishAt, ok := filters["beforePublishAt"].(time.Time); ok && !beforePublishAt.IsZero() {
+		query = query.Where("publish_at <= ?", beforePublishAt)
 	}
 
 	// Get total count
@@ -97,8 +98,8 @@ func (r *postRepo) List(ctx context.Context, filters map[string]interface{}, pag
 		query = query.Offset(offset).Limit(limit)
 	}
 
-	// Order by date descending
-	err = query.Order("date DESC").Find(&posts).Error
+	// Order by publish time descending
+	err = query.Order("publish_at DESC").Find(&posts).Error
 	if err != nil {
 		return nil, 0, err
 	}
@@ -210,7 +211,7 @@ func (r *postRepo) GetRecent(ctx context.Context, limit int) ([]entity.Post, err
 	var posts []entity.Post
 	err := r.db.WithContext(ctx).
 		Model(&entity.Post{}).
-		Order("date DESC").
+		Order("publish_at DESC").
 		Limit(limit).
 		Find(&posts).Error
 	return posts, err

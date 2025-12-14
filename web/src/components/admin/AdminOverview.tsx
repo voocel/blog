@@ -62,13 +62,13 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({ user, dashboardStats, onE
                         {recentPosts.map(post => (
                             <div key={post.id} className="group flex items-center gap-5 bg-white p-4 rounded-xl border border-stone-200 hover:border-gold-300 shadow-sm transition-all cursor-pointer" onClick={() => onEditPost(post)}>
                                 <div className="w-20 h-20 rounded-lg overflow-hidden bg-stone-100 shrink-0 relative">
-                                    <img src={post.imageUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    <img src={post.cover} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <h4 className="font-serif font-bold text-lg text-ink truncate group-hover:text-gold-600 transition-colors mb-1">{post.title}</h4>
                                     <p className="text-sm text-stone-500 truncate mb-2">{post.excerpt}</p>
                                     <div className="flex items-center gap-3 text-xs text-stone-400">
-                                        <span className="flex items-center gap-1"><IconClock className="w-3 h-3" /> {post.date}</span>
+                                        <span className="flex items-center gap-1"><IconClock className="w-3 h-3" /> {new Date(post.publishAt).toLocaleString()}</span>
                                         <span className="flex items-center gap-1"><IconEye className="w-3 h-3" /> {post.views}</span>
                                     </div>
                                 </div>

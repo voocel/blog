@@ -8,7 +8,7 @@ export const AUTHOR_NAME = "Voocel";
 export const HERO_CONTENT = {
   title: 'The Aesthetics of Code',
   excerpt: 'Exploring the silent rhythm of algorithms and why the most beautiful functions are often the most dangerous.',
-  imageUrl: 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=2576&auto=format&fit=crop',
+  cover: 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=2576&auto=format&fit=crop',
 };
 
 export const MOCK_CATEGORIES: Category[] = [
@@ -63,11 +63,11 @@ True beauty lies in **simplicity**. The most elegant solutions are often the one
 ### The Void
 We often fear the empty space in our editors, rushing to fill it with logic. But in that void, there is potential.`,
     author: AUTHOR_NAME,
-    date: '2024-05-15',
+    publishAt: '2024-05-15T09:00:00+08:00',
     categoryId: 'c1',
     category: 'Philosophy',
     readTime: '5 min read',
-    imageUrl: MOCK_FILES[0].url,
+    cover: MOCK_FILES[0].url,
     tags: ['AI', 'Minimalism'],
     views: 1240,
     status: 'published'
@@ -90,11 +90,11 @@ To design is to remove.
 
 When we strip away the non-essential, we are left with the truth.`,
     author: AUTHOR_NAME,
-    date: '2024-05-10',
+    publishAt: '2024-05-10T09:00:00+08:00',
     categoryId: 'c2',
     category: 'Design',
     readTime: '4 min read',
-    imageUrl: MOCK_FILES[1].url,
+    cover: MOCK_FILES[1].url,
     tags: ['Minimalism'],
     views: 856,
     status: 'published'
@@ -115,11 +115,11 @@ It wasn't just the sun; it was the reflection off millions of glass panels, crea
 
 I found myself walking for hours, camera in hand, looking for the quiet moments between the chaos.`,
     author: AUTHOR_NAME,
-    date: '2024-04-22',
+    publishAt: '2024-04-22T09:00:00+08:00',
     categoryId: 'c4',
     category: 'Travel',
     readTime: '6 min read',
-    imageUrl: MOCK_FILES[2].url,
+    cover: MOCK_FILES[2].url,
     tags: ['Tokyo', 'Photography'],
     views: 2301,
     status: 'published'
@@ -145,11 +145,11 @@ async function Page() {
 
 This is not just a syntax change; it is a mental model shift.`,
     author: AUTHOR_NAME,
-    date: '2024-03-15',
+    publishAt: '2024-03-15T09:00:00+08:00',
     categoryId: 'c3',
     category: 'Engineering',
     readTime: '8 min read',
-    imageUrl: MOCK_FILES[3].url,
+    cover: MOCK_FILES[3].url,
     tags: ['React'],
     views: 1540,
     status: 'published'
@@ -164,11 +164,11 @@ We need to bring back the feeling of material. Not skeuomorphism, but **soul**.
 
 Buttons should feel clickable. Transitions should feel physical. The web is a medium, just like paper or clay.`,
     author: AUTHOR_NAME,
-    date: '2024-03-01',
+    publishAt: '2024-03-01T09:00:00+08:00',
     categoryId: 'c2',
     category: 'Design',
     readTime: '5 min read',
-    imageUrl: MOCK_FILES[5].url,
+    cover: MOCK_FILES[5].url,
     tags: ['Design', 'Retro'],
     views: 920,
     status: 'published'
@@ -188,11 +188,11 @@ A garden is:
 
 Let's build spaces that age well.`,
     author: AUTHOR_NAME,
-    date: '2024-02-28',
+    publishAt: '2024-02-28T09:00:00+08:00',
     categoryId: 'c1',
     category: 'Philosophy',
     readTime: '6 min read',
-    imageUrl: MOCK_FILES[4].url,
+    cover: MOCK_FILES[4].url,
     tags: ['Web', 'Philosophy'],
     views: 450,
     status: 'published'
@@ -207,11 +207,11 @@ You wouldn't wear a tuxedo to a beach party. Why use Helvetica for a romance nov
 
 **Serifs** carry history. **Sans-serifs** carry modernity. Choose wisely.`,
     author: AUTHOR_NAME,
-    date: '2024-02-15',
+    publishAt: '2024-02-15T09:00:00+08:00',
     categoryId: 'c2',
     category: 'Design',
     readTime: '4 min read',
-    imageUrl: MOCK_FILES[6].url,
+    cover: MOCK_FILES[6].url,
     tags: ['Typography', 'Design'],
     views: 1102,
     status: 'published'
@@ -226,11 +226,11 @@ We optimize for TTI (Time to Interactive). We should optimize for TTC (Time to C
 
 Make it fast, yes. But make it calm.`,
     author: AUTHOR_NAME,
-    date: '2024-02-01',
+    publishAt: '2024-02-01T09:00:00+08:00',
     categoryId: 'c1',
     category: 'Philosophy',
     readTime: '5 min read',
-    imageUrl: MOCK_FILES[7].url,
+    cover: MOCK_FILES[7].url,
     tags: ['Minimalism', 'Web'],
     views: 890,
     status: 'published'
@@ -241,11 +241,11 @@ Make it fast, yes. But make it calm.`,
     excerpt: 'A personal reflection on working alone and the silence required to build great things.',
     content: '# Notes on Solitude\n\nThis is a draft post about the importance of being alone with your thoughts...',
     author: AUTHOR_NAME,
-    date: '2024-02-10',
+    publishAt: '2024-02-10T09:00:00+08:00',
     categoryId: 'c1',
     category: 'Philosophy',
     readTime: '3 min read',
-    imageUrl: MOCK_FILES[4].url,
+    cover: MOCK_FILES[4].url,
     tags: ['Minimalism'],
     views: 40,
     status: 'draft'

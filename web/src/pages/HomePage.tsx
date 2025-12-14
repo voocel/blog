@@ -137,7 +137,7 @@ const HomePage: React.FC = () => {
       <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={heroPost.imageUrl}
+            src={heroPost.cover}
             alt="Hero"
             className="w-full h-full object-cover filter saturate-[0.8] sepia-[0.15] opacity-90 animate-slow-pan"
           />

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { IconCheck, IconX, IconSparkles } from './Icons';
 
 export type ToastType = 'success' | 'error' | 'info';
@@ -50,15 +50,15 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     <div
                         key={toast.id}
                         className={`pointer-events-auto min-w-[320px] max-w-sm rounded-xl p-4 shadow-2xl backdrop-blur-xl border animate-slide-up flex items-start gap-3 transition-all ${toast.type === 'success'
-                                ? 'bg-white/90 border-emerald-100 text-emerald-900'
-                                : toast.type === 'error'
-                                    ? 'bg-white/90 border-red-100 text-red-900'
-                                    : 'bg-white/90 border-stone-100 text-ink'
+                            ? 'bg-white/90 border-emerald-100 text-emerald-900'
+                            : toast.type === 'error'
+                                ? 'bg-white/90 border-red-100 text-red-900'
+                                : 'bg-white/90 border-stone-100 text-ink'
                             }`}
                     >
                         <div className={`mt-0.5 p-1 rounded-full shrink-0 ${toast.type === 'success' ? 'bg-emerald-100 text-emerald-600' :
-                                toast.type === 'error' ? 'bg-red-100 text-red-600' :
-                                    'bg-stone-100 text-stone-500'
+                            toast.type === 'error' ? 'bg-red-100 text-red-600' :
+                                'bg-stone-100 text-stone-500'
                             }`}>
                             {toast.type === 'success' && <IconCheck className="w-4 h-4" />}
                             {toast.type === 'error' && <IconX className="w-4 h-4" />}

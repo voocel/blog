@@ -94,7 +94,7 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
 
                             {/* Image */}
                             <div className="w-28 h-20 rounded-lg bg-stone-100 overflow-hidden shrink-0 relative border border-stone-100 cursor-pointer" onClick={() => onViewPost(post.id)}>
-                                <img src={post.imageUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="" />
+                                <img src={post.cover} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="" />
                             </div>
 
                             {/* Content */}
@@ -104,7 +104,7 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
                                     <span className="text-[10px] uppercase tracking-wider text-stone-500 bg-stone-100 px-2 py-0.5 rounded border border-stone-200">{post.category}</span>
                                 </div>
                                 <div className="flex items-center gap-6 text-xs text-stone-400 font-medium">
-                                    <span className="flex items-center gap-1.5"><IconClock className="w-3.5 h-3.5" /> {post.date}</span>
+                                    <span className="flex items-center gap-1.5"><IconClock className="w-3.5 h-3.5" /> {new Date(post.publishAt).toLocaleString()}</span>
                                     <span className="flex items-center gap-1.5"><IconEye className="w-3.5 h-3.5" /> {post.views.toLocaleString()} reads</span>
                                     <div className="flex gap-2">
                                         {post.tags.slice(0, 3).map(t => <span key={t} className="text-stone-300">#{t}</span>)}

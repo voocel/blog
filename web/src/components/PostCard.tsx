@@ -35,7 +35,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
         <div className="absolute inset-0 bg-stone-200 animate-pulse" />
 
         <img
-          src={getAssetUrl(post.imageUrl)}
+          src={getAssetUrl(post.cover)}
           alt={post.title}
           loading="lazy"
           className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 relative z-10"
@@ -55,7 +55,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
             </span>
             <div className="flex items-center gap-2 text-stone-400 text-xs tracking-wider">
               <IconClock className="w-3.5 h-3.5" />
-              <span>{getTimeAgo(post.date)}</span>
+              <span>{getTimeAgo(post.publishAt)}</span>
             </div>
           </div>
 

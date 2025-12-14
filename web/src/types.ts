@@ -5,11 +5,12 @@ export interface BlogPost {
   excerpt: string;
   content: string;
   author: string;
-  date: string;
+  // Scheduled publish time in RFC3339 (e.g. 2025-12-14T16:30:00+08:00)
+  publishAt: string;
   categoryId: string;
   category: string;
   readTime: string;
-  imageUrl: string;
+  cover: string;
   tags: string[]; // Array of Tag IDs
   views: number;
   status: 'published' | 'draft';

@@ -3,8 +3,10 @@ package handler
 import (
 	"blog/internal/entity"
 	"blog/internal/usecase"
+	"errors"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -27,8 +29,8 @@ func (h *PostHandler) ListPublishedPosts(c *gin.Context) {
 
 	filters := map[string]interface{}{
 		"status": "published",
-		// Only show posts with publish date <= current date (scheduled publishing)
-		"beforeDate": time.Now().Format("2006-01-02"),
+		// Only show posts where publish_at <= now (scheduled publishing).
+		"beforePublishAt": time.Now(),
 	}
 	if category != "" {
 		filters["categoryId"] = category
@@ -51,7 +53,7 @@ func (h *PostHandler) ListAllPosts(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
 	category := c.Query("category")
-	status := c.Query("status") // all | published | draft
+	status := strings.ToLower(strings.TrimSpace(c.Query("status"))) // all | published | draft
 	search := c.Query("search")
 
 	filters := make(map[string]interface{})
@@ -91,8 +93,7 @@ func (h *PostHandler) GetPost(c *gin.Context) {
 	}
 
 	// Check if publish date has arrived (scheduled publishing)
-	currentDate := time.Now().Format("2006-01-02")
-	if post.Date > currentDate {
+	if post.PublishAt.After(time.Now()) {
 		JSONError(c, http.StatusNotFound, "Post not found", nil)
 		return
 	}
@@ -128,6 +129,10 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 	}
 
 	if err := h.postUseCase.Create(c.Request.Context(), req, username.(string)); err != nil {
+		if errors.Is(err, usecase.ErrInvalidArgument) {
+			JSONError(c, http.StatusBadRequest, err.Error(), err)
+			return
+		}
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
@@ -146,6 +151,10 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 	}
 
 	if err := h.postUseCase.Update(c.Request.Context(), id, req); err != nil {
+		if errors.Is(err, usecase.ErrInvalidArgument) {
+			JSONError(c, http.StatusBadRequest, err.Error(), err)
+			return
+		}
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}

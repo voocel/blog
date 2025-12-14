@@ -120,10 +120,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                 excerpt: '',
                 content: '',
                 author: AUTHOR_NAME,
-                date: new Date().toLocaleDateString(),
+                publishAt: new Date().toISOString(),
                 category: categories[0]?.name || 'General',
                 readTime: '5 min read',
-                imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
+                cover: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
                 tags: [],
                 status: 'draft',
                 views: 0
@@ -247,7 +247,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
 
                         <div className="space-y-8">
                             <div>
-                                <label className="block text-xs uppercase tracking-widest text-stone-500 mb-3 font-bold">Publish Date</label>
+                                <label className="block text-xs uppercase tracking-widest text-stone-500 mb-3 font-bold">Publish Time</label>
                                 <div
                                     className="relative group cursor-pointer"
                                     onClick={() => {
@@ -268,9 +268,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                                             </div>
                                             <div className="flex flex-col">
                                                 <span className="text-xs text-stone-400 font-medium uppercase tracking-wider">Scheduled For</span>
-                                                <span className={`text-sm font-serif font-medium ${editingPost.date ? 'text-ink' : 'text-stone-300 italic'}`}>
-                                                    {editingPost.date
-                                                        ? new Date(editingPost.date).toLocaleString('en-US', {
+                                                <span className={`text-sm font-serif font-medium ${editingPost.publishAt ? 'text-ink' : 'text-stone-300 italic'}`}>
+                                                    {editingPost.publishAt
+                                                        ? new Date(editingPost.publishAt).toLocaleString('en-US', {
                                                             month: 'short', day: 'numeric', year: 'numeric',
                                                             hour: 'numeric', minute: 'numeric', hour12: true
                                                         })
@@ -283,9 +283,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                                         id="publish-date-picker"
                                         type="datetime-local"
                                         className="absolute inset-0 w-full h-full opacity-0 pointer-events-none"
-                                        value={editingPost.date ? new Date(editingPost.date).toISOString().slice(0, 16) : ''}
+                                        value={editingPost.publishAt ? new Date(editingPost.publishAt).toISOString().slice(0, 16) : ''}
                                         onChange={e => {
-                                            setEditingPost({ ...editingPost, date: e.target.value });
+                                            const v = e.target.value; // "YYYY-MM-DDTHH:mm" in local time
+                                            const iso = v ? new Date(v).toISOString() : '';
+                                            setEditingPost({ ...editingPost, publishAt: iso });
                                         }}
                                     />
                                 </div>
@@ -364,12 +366,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                             <div>
                                 <label className="block text-xs uppercase tracking-widest text-stone-500 mb-3 font-bold">Cover Image URL</label>
                                 <div className="w-full h-48 bg-stone-200 rounded-xl mb-3 overflow-hidden border border-stone-300 relative group">
-                                    <img src={editingPost.imageUrl} className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700" alt="Cover" />
+                                    <img src={editingPost.cover} className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700" alt="Cover" />
                                 </div>
                                 <input
                                     className="w-full bg-white border border-stone-200 rounded-xl p-3 text-xs font-mono focus:outline-none focus:border-gold-500 shadow-sm"
-                                    value={editingPost.imageUrl}
-                                    onChange={e => setEditingPost({ ...editingPost, imageUrl: e.target.value })}
+                                    value={editingPost.cover}
+                                    onChange={e => setEditingPost({ ...editingPost, cover: e.target.value })}
                                     placeholder="https://..."
                                 />
                             </div>
