@@ -120,7 +120,7 @@ const AdminFiles: React.FC<AdminFilesProps> = ({ files, onAddFile, onDeleteFile,
                     />
                     <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="p-2 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-lg border border-stone-200 transition-colors"
+                        className="p-2 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-lg border border-stone-200 transition-colors cursor-pointer"
                         title="Upload Local File"
                     >
                         <IconUpload className="w-5 h-5" />

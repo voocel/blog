@@ -73,7 +73,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, onBack }) => {
                         <span className="text-ink font-medium text-sm">{new Date(post.publishAt).toLocaleString()}</span>
                     </div>
 
-                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-ink leading-tight mb-6 drop-shadow-sm">
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-ink leading-tight mb-6 drop-shadow-sm hover:text-gold-600 transition-colors cursor-default">
                         {post.title}
                     </h1>
 
@@ -107,7 +107,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, onBack }) => {
                             <button
                                 onClick={handleGenerateSummary}
                                 disabled={loadingSummary}
-                                className="w-full py-3 border border-stone-300 rounded text-sm text-stone-500 hover:border-gold-500 hover:text-gold-600 transition-all disabled:opacity-50"
+                                className="w-full py-3 border border-stone-300 rounded text-sm text-stone-500 hover:border-gold-500 hover:text-gold-600 transition-all disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                             >
                                 {loadingSummary ? 'Analyzing...' : 'Generate Summary'}
                             </button>
@@ -128,7 +128,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, onBack }) => {
                             <button
                                 onClick={handleGenerateInsight}
                                 disabled={loadingInsight}
-                                className="w-full py-3 border border-stone-300 rounded text-sm text-stone-500 hover:border-teal-500 hover:text-teal-600 transition-all disabled:opacity-50"
+                                className="w-full py-3 border border-stone-300 rounded text-sm text-stone-500 hover:border-teal-500 hover:text-teal-600 transition-all disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                             >
                                 {loadingInsight ? 'Thinking...' : 'Reveal Hidden Meaning'}
                             </button>

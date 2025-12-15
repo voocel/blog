@@ -27,12 +27,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentSection, setSection, onExit })
     return (
         <aside className="fixed left-0 top-0 h-full w-72 bg-white border-r border-stone-200 flex flex-col z-50">
             {/* Brand - Clickable to Home */}
-            <div
-                className="h-24 flex items-center px-8 cursor-pointer group"
-                onClick={onExit}
-                title="Return to Site"
-            >
-                <div className="flex items-center gap-3">
+            <div className="h-24 flex items-center px-8">
+                <div
+                    className="flex items-center gap-3 cursor-pointer group"
+                    onClick={onExit}
+                    title="Return to Site"
+                >
                     <div className="w-8 h-8 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                         <IconSparkles className="w-4 h-4 text-gold-600" />
                     </div>
