@@ -106,3 +106,32 @@
     border-radius: 0.25rem;
     font-size: 0.875em;
 }
+
+/* MDEditor styling */
+.w-md-editor {
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+.w-md-editor-content,
+.w-md-editor-area {
+    background-color: transparent !important;
+}
+
+/* Fix editor content height when highlightEnable=false */
+.w-md-editor-content {
+    height: 100% !important;
+}
+
+.w-md-editor-area {
+    height: 100% !important;
+}
+
+.w-md-editor-text {
+    min-height: 100% !important;
+}
+
+.w-md-editor-text-input {
+    min-height: 100% !important;
+}

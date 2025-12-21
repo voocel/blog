@@ -388,21 +388,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                                 onChange={e => setEditingPost({ ...editingPost, title: e.target.value })}
                             />
 
-                            <div className="flex-1 min-h-[500px]" data-color-mode="light">
+                            <div className="flex-1" data-color-mode="light">
                                 <MDEditor
                                     value={editingPost.content}
                                     onChange={(val) => setEditingPost({ ...editingPost, content: val || '' })}
                                     preview="edit"
-                                    height="100%"
+                                    height={600}
                                     visibleDragbar={false}
+                                    highlightEnable={false}
                                     textareaProps={{
                                         placeholder: "Start writing your thoughts..."
-                                    }}
-                                    style={{
-                                        backgroundColor: 'transparent',
-                                        color: '#44403c', // stone-700
-                                        fontFamily: 'Inter, sans-serif',
-                                        boxShadow: 'none'
                                     }}
                                 />
                             </div>

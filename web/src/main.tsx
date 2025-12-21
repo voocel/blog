@@ -1,6 +1,5 @@
 import React, { useState, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
 import { BlogProvider } from './context/BlogContext';
 import type { AdminSection } from './types';
 import Header from './components/Header';
@@ -79,17 +78,15 @@ import { ToastProvider } from './components/Toast';
 
 const App: React.FC = () => {
   return (
-    <HelmetProvider>
-      <ToastProvider>
-        <BlogProvider>
-          <Router>
-            <ErrorBoundary>
-              <AppContent />
-            </ErrorBoundary>
-          </Router>
-        </BlogProvider>
-      </ToastProvider>
-    </HelmetProvider>
+    <ToastProvider>
+      <BlogProvider>
+        <Router>
+          <ErrorBoundary>
+            <AppContent />
+          </ErrorBoundary>
+        </Router>
+      </BlogProvider>
+    </ToastProvider>
   );
 };
 
