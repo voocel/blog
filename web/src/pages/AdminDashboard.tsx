@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import MDEditor from '@uiw/react-md-editor';
 import { useBlog } from '../context/BlogContext';
 import type { AdminSection, BlogPost } from '../types';
 import { useToast } from '../components/Toast';
-import { IconX, IconGrid, IconClock } from '../components/Icons';
 import { AUTHOR_NAME } from '../constants';
+import ConfirmModal from '../components/ConfirmModal';
+import PostEditor from '../components/admin/PostEditor';
 
 import AdminOverview from '../components/admin/AdminOverview';
 import AdminPosts from '../components/admin/AdminPosts';
@@ -28,26 +28,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         addPost, updatePost, deletePost,
         addCategory, deleteCategory,
         addTag, deleteTag,
-        addFile, deleteFile,
-        visitLogs,
-        refreshPosts,
-        refreshCategories,
-        refreshTags,
-        refreshFiles,
-        refreshVisitLogs,
-        dashboardStats,
-        refreshDashboardOverview,
-        // Admin Lists
-        adminUsers, refreshAdminUsers,
-        allComments, refreshAllComments
+        addFile, deleteFile, visitLogs, dashboardStats,
+        refreshPosts, refreshCategories, refreshTags, refreshFiles, refreshVisitLogs, refreshDashboardOverview,
+        adminUsers, refreshAdminUsers, allComments, refreshAllComments
     } = useBlog();
 
-    // Refresh data when switching sections
-    React.useEffect(() => {
+    const { showToast } = useToast();
+
+    // Fetch data based on section
+    useEffect(() => {
         if (section === 'overview') {
             refreshDashboardOverview();
+            refreshPosts();
         } else if (section === 'posts') {
             refreshPosts();
+            refreshCategories();
+            refreshTags();
         } else if (section === 'categories') {
             refreshCategories();
         } else if (section === 'tags') {
@@ -63,13 +59,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         }
     }, [section]);
 
-    // --- Shared State ---
+    // --- Editor State ---
     const [isEditorOpen, setIsEditorOpen] = useState(false);
-
-    // --- Post State (Editor) ---
     const [editingPost, setEditingPost] = useState<Partial<BlogPost> | null>(null);
 
-    // --- Confirmation State ---
+    // --- Confirmation Modal State ---
     const [confirmModal, setConfirmModal] = useState<{
         isOpen: boolean;
         title: string;
@@ -102,12 +96,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         });
     };
 
-    // --- Handlers ---
-
-    // POSTS
+    // --- Post Handlers ---
     const handleEditPost = (post?: BlogPost) => {
         if (post) {
-            // Ensure tags are IDs when loading a post
             const tagIds = (post.tags || []).map(t => {
                 const tagByName = tags.find(tag => tag.name === t);
                 return tagByName ? tagByName.id : t;
@@ -115,7 +106,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
             setEditingPost({ ...post, tags: tagIds });
         } else {
             setEditingPost({
-                // id: Date.now().toString(), // Let backend generate ID
                 title: '',
                 excerpt: '',
                 content: '',
@@ -129,60 +119,55 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                 views: 0
             });
         }
-        // Ensure categories and tags are fresh
         refreshCategories();
         refreshTags();
         setIsEditorOpen(true);
     };
 
-    const { showToast } = useToast();
+    const handleSavePost = async (post: Partial<BlogPost>) => {
+        if (!post.title) return;
 
-    // ... imports
-
-    const savePost = async () => {
-        if (!editingPost || !editingPost.title) return;
-
-        // ... (payload construction)
         const payload: any = {
-            ...editingPost,
-            categoryId: editingPost.categoryId, // Ensure this is set
-            tags: (editingPost.tags || []).map(t => {
+            ...post,
+            categoryId: post.categoryId,
+            tags: (post.tags || []).map(t => {
                 const tagByName = tags.find(tag => tag.name === t);
                 return tagByName ? tagByName.id : t;
             })
         };
 
-        // If categoryId is missing but we have category name (legacy/fallback), try to find ID
-        if (!payload.categoryId && editingPost.category) {
-            const cat = categories.find(c => c.name === editingPost.category);
-            if (cat) payload.categoryId = cat.id;
-        }
-
-        // If categoryId is still missing, default to first category
         if (!payload.categoryId && categories.length > 0) {
-            payload.categoryId = categories[0].id;
+            const matchedCat = categories.find(c => c.name === post.category);
+            payload.categoryId = matchedCat ? matchedCat.id : categories[0].id;
         }
 
-        try {
-            const existing = posts.find(p => p.id === editingPost.id);
-            if (existing && editingPost.id) {
-                await updatePost(editingPost.id, payload);
-                showToast("Entry updated successfully", "success");
-            } else {
-                await addPost(payload as BlogPost);
-                showToast("New entry created", "success");
-            }
-            setIsEditorOpen(false);
-            setEditingPost(null);
-        } catch (error: any) {
-            console.error("Failed to save post:", error);
-            const errorMessage = error.response?.data?.error || "Failed to save post";
-            const errorDetails = error.response?.data?.details || error.message;
-            showToast(errorMessage, "error", errorDetails);
+        const existing = posts.find(p => p.id === post.id);
+        if (existing && post.id) {
+            await updatePost(post.id, payload);
+            showToast("Entry updated successfully", "success");
+        } else {
+            await addPost(payload as BlogPost);
+            showToast("New entry created", "success");
         }
     };
 
-    // CATEGORIES
+    const handleCloseEditor = () => {
+        setIsEditorOpen(false);
+        setEditingPost(null);
+    };
+
+    const handlePublishPost = async (id: string) => {
+        try {
+            await updatePost(id, { status: 'published' });
+            refreshPosts();
+            showToast("Entry published successfully", "success");
+        } catch (error) {
+            console.error("Failed to publish post:", error);
+            showToast("Failed to publish post", "error");
+        }
+    };
+
+    // --- Category & Tag Handlers ---
     const handleAddCategory = (name: string) => {
         addCategory({
             id: `c-${Date.now()}`,
@@ -192,232 +177,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         });
     };
 
-    // TAGS
     const handleAddTag = (name: string) => {
         addTag({
             id: `t-${Date.now()}`,
             name: name
         });
-    };
-
-    // --- ZEN EDITOR ---
-    const renderEditor = () => {
-        if (!editingPost) return null;
-        return (
-            <div className="fixed inset-0 z-[100] bg-[#FDFBF7] flex flex-col animate-slide-up">
-                {/* Toolbar */}
-                <div className="h-20 border-b border-stone-200 flex justify-between items-center px-8 bg-white/90 backdrop-blur-md shadow-sm z-20">
-                    <div className="flex items-center gap-6">
-                        <button onClick={() => setIsEditorOpen(false)} className="text-stone-400 hover:text-ink flex items-center gap-2 transition-colors cursor-pointer">
-                            <IconX className="w-6 h-6" />
-                        </button>
-                        <div className="h-6 w-px bg-stone-200"></div>
-                        <span className="font-serif italic text-stone-400 text-lg">
-                            {editingPost.id ? 'Editing Entry' : 'New Entry'}
-                        </span>
-                    </div>
-
-                    <div className="flex gap-4 items-center">
-                        <div className="flex items-center gap-2 bg-stone-100 rounded-lg p-1.5 mr-4">
-                            {['draft', 'published'].map(s => (
-                                <button
-                                    key={s}
-                                    onClick={() => setEditingPost({ ...editingPost, status: s as any })}
-                                    className={`px-4 py-2 rounded-md text-xs uppercase tracking-wider font-bold transition-all cursor-pointer ${editingPost.status === s ? 'bg-white shadow-sm text-ink' : 'text-stone-400 hover:text-stone-600'
-                                        }`}
-                                >
-                                    {s}
-                                </button>
-                            ))}
-                        </div>
-                        <button
-                            onClick={savePost}
-                            className="bg-ink text-white px-8 py-3 rounded-xl font-bold tracking-wide hover:bg-gold-600 transition-colors shadow-lg flex items-center gap-2 cursor-pointer"
-                        >
-                            Save Changes
-                        </button>
-                    </div>
-                </div>
-
-                {/* Main Editor Area */}
-                <div className="flex-1 flex overflow-hidden">
-                    {/* Meta Sidebar */}
-                    <div className="w-96 border-r border-stone-200 bg-stone-50 p-8 overflow-y-auto hidden lg:block custom-scrollbar">
-                        <h3 className="font-serif font-bold text-ink mb-8 text-xl">Entry Metadata</h3>
-
-                        <div className="space-y-8">
-                            <div>
-                                <label className="block text-xs uppercase tracking-widest text-stone-500 mb-3 font-bold">Publish Time</label>
-                                <div
-                                    className="relative group cursor-pointer"
-                                    onClick={() => {
-                                        try {
-                                            // @ts-ignore - showPicker is standard but TS might complain depending on version
-                                            document.getElementById('publish-date-picker')?.showPicker();
-                                        } catch (e) {
-                                            console.error("showPicker not supported", e);
-                                            // Fallback: focus the input
-                                            document.getElementById('publish-date-picker')?.focus();
-                                        }
-                                    }}
-                                >
-                                    <div className="w-full bg-white border border-stone-200 group-hover:border-gold-400 rounded-xl p-3 flex items-center justify-between transition-all shadow-sm">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 group-hover:text-gold-500 transition-colors">
-                                                <IconClock className="w-4 h-4" />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-xs text-stone-400 font-medium uppercase tracking-wider">Scheduled For</span>
-                                                <span className={`text-sm font-serif font-medium ${editingPost.publishAt ? 'text-ink' : 'text-stone-300 italic'}`}>
-                                                    {editingPost.publishAt
-                                                        ? new Date(editingPost.publishAt).toLocaleString('en-US', {
-                                                            month: 'short', day: 'numeric', year: 'numeric',
-                                                            hour: 'numeric', minute: 'numeric', hour12: true
-                                                        })
-                                                        : 'Set publish time...'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <input
-                                        id="publish-date-picker"
-                                        type="datetime-local"
-                                        className="absolute inset-0 w-full h-full opacity-0 pointer-events-none"
-                                        value={editingPost.publishAt ? new Date(editingPost.publishAt).toISOString().slice(0, 16) : ''}
-                                        onChange={e => {
-                                            const v = e.target.value; // "YYYY-MM-DDTHH:mm" in local time
-                                            const iso = v ? new Date(v).toISOString() : '';
-                                            setEditingPost({ ...editingPost, publishAt: iso });
-                                        }}
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs uppercase tracking-widest text-stone-500 mb-3 font-bold">Category</label>
-                                <div className="relative">
-                                    <select
-                                        className="w-full bg-white border border-stone-200 rounded-xl p-3 text-sm focus:outline-none focus:border-gold-500 appearance-none shadow-sm font-serif"
-                                        value={editingPost.categoryId || (categories.find(c => c.name === editingPost.category)?.id) || ''}
-                                        onChange={e => {
-                                            const cat = categories.find(c => c.id === e.target.value);
-                                            setEditingPost({
-                                                ...editingPost,
-                                                categoryId: e.target.value,
-                                                category: cat ? cat.name : ''
-                                            });
-                                        }}
-                                    >
-                                        <option value="" disabled>Select a category</option>
-                                        {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                    </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                        <IconGrid className="w-4 h-4 text-stone-400" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs uppercase tracking-widest text-stone-500 mb-3 font-bold">Tags</label>
-                                <div className="flex flex-wrap gap-2">
-                                    {tags.map(tag => {
-                                        const isSelected = editingPost.tags?.includes(tag.id) || editingPost.tags?.includes(tag.name); // Handle both ID and Name for compatibility
-                                        return (
-                                            <button
-                                                key={tag.id}
-                                                onClick={() => {
-                                                    const currentTags = editingPost.tags || [];
-                                                    // Check if tag is already selected (by ID or Name)
-                                                    const alreadySelected = currentTags.includes(tag.id) || currentTags.includes(tag.name);
-
-                                                    let newTags;
-                                                    if (alreadySelected) {
-                                                        // Remove
-                                                        newTags = currentTags.filter(t => t !== tag.id && t !== tag.name);
-                                                    } else {
-                                                        // Add ID
-                                                        newTags = [...currentTags, tag.id];
-                                                    }
-                                                    setEditingPost({ ...editingPost, tags: newTags });
-                                                }}
-                                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${isSelected
-                                                    ? 'bg-teal-50 border-teal-200 text-teal-700'
-                                                    : 'bg-white border-stone-200 text-stone-500 hover:border-stone-300'
-                                                    }`}
-                                            >
-                                                {tag.name}
-                                            </button>
-                                        );
-                                    })}
-                                    {tags.length === 0 && <span className="text-xs text-stone-400 italic">No tags available. Create some in the Tags section.</span>}
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs uppercase tracking-widest text-stone-500 mb-3 font-bold">Excerpt / Summary</label>
-                                <textarea
-                                    className="w-full bg-white border border-stone-200 rounded-xl p-4 text-sm h-40 resize-none focus:outline-none focus:border-gold-500 shadow-sm leading-relaxed"
-                                    value={editingPost.excerpt}
-                                    onChange={e => setEditingPost({ ...editingPost, excerpt: e.target.value })}
-                                    placeholder="Write a short summary for the feed display..."
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-xs uppercase tracking-widest text-stone-500 mb-3 font-bold">Cover Image URL</label>
-                                <div className="w-full h-48 bg-stone-200 rounded-xl mb-3 overflow-hidden border border-stone-300 relative group">
-                                    <img src={editingPost.cover} className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700" alt="Cover" />
-                                </div>
-                                <input
-                                    className="w-full bg-white border border-stone-200 rounded-xl p-3 text-xs font-mono focus:outline-none focus:border-gold-500 shadow-sm"
-                                    value={editingPost.cover}
-                                    onChange={e => setEditingPost({ ...editingPost, cover: e.target.value })}
-                                    placeholder="https://..."
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Writing Canvas */}
-                    <div className="flex-1 overflow-y-auto bg-[#FDFBF7]">
-                        <div className="max-w-4xl mx-auto py-20 px-12 h-full flex flex-col">
-                            <input
-                                className="w-full text-3xl md:text-5xl font-serif font-bold text-ink bg-transparent border-none focus:outline-none focus:ring-0 placeholder-stone-300 leading-tight mb-8 tracking-tight caret-gold-500"
-                                placeholder="Untitled Entry"
-                                value={editingPost.title}
-                                onChange={e => setEditingPost({ ...editingPost, title: e.target.value })}
-                            />
-
-                            <div className="flex-1" data-color-mode="light">
-                                <MDEditor
-                                    value={editingPost.content}
-                                    onChange={(val) => setEditingPost({ ...editingPost, content: val || '' })}
-                                    preview="edit"
-                                    height={600}
-                                    visibleDragbar={false}
-                                    highlightEnable={false}
-                                    textareaProps={{
-                                        placeholder: "Start writing your thoughts..."
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    const handlePublishPost = async (id: string) => {
-        try {
-            await updatePost(id, { status: 'published' });
-            // Refresh posts is handled by updatePost usually updating local state or we trigger refresh
-            refreshPosts();
-            showToast("Entry published successfully", "success");
-        } catch (error) {
-            console.error("Failed to publish post:", error);
-            showToast("Failed to publish post", "error");
-        }
     };
 
     return (
@@ -479,18 +243,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                         'Delete Comment?',
                         'Are you sure you want to remove this comment? This action cannot be undone.',
                         async () => {
-                            // Import logically since we don't have this in useBlog yet fully wrapped or just use service direct?
-                            // Good practice: Wrap in context, but for now specific
-                            // const { commentService } = await import('../services/commentService');
-                            // await commentService.deleteComment(id);
-                            // refreshAllComments();
-
-                            // Better: We should add deleteComment to BlogContext really if we want consistency, 
-                            // BUT I can just do it here or better yet add it to context in next step if I forgot.
-                            // Checking context... I didn't add deleteComment to context interface.
-                            // I will do sloppy dynamic import here or I should update Context. 
-                            // Creating a handle here is cleaner.
-
                             try {
                                 const { commentService } = await import('../services/commentService');
                                 await commentService.deleteComment(id);
@@ -505,35 +257,31 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                 />
             )}
 
-            {isEditorOpen && renderEditor()}
+            {/* Post Editor */}
+            {isEditorOpen && editingPost && (
+                <PostEditor
+                    post={editingPost}
+                    categories={categories}
+                    tags={tags}
+                    onSave={handleSavePost}
+                    onClose={handleCloseEditor}
+                    onDraftSaved={() => showToast('Draft saved', 'success')}
+                />
+            )}
 
             {/* Confirmation Modal */}
-            {confirmModal.isOpen && (
-                <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-stone-900/50 backdrop-blur-sm" onClick={() => setConfirmModal({ ...confirmModal, isOpen: false })} />
-                    <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-slide-up">
-                        <h3 className="text-xl font-serif font-bold text-ink mb-2">{confirmModal.title}</h3>
-                        <p className="text-stone-500 mb-6">{confirmModal.message}</p>
-                        <div className="flex justify-end gap-3">
-                            <button
-                                onClick={() => setConfirmModal({ ...confirmModal, isOpen: false })}
-                                className="px-4 py-2 text-stone-500 hover:text-ink font-medium cursor-pointer"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() => { confirmModal.onConfirm(); setConfirmModal({ ...confirmModal, isOpen: false }); }}
-                                className={`px-6 py-2 text-white rounded-lg font-bold transition-colors shadow-lg cursor-pointer ${confirmModal.isDestructive
-                                    ? 'bg-red-600 hover:bg-red-700 shadow-red-100'
-                                    : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-100'
-                                    }`}
-                            >
-                                {confirmModal.confirmText}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmText={confirmModal.confirmText}
+                isDestructive={confirmModal.isDestructive}
+                onConfirm={() => {
+                    confirmModal.onConfirm();
+                    setConfirmModal({ ...confirmModal, isOpen: false });
+                }}
+                onCancel={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+            />
         </div>
     );
 };
