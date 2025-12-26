@@ -101,6 +101,16 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
                             <div className="flex-1 min-w-0 py-1">
                                 <div className="flex items-center gap-3 mb-1.5">
                                     <h3 onClick={() => onViewPost(post.id)} className="text-xl font-serif font-bold text-ink truncate hover:text-gold-600 transition-colors cursor-pointer">{post.title}</h3>
+                                    {post.status === 'draft' && (
+                                        <span className="text-[10px] uppercase tracking-wider font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 animate-pulse">
+                                            Draft
+                                        </span>
+                                    )}
+                                    {post.status === 'published' && (
+                                        <span className="text-[10px] uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                            Published
+                                        </span>
+                                    )}
                                     <span className="text-[10px] uppercase tracking-wider text-stone-500 bg-stone-100 px-2 py-0.5 rounded border border-stone-200">{post.category}</span>
                                 </div>
                                 <div className="flex items-center gap-6 text-xs text-stone-400 font-medium">
