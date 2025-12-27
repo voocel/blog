@@ -82,18 +82,16 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [visitLogs, setVisitLogs] = useState<VisitLog[]>([]);
   const [dashboardStats, setDashboardStats] = useState<DashboardOverview | null>(null);
 
-  // Fetch Initial Public Data
+  // Fetch Initial Public Data (excluding posts - pages manage their own posts)
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [fetchedPostsResponse, fetchedUser, fetchedCategories, fetchedTags] = await Promise.all([
-          postService.getPosts(),
+        const [fetchedUser, fetchedCategories, fetchedTags] = await Promise.all([
           authService.getCurrentUser(),
           metaService.getCategories(),
           metaService.getTags()
         ]);
-        setPosts(fetchedPostsResponse.data);
         setUser(fetchedUser);
         setCategories(fetchedCategories);
         setTags(fetchedTags);

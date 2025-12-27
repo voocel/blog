@@ -54,7 +54,7 @@ import type { BlogPost } from '../types';
 // ... (Reveal Component stays same)
 
 const HomePage: React.FC = () => {
-  const { categories, logVisit } = useBlog(); // Removed posts from here
+  const { categories } = useBlog();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -63,13 +63,13 @@ const HomePage: React.FC = () => {
 
   const itemsPerPage = 5;
 
-  // Track visit
-  useEffect(() => {
-    logVisit('/');
-  }, []);
-
   // Fetch Posts Server-Side
   useEffect(() => {
+    // Wait for categories to be loaded before fetching (to resolve category IDs)
+    if (selectedCategory !== 'All' && categories.length === 0) {
+      return;
+    }
+
     const fetchPosts = async () => {
       setIsLoadingPosts(true);
       try {
@@ -97,7 +97,7 @@ const HomePage: React.FC = () => {
     };
 
     fetchPosts();
-  }, [selectedCategory, pagination.page, categories]); // Depends on categories to resolve ID
+  }, [selectedCategory, pagination.page, categories.length]); // Use categories.length instead of categories
 
   // Extract unique categories for filter bar (Using Context Categories is better/source of truth, but user might want only categories with posts? API returns all categories. Let's use Context Categories + All)
   const categoryList = ['All', ...categories.map(c => c.name)];

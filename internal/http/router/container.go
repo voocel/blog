@@ -62,7 +62,7 @@ func NewContainer(db *gorm.DB) *Container {
 	// Initialize UseCases
 	c.AuthUseCase = usecase.NewAuthUseCase(c.UserRepo)
 	c.UserUseCase = usecase.NewUserUseCase(c.UserRepo)
-	c.PostUseCase = usecase.NewPostUseCase(c.PostRepo, c.CategoryRepo, c.TagRepo)
+	c.PostUseCase = usecase.NewPostUseCase(c.PostRepo, c.CategoryRepo, c.TagRepo, c.AnalyticsRepo)
 	c.CategoryUseCase = usecase.NewCategoryUseCase(c.CategoryRepo)
 	c.TagUseCase = usecase.NewTagUseCase(c.TagRepo)
 	c.MediaUseCase = usecase.NewMediaUseCase(c.MediaRepo)

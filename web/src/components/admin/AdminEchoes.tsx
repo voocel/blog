@@ -17,18 +17,18 @@ const AdminEchoes: React.FC<AdminEchoesProps> = ({ visitLogs, posts }) => {
 
     // Resonances (Page Views)
     const totalResonances = visitLogs.length;
-    const monthResonances = visitLogs.filter(l => l.timestamp >= startOfMonth).length;
-    const dayResonances = visitLogs.filter(l => l.timestamp >= startOfDay).length;
+    const monthResonances = visitLogs.filter(l => l.timestamp * 1000 >= startOfMonth).length;
+    const dayResonances = visitLogs.filter(l => l.timestamp * 1000 >= startOfDay).length;
 
     // Wanderers (Unique Visitors)
     const uniqueVisitorsTotal = new Set(visitLogs.map(log => log.ip)).size;
-    const uniqueVisitorsMonth = new Set(visitLogs.filter(l => l.timestamp >= startOfMonth).map(l => l.ip)).size;
-    const uniqueVisitorsDay = new Set(visitLogs.filter(l => l.timestamp >= startOfDay).map(l => l.ip)).size;
+    const uniqueVisitorsMonth = new Set(visitLogs.filter(l => l.timestamp * 1000 >= startOfMonth).map(l => l.ip)).size;
+    const uniqueVisitorsDay = new Set(visitLogs.filter(l => l.timestamp * 1000 >= startOfDay).map(l => l.ip)).size;
 
     // Top Posts (Today Only)
     const today = new Date().toDateString();
     const topPosts = visitLogs
-        .filter(log => log.postId && new Date(log.timestamp).toDateString() === today)
+        .filter(log => log.postId && new Date(log.timestamp * 1000).toDateString() === today)
         .reduce((acc, log) => {
             const id = log.postId!;
             acc[id] = (acc[id] || 0) + 1;
@@ -167,7 +167,7 @@ const AdminEchoes: React.FC<AdminEchoesProps> = ({ visitLogs, posts }) => {
                                         </div>
                                         <div className="text-xs text-stone-400 font-mono text-right">
                                             <div className="font-bold text-stone-500">{log.ip}</div>
-                                            <div>{new Date(log.timestamp).toLocaleString(undefined, { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+                                            <div>{new Date(log.timestamp * 1000).toLocaleString(undefined, { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
                                         </div>
                                     </div>
                                 ))}

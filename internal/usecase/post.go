@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"blog/internal/entity"
+	"blog/pkg/geoip"
 	"blog/pkg/log"
 	"context"
 	"fmt"
@@ -11,16 +12,18 @@ import (
 )
 
 type PostUseCase struct {
-	postRepo     PostRepo
-	categoryRepo CategoryRepo
-	tagRepo      TagRepo
+	postRepo      PostRepo
+	categoryRepo  CategoryRepo
+	tagRepo       TagRepo
+	analyticsRepo AnalyticsRepo
 }
 
-func NewPostUseCase(postRepo PostRepo, categoryRepo CategoryRepo, tagRepo TagRepo) *PostUseCase {
+func NewPostUseCase(postRepo PostRepo, categoryRepo CategoryRepo, tagRepo TagRepo, analyticsRepo AnalyticsRepo) *PostUseCase {
 	return &PostUseCase{
-		postRepo:     postRepo,
-		categoryRepo: categoryRepo,
-		tagRepo:      tagRepo,
+		postRepo:      postRepo,
+		categoryRepo:  categoryRepo,
+		tagRepo:       tagRepo,
+		analyticsRepo: analyticsRepo,
 	}
 }
 
@@ -89,10 +92,64 @@ func (uc *PostUseCase) GetByID(ctx context.Context, id string) (*entity.PostResp
 		return nil, err
 	}
 
-	// Increment views
+	return uc.assemblePostResponse(ctx, post)
+}
+
+// GetByIDWithAnalytics retrieves a post and logs the visit (used by public API)
+func (uc *PostUseCase) GetByIDWithAnalytics(ctx context.Context, id, ip, userAgent string) (*entity.PostResponse, error) {
+	post, err := uc.postRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Increment views (async)
 	go uc.postRepo.IncrementViews(context.Background(), id)
 
+	// Log visit (async)
+	go uc.logVisit(id, post.Title, ip, userAgent)
+
 	return uc.assemblePostResponse(ctx, post)
+}
+
+// logVisit records a page visit to analytics
+func (uc *PostUseCase) logVisit(postID, postTitle, ip, userAgent string) {
+	if uc.analyticsRepo == nil {
+		return
+	}
+
+	location := geoip.Lookup(ip)
+
+	pID := postID
+	log := &entity.Analytics{
+		PagePath:  "/post/" + postID,
+		PostID:    &pID,
+		PostTitle: postTitle,
+		IP:        ip,
+		Location:  location,
+		UserAgent: userAgent,
+		Timestamp: time.Now().Unix(),
+	}
+
+	_ = uc.analyticsRepo.Create(context.Background(), log)
+}
+
+// LogHomeVisit records a homepage visit to analytics
+func (uc *PostUseCase) LogHomeVisit(ip, userAgent string) {
+	if uc.analyticsRepo == nil {
+		return
+	}
+
+	location := geoip.Lookup(ip)
+
+	log := &entity.Analytics{
+		PagePath:  "/",
+		IP:        ip,
+		Location:  location,
+		UserAgent: userAgent,
+		Timestamp: time.Now().Unix(),
+	}
+
+	_ = uc.analyticsRepo.Create(context.Background(), log)
 }
 
 func (uc *PostUseCase) List(ctx context.Context, filters map[string]interface{}, page, limit int) (interface{}, error) {

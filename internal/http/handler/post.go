@@ -45,6 +45,11 @@ func (h *PostHandler) ListPublishedPosts(c *gin.Context) {
 		return
 	}
 
+	// Log homepage visit (only for first page without filters)
+	if page <= 1 && category == "" && search == "" {
+		go h.postUseCase.LogHomeVisit(c.ClientIP(), c.GetHeader("User-Agent"))
+	}
+
 	c.JSON(http.StatusOK, result)
 }
 
@@ -80,8 +85,10 @@ func (h *PostHandler) ListAllPosts(c *gin.Context) {
 // GetPost - GET /posts/:id (Public API)
 func (h *PostHandler) GetPost(c *gin.Context) {
 	id := c.Param("id")
+	ip := c.ClientIP()
+	userAgent := c.GetHeader("User-Agent")
 
-	post, err := h.postUseCase.GetByID(c.Request.Context(), id)
+	post, err := h.postUseCase.GetByIDWithAnalytics(c.Request.Context(), id, ip, userAgent)
 	if err != nil {
 		JSONError(c, http.StatusNotFound, "Post not found", err)
 		return

@@ -9,7 +9,7 @@ import type { BlogPost } from '../types';
 const PostPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { posts, isLoading } = useBlog();
+    const { isLoading } = useBlog();
     const [post, setPost] = useState<BlogPost | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -17,30 +17,19 @@ const PostPage: React.FC = () => {
         const fetchPost = async () => {
             if (!id) return;
 
-            // First check if it's already in context
-            const existingPost = posts.find(p => p.id === id);
-            if (existingPost) {
-                setPost(existingPost);
-                setLoading(false);
-                return;
-            }
-
-            // If not in context (e.g. direct link), fetch it
+            // Always fetch from API to trigger view count increment
             try {
                 const fetchedPost = await postService.getPost(id);
                 setPost(fetchedPost || null);
             } catch (error) {
                 console.error("Failed to load post", error);
-                // navigate('/'); // Optional: redirect to home on error
             } finally {
                 setLoading(false);
             }
         };
 
-        if (!isLoading) {
-            fetchPost();
-        }
-    }, [id, posts, isLoading]);
+        fetchPost();
+    }, [id]);
 
     if (loading || isLoading) {
         return (

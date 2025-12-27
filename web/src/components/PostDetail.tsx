@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import type { BlogPost } from '../types';
 import { getAssetUrl } from '../utils/urlUtils';
-import { IconArrowLeft, IconSparkles, IconBrain } from './Icons';
-import { useBlog } from '../context/BlogContext';
+import { IconArrowLeft, IconSparkles, IconBrain, IconEye } from './Icons';
 import { generateSummary, generateInsight } from '../services/geminiService';
 import SEO from './SEO';
 
@@ -14,15 +13,10 @@ interface PostDetailProps {
 }
 
 const PostDetail: React.FC<PostDetailProps> = ({ post, onBack }) => {
-    const { logVisit } = useBlog(); // Added useBlog hook call
     const [summary, setSummary] = useState<string | null>(null);
     const [insight, setInsight] = useState<string | null>(null);
     const [loadingSummary, setLoadingSummary] = useState(false);
     const [loadingInsight, setLoadingInsight] = useState(false);
-
-    useEffect(() => {
-        logVisit(`/ post / ${post.id} `, post.id, post.title); // Added new useEffect
-    }, [post.id]);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -83,7 +77,14 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, onBack }) => {
                         </div>
                         <div>
                             <p className="text-ink font-medium">{post.author}</p>
-                            <p className="text-xs text-stone-500">{post.readTime}</p>
+                            <div className="flex items-center gap-2 text-xs text-stone-500">
+                                <span>{post.readTime}</span>
+                                <span>•</span>
+                                <span className="flex items-center gap-1">
+                                    <IconEye className="w-3.5 h-3.5" />
+                                    {post.views?.toLocaleString() || 0}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
