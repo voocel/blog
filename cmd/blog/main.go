@@ -33,7 +33,7 @@ func main() {
 
 	if config.Conf.App.GeoIPDBPath != "" {
 		if err := geoip.Init(config.Conf.App.GeoIPDBPath); err != nil {
-			log.Warnf("GeoIP database initialization failed (will use 'Unknown' as location): %v", err)
+			log.Errorf("GeoIP database initialization failed (will use 'Unknown' as location): %v", err)
 		} else {
 			log.Info("GeoIP database initialized successfully")
 		}

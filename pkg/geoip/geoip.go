@@ -2,7 +2,6 @@ package geoip
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"sync"
 
@@ -43,11 +42,6 @@ func Init(dbPath string) error {
 		mu.Lock()
 		defer mu.Unlock()
 		db, err = maxminddb.Open(dbPath)
-		if err != nil {
-			log.Printf("[GeoIP] Failed to open database %s: %v", dbPath, err)
-		} else {
-			log.Printf("[GeoIP] Database loaded successfully from %s", dbPath)
-		}
 	})
 	return err
 }
@@ -66,13 +60,11 @@ func Lookup(ipStr string) string {
 	defer mu.RUnlock()
 
 	if db == nil {
-		log.Printf("[GeoIP] Database not initialized, returning Unknown for IP: %s", ipStr)
 		return "Unknown"
 	}
 
 	ip := net.ParseIP(ipStr)
 	if ip == nil {
-		log.Printf("[GeoIP] Invalid IP format: %s", ipStr)
 		return "Invalid IP"
 	}
 
@@ -83,13 +75,10 @@ func Lookup(ipStr string) string {
 	var record CityRecord
 	err := db.Lookup(ip, &record)
 	if err != nil {
-		log.Printf("[GeoIP] Lookup failed for IP %s: %v", ipStr, err)
 		return "Unknown"
 	}
 
-	result := formatLocation(&record)
-	log.Printf("[GeoIP] IP %s -> %s", ipStr, result)
-	return result
+	return formatLocation(&record)
 }
 
 func formatLocation(record *CityRecord) string {

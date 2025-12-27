@@ -56,3 +56,6 @@ web/dist/
 Dockerfile
 docker-compose*.yml
 .dockerignore
+
+# GeoIP database (mounted at runtime)
+config/GeoLite2-City.mmdb
