@@ -46,6 +46,10 @@ func RequestLogger() gin.HandlerFunc {
 				log.Pair("errors", c.Errors.String()),
 			)
 		} else {
+			// Skip logging for health check endpoint
+			if path == "/api/v1/health" {
+				return
+			}
 			log.Infow("HTTP Request",
 				log.Pair("status", statusCode),
 				log.Pair("method", method),

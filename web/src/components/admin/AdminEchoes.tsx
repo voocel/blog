@@ -162,7 +162,7 @@ const AdminEchoes: React.FC<AdminEchoesProps> = ({ visitLogs, posts }) => {
                                                 <span className="font-bold text-indigo-600">Visitor</span> from <span className="font-medium">{log.location}</span>
                                             </p>
                                             <p className="text-sm font-serif italic text-stone-500 truncate">
-                                                Reading: {log.postTitle ? `"${log.postTitle}"` : log.pagePath === '/' ? "The Homepage" : log.pagePath}
+                                                Reading: <span className="text-indigo-600 font-medium not-italic">{log.postTitle ? `"${log.postTitle}"` : log.pagePath === '/' ? "The Homepage" : log.pagePath}</span>
                                             </p>
                                         </div>
                                         <div className="text-xs text-stone-400 font-mono text-right">

@@ -30,7 +30,7 @@ const AppContent: React.FC = () => {
           onExit={() => window.location.href = '/'}
         />
         <main className="flex-1 ml-72 bg-transparent overflow-auto">
-          <Suspense fallback={<div className="p-8 text-stone-400">Loading Dashboard...</div>}>
+          <Suspense fallback={<div className="h-full flex items-center justify-center text-stone-400">Loading Dashboard...</div>}>
             <AdminDashboard section={adminSection} onExit={() => window.location.href = '/'} />
           </Suspense>
         </main>
