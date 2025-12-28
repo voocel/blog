@@ -168,20 +168,73 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
     };
 
     // --- Category & Tag Handlers ---
-    const handleAddCategory = (name: string) => {
-        addCategory({
-            id: `c-${Date.now()}`,
-            name: name,
-            slug: name.toLowerCase().replace(/ /g, '-'),
-            count: 0
-        });
+    const handleAddCategory = async (name: string) => {
+        try {
+            await addCategory({
+                id: `c-${Date.now()}`,
+                name: name,
+                slug: name.toLowerCase().replace(/ /g, '-'),
+                count: 0
+            });
+            showToast("Category created successfully", "success");
+        } catch (error) {
+            console.error(error);
+            showToast("Failed to create category", "error");
+        }
     };
 
-    const handleAddTag = (name: string) => {
-        addTag({
-            id: `t-${Date.now()}`,
-            name: name
-        });
+    const handleDeleteCategory = async (id: string) => {
+        try {
+            await deleteCategory(id);
+            showToast("Category deleted successfully", "success");
+        } catch (error) {
+            console.error(error);
+            showToast("Failed to delete category", "error");
+        }
+    };
+
+    const handleAddTag = async (name: string) => {
+        try {
+            await addTag({
+                id: `t-${Date.now()}`,
+                name: name
+            });
+            showToast("Tag created successfully", "success");
+        } catch (error) {
+            console.error(error);
+            showToast("Failed to create tag", "error");
+        }
+    };
+
+    const handleDeleteTag = async (id: string) => {
+        try {
+            await deleteTag(id);
+            showToast("Tag deleted successfully", "success");
+        } catch (error) {
+            console.error(error);
+            showToast("Failed to delete tag", "error");
+        }
+    };
+
+    // --- File Handlers ---
+    const handleAddFile = async (file: any) => {
+        try {
+            await addFile(file);
+            showToast("File uploaded successfully", "success");
+        } catch (error) {
+            console.error(error);
+            showToast("Failed to upload file", "error");
+        }
+    };
+
+    const handleDeleteFile = async (id: string) => {
+        try {
+            await deleteFile(id);
+            showToast("File deleted successfully", "success");
+        } catch (error) {
+            console.error(error);
+            showToast("Failed to delete file", "error");
+        }
     };
 
     return (
@@ -207,7 +260,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                 <AdminCategories
                     categories={categories}
                     onAddCategory={handleAddCategory}
-                    onDeleteCategory={deleteCategory}
+                    onDeleteCategory={handleDeleteCategory}
                     requestConfirm={requestConfirm}
                 />
             )}
@@ -215,15 +268,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                 <AdminTags
                     tags={tags}
                     onAddTag={handleAddTag}
-                    onDeleteTag={deleteTag}
+                    onDeleteTag={handleDeleteTag}
                     requestConfirm={requestConfirm}
                 />
             )}
             {section === 'files' && (
                 <AdminFiles
                     files={files}
-                    onAddFile={addFile}
-                    onDeleteFile={deleteFile}
+                    onAddFile={handleAddFile}
+                    onDeleteFile={handleDeleteFile}
                     requestConfirm={requestConfirm}
                 />
             )}

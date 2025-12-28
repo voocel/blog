@@ -244,6 +244,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setCategories(updatedCategories);
     } catch (err) {
       console.error("Failed to add category", err);
+      throw err;
     }
   }
   const deleteCategory = async (id: string) => {
@@ -252,6 +253,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setCategories(prev => prev.filter(c => c.id !== id));
     } catch (err) {
       console.error("Failed to delete category", err);
+      throw err;
     }
   }
 
@@ -264,6 +266,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setTags(updatedTags);
     } catch (err) {
       console.error("Failed to add tag", err);
+      throw err;
     }
   }
   const deleteTag = async (id: string) => {
@@ -272,6 +275,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setTags(prev => prev.filter(t => t.id !== id));
     } catch (err) {
       console.error("Failed to delete tag", err);
+      throw err;
     }
   }
 
@@ -282,6 +286,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setFiles(prev => [newFile, ...prev]);
     } catch (err) {
       console.error("Failed to add file", err);
+      throw err;
     }
   }
   const deleteFile = async (id: string) => {
@@ -290,6 +295,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setFiles(prev => prev.filter(f => f.id !== id));
     } catch (err) {
       console.error("Failed to delete file", err);
+      throw err;
     }
   };
 

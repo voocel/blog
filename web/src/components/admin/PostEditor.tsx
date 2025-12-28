@@ -241,8 +241,8 @@ const PostEditor: React.FC<PostEditorProps> = ({
                                                 setEditingPost({ ...editingPost, tags: newTags });
                                             }}
                                             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${isSelected
-                                                    ? 'bg-teal-50 border-teal-200 text-teal-700'
-                                                    : 'bg-white border-stone-200 text-stone-500 hover:border-stone-300'
+                                                ? 'bg-teal-50 border-teal-200 text-teal-700'
+                                                : 'bg-white border-stone-200 text-stone-500 hover:border-stone-300'
                                                 }`}
                                         >
                                             {tag.name}
