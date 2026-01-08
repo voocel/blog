@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useBlog } from '../context/BlogContext';
+import { useAuth } from '../context/AuthContext';
 import PostDetail from '../components/PostDetail';
 import CommentSection from '../components/CommentSection';
 import { postService } from '../services/postService';
@@ -9,7 +9,7 @@ import type { BlogPost } from '../types';
 const PostPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { isLoading } = useBlog();
+    const { isLoading } = useAuth();
     const [post, setPost] = useState<BlogPost | null>(null);
     const [loading, setLoading] = useState(true);
 

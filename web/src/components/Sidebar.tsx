@@ -2,7 +2,7 @@
 import React from 'react';
 import { IconHome, IconGrid, IconLayers, IconTag, IconImage, IconLogOut, IconArrowLeft, IconSparkles, IconUserCircle, IconActivity, IconUser, IconMessageSquare } from './Icons';
 import type { AdminSection } from '../types';
-import { useBlog } from '../context/BlogContext';
+import { useAuth } from '../context/AuthContext';
 
 interface SidebarProps {
     currentSection: AdminSection;
@@ -11,7 +11,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ currentSection, setSection, onExit }) => {
-    const { logout, user } = useBlog();
+    const { logout, user } = useAuth();
 
     const menuItems: { id: AdminSection; label: string; icon: React.FC<any> }[] = [
         { id: 'overview', label: 'Command Center', icon: IconHome },

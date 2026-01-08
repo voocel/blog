@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useBlog } from '../context/BlogContext';
+import { useAuth } from '../context/AuthContext';
 import { IconUser, IconMail, IconCamera, IconArrowLeft, IconCheck, IconSparkles, IconMoon, IconGlobe } from '../components/Icons';
 import { uploadImage } from '../services/uploadService';
 
@@ -8,7 +8,7 @@ interface SettingsPageProps {
 }
 
 const SettingsPage: React.FC<SettingsPageProps> = ({ onExit }) => {
-    const { user, updateUser } = useBlog();
+    const { user, updateUser } = useAuth();
 
     // Local state for form
     const [username, setUsername] = useState(user?.username || '');

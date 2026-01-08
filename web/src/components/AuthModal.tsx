@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { useBlog } from '../context/BlogContext';
+import { useAuth } from '../context/AuthContext';
 import { IconX, IconLock, IconUser } from './Icons';
 
 const AuthModal: React.FC = () => {
-    const { isAuthModalOpen, setAuthModalOpen, login, register, user } = useBlog();
+    const { isAuthModalOpen, setAuthModalOpen, login, register, user } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');

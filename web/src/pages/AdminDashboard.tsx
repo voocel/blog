@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { useBlog } from '../context/BlogContext';
+import { useAdmin } from '../context/AdminContext';
 import type { AdminSection, BlogPost } from '../types';
 import { useToast } from '../components/Toast';
 import { AUTHOR_NAME } from '../constants';
@@ -23,15 +25,27 @@ interface AdminDashboardProps {
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExit }) => {
     const navigate = useNavigate();
+
+    // Auth Context - user info
+    const { user } = useAuth();
+
+    // Blog Context - posts, categories, tags
     const {
-        posts, categories, tags, files, user,
+        posts, categories, tags,
         addPost, updatePost, deletePost,
         addCategory, deleteCategory,
         addTag, deleteTag,
-        addFile, deleteFile, visitLogs, dashboardStats,
-        refreshPosts, refreshCategories, refreshTags, refreshFiles, refreshVisitLogs, refreshDashboardOverview,
-        adminUsers, refreshAdminUsers, allComments, refreshAllComments
+        refreshPosts, refreshCategories, refreshTags
     } = useBlog();
+
+    // Admin Context - admin-only data
+    const {
+        files, visitLogs, dashboardStats,
+        adminUsers, allComments,
+        addFile, deleteFile,
+        refreshFiles, refreshVisitLogs, refreshDashboardOverview,
+        refreshAdminUsers, refreshAllComments
+    } = useAdmin();
 
     const { showToast } = useToast();
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useBlog } from '../context/BlogContext';
+import { useAuth } from '../context/AuthContext';
 import { commentService } from '../services/commentService';
 import type { Comment } from '../types';
 import { IconUserCircle, IconSparkles } from './Icons';
@@ -9,7 +9,7 @@ interface CommentSectionProps {
 }
 
 const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
-    const { user, setAuthModalOpen } = useBlog();
+    const { user, setAuthModalOpen } = useAuth();
     const [comments, setComments] = useState<Comment[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [newComment, setNewComment] = useState('');

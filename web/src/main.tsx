@@ -1,12 +1,15 @@
 import React, { useState, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import { BlogProvider } from './context/BlogContext';
+import { AdminProvider } from './context/AdminContext';
 import type { AdminSection } from './types';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import AuthModal from './components/AuthModal';
 import AIChat from './components/AIChat';
 import ErrorBoundary from './components/ErrorBoundary';
+import { ToastProvider } from './components/Toast';
 
 // Lazy Load Pages
 const HomePage = React.lazy(() => import('./pages/HomePage'));
@@ -43,7 +46,6 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen text-ink font-sans selection:bg-gold-500/30 selection:text-white bg-transparent">
       <AuthModal />
 
-      {/* Header is shown on all public pages except settings if we wanted, but let's keep it consistent */}
       {location.pathname !== '/settings' && (
         <Header />
       )}
@@ -61,31 +63,29 @@ const AppContent: React.FC = () => {
           <Route path="/post/:id" element={<PostPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/settings" element={<SettingsPage onExit={() => window.location.href = '/'} />} />
-          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
 
-      {/* AI Chat is available on the public site */}
       {location.pathname !== '/settings' && <AIChat />}
     </div>
   );
 };
 
-import { ToastProvider } from './components/Toast';
-
-// ... imports
-
 const App: React.FC = () => {
   return (
     <ToastProvider>
-      <BlogProvider>
-        <Router>
-          <ErrorBoundary>
-            <AppContent />
-          </ErrorBoundary>
-        </Router>
-      </BlogProvider>
+      <AuthProvider>
+        <BlogProvider>
+          <AdminProvider>
+            <Router>
+              <ErrorBoundary>
+                <AppContent />
+              </ErrorBoundary>
+            </Router>
+          </AdminProvider>
+        </BlogProvider>
+      </AuthProvider>
     </ToastProvider>
   );
 };

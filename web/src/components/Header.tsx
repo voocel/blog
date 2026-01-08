@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useBlog } from '../context/BlogContext';
+import { useAuth } from '../context/AuthContext';
 import { IconMenu, IconX, IconUser, IconSettings, IconLogOut, IconGrid, IconUserCircle, IconLock, IconEye } from './Icons';
 
 interface HeaderProps {
@@ -10,7 +10,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = () => {
-  const { user, setAuthModalOpen, logout } = useBlog();
+  const { user, setAuthModalOpen, logout } = useAuth();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

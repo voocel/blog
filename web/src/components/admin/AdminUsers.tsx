@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useBlog } from '../../context/BlogContext';
+import { useAdmin } from '../../context/AdminContext';
 import { IconUserCircle, IconSearch, IconShield, IconLock, IconCheck, IconGoogle, IconGithub, IconMail } from '../Icons';
 import { authService } from '../../services/authService';
 import type { User } from '../../types';
@@ -14,7 +14,7 @@ import { useToast } from '../../components/Toast';
 // ...
 
 const AdminUsers: React.FC<AdminUsersProps> = ({ users, requestConfirm }) => {
-    const { refreshAdminUsers } = useBlog();
+    const { refreshAdminUsers } = useAdmin();
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [processingId, setProcessingId] = useState<string | null>(null);
