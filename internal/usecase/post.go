@@ -385,14 +385,34 @@ func (uc *PostUseCase) assemblePostResponse(ctx context.Context, post *entity.Po
 	return resp, nil
 }
 
-// calculateReadTime calculates reading time (approximately 200 words/minute)
+// calculateReadTime calculates reading time based on content type.
+// Chinese: ~500 characters/minute, English: ~200 words/minute.
 func calculateReadTime(content string) string {
-	wordCount := len(strings.Fields(content))
-	minutes := wordCount / 200
+	// Count Chinese characters and English words separately
+	var chineseChars, englishWords int
+	inWord := false
+
+	for _, r := range content {
+		if r >= 0x4E00 && r <= 0x9FFF { // CJK Unified Ideographs
+			chineseChars++
+			inWord = false
+		} else if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') {
+			if !inWord {
+				englishWords++
+				inWord = true
+			}
+		} else {
+			inWord = false
+		}
+	}
+
+	// Calculate reading time: Chinese 500 chars/min, English 200 words/min
+	minutes := float64(chineseChars)/500 + float64(englishWords)/200
+
 	if minutes < 1 {
 		return "1 min read"
 	}
-	return fmt.Sprintf("%d min read", minutes)
+	return fmt.Sprintf("%d min read", int(minutes+0.5)) // Round to nearest
 }
 
 func normalizePostStatus(s string) (string, error) {
