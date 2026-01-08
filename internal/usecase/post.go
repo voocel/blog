@@ -102,8 +102,12 @@ func (uc *PostUseCase) GetByIDWithAnalytics(ctx context.Context, id, ip, userAge
 		return nil, err
 	}
 
-	// Increment views (async)
-	go uc.postRepo.IncrementViews(context.Background(), id)
+	// Increment views (async with timeout)
+	go func() {
+		bgCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		uc.postRepo.IncrementViews(bgCtx, id)
+	}()
 
 	// Log visit (async)
 	go uc.logVisit(id, post.Title, ip, userAgent)
@@ -130,7 +134,9 @@ func (uc *PostUseCase) logVisit(postID, postTitle, ip, userAgent string) {
 		Timestamp: time.Now().Unix(),
 	}
 
-	_ = uc.analyticsRepo.Create(context.Background(), log)
+	bgCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	_ = uc.analyticsRepo.Create(bgCtx, log)
 }
 
 // LogHomeVisit records a homepage visit to analytics
@@ -149,7 +155,9 @@ func (uc *PostUseCase) LogHomeVisit(ip, userAgent string) {
 		Timestamp: time.Now().Unix(),
 	}
 
-	_ = uc.analyticsRepo.Create(context.Background(), log)
+	bgCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	_ = uc.analyticsRepo.Create(bgCtx, log)
 }
 
 func (uc *PostUseCase) List(ctx context.Context, filters map[string]interface{}, page, limit int) (interface{}, error) {
