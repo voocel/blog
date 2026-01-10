@@ -46,7 +46,7 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen text-ink font-sans selection:bg-gold-500/30 selection:text-white bg-transparent">
       <AuthModal />
 
-      {location.pathname !== '/settings' && (
+      {location.pathname !== '/settings' && location.pathname !== '/' && (
         <Header />
       )}
 

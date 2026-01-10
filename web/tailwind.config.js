@@ -1,3 +1,4 @@
+
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
@@ -7,49 +8,56 @@ export default {
     theme: {
         extend: {
             colors: {
-                ink: '#111827', // Dark gray/black for text
-                paper: '#ffffff',
+                ink: '#1c1917', // stone-900
                 gold: {
-                    50: '#fffbeb',
-                    100: '#fef3c7',
-                    200: '#fde68a',
-                    300: '#fcd34d',
-                    400: '#fbbf24',
-                    500: '#f59e0b', // Amber-500 as gold
-                    600: '#d97706',
-                    700: '#b45309',
-                    800: '#92400e',
-                    900: '#78350f',
+                    50: '#fefce8',
+                    100: '#fef9c3',
+                    200: '#fef08a',
+                    300: '#fde047',
+                    400: '#facc15',
+                    500: '#eab308',
+                    600: '#ca8a04',
+                    700: '#a16207',
+                    800: '#854d0e',
+                    900: '#713f12',
                 },
             },
             fontFamily: {
-                sans: ['Inter', 'sans-serif'],
-                serif: ['Merriweather', 'serif'],
+                sans: ['"Inter"', 'sans-serif'],
+                serif: ['"Playfair Display"', 'serif'],
+                mono: ['"JetBrains Mono"', 'monospace'],
             },
             animation: {
-                'slide-up': 'slideUp 0.5s ease-out forwards',
                 'fade-in': 'fadeIn 0.5s ease-out forwards',
-                'blur-in': 'blurIn 0.3s ease-out forwards',
-                'spin-slow': 'spin 2s linear infinite',
-                'slow-pan': 'slowPan 60s linear infinite alternate',
+                'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                'slow-pan': 'panImage 30s linear infinite alternate',
+                'spin-slow': 'spin 10s linear infinite',
+                'blur-in': 'blurIn 0.8s ease-out forwards',
+                'blob': 'blob 7s infinite',
             },
             keyframes: {
-                slideUp: {
-                    '0%': { transform: 'translateY(20px)', opacity: '0' },
-                    '100%': { transform: 'translateY(0)', opacity: '1' },
-                },
                 fadeIn: {
                     '0%': { opacity: '0' },
                     '100%': { opacity: '1' },
                 },
+                fadeInUp: {
+                    '0%': { opacity: '0', transform: 'translateY(20px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
+                },
+                panImage: {
+                    '0%': { transform: 'scale(1.1) translate(0%, 0%)' },
+                    '100%': { transform: 'scale(1.2) translate(-2%, -2%)' },
+                },
                 blurIn: {
-                    '0%': { filter: 'blur(10px)', opacity: '0' },
-                    '100%': { filter: 'blur(0)', opacity: '1' },
+                    '0%': { opacity: '0', filter: 'blur(10px)' },
+                    '100%': { opacity: '1', filter: 'blur(0)' },
                 },
-                slowPan: {
-                    '0%': { transform: 'scale(1)' },
-                    '100%': { transform: 'scale(1.1)' },
-                },
+                blob: {
+                    '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                    '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                    '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                    '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                }
             },
         },
     },

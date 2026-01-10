@@ -1,298 +1,229 @@
 
-import React, { useState, useRef, useEffect, type ReactNode } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useBlog } from '../context/BlogContext';
-import { HERO_CONTENT } from '../constants';
-import PostCard from '../components/PostCard';
-import { IconArrowDown, IconArrowLeft } from '../components/Icons';
+import BentoItem from '../components/bento/BentoItem';
+import ProfileWidget from '../components/bento/widgets/ProfileWidget';
+import NavWidget from '../components/bento/widgets/NavWidget';
+import ClockWidget from '../components/bento/widgets/ClockWidget';
+import CalendarWidget from '../components/bento/widgets/CalendarWidget';
+import MediaWidget from '../components/bento/widgets/MediaWidget';
+import SocialWidget from '../components/bento/widgets/SocialWidget';
+import SettingsModal from '../components/SettingsModal';
 import SEO from '../components/SEO';
+import { postService } from '../services/postService';
+import type { BlogPost } from '../types';
+import { useAuth } from '../context/AuthContext';
 
-// --- Reusable Scroll Reveal Component ---
-interface RevealProps {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-  threshold?: number;
-}
+const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+  const { user, setAuthModalOpen } = useAuth();
+  const [latestPost, setLatestPost] = useState<BlogPost | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-const Reveal: React.FC<RevealProps> = ({ children, className = "", delay = 0, threshold = 0.1 }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
+  // Fetch latest post on mount
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect(); // Only trigger once
+    postService.getPosts({ page: 1, limit: 1 })
+      .then(res => {
+        if (res.data.length > 0) {
+          setLatestPost(res.data[0]);
         }
-      },
-      { threshold }
-    );
+      })
+      .catch(err => {
+        console.error('Failed to fetch latest post:', err);
+      });
+  }, []);
 
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
+  const catImage = "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2643&auto=format&fit=crop";
 
-    return () => observer.disconnect();
-  }, [threshold]);
+  // Open auth modal for login
+  const handleLoginClick = () => {
+    setAuthModalOpen(true);
+  };
+
+  // Navigate to admin dashboard
+  const handleDashboardClick = () => {
+    navigate('/admin');
+  };
 
   return (
-    <div
-      ref={ref}
-      className={`${isVisible ? 'animate-blur-in' : 'opacity-0'} ${className}`}
-      style={{ animationDelay: `${delay}ms`, animationFillMode: 'both' }}
-    >
-      {children}
+    <div className="min-h-screen w-full bg-[#fdfaf6] bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-orange-100/40 via-rose-100/20 to-transparent overflow-hidden relative">
+      <SEO title="Home - Voocel Dashboard" />
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+
+      {/* Background Decorations - Animated blobs */}
+      <div className="fixed top-20 left-10 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob pointer-events-none" aria-hidden="true"></div>
+      <div className="fixed top-20 right-10 w-64 h-64 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000 pointer-events-none" aria-hidden="true"></div>
+      <div className="fixed -bottom-8 left-20 w-64 h-64 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000 pointer-events-none" aria-hidden="true"></div>
+
+      {/* Main Layout Container - Scattered organic positioning */}
+      <div className="relative w-full max-w-[1100px] mx-auto h-screen p-8">
+
+        {/* ==================== LEFT ZONE ==================== */}
+
+        {/* Navigation Widget - Site navigation menu */}
+        <div className="absolute left-[10%] top-[8%] w-[280px]">
+          <BentoItem className="h-auto shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-lg" aria-hidden="true">🐱</div>
+              <div>
+                <h3 className="font-bold text-stone-800 text-sm">Voocel</h3>
+                <span className="text-[9px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-bold">开发中</span>
+              </div>
+            </div>
+            <div className="text-[9px] text-stone-400 font-bold mb-2 uppercase tracking-wider">General</div>
+            <NavWidget />
+          </BentoItem>
+        </div>
+
+        {/* Recent Post Widget - Latest blog post preview */}
+        <div className="absolute left-[12%] top-[62%] w-[210px]">
+          <BentoItem className="h-[170px] hover:!bg-white cursor-pointer relative group p-0 overflow-hidden shadow-sm">
+            {latestPost ? (
+              <div
+                onClick={() => navigate(`/post/${latestPost.id}`)}
+                className="h-full flex flex-col"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${latestPost.id}`)}
+                aria-label={`Read article: ${latestPost.title}`}
+              >
+                <div className="h-20 w-full bg-stone-100 relative">
+                  <img src={latestPost.cover} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" alt={latestPost.title} />
+                  <div className="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-0.5 rounded text-[9px] font-bold text-stone-600">
+                    最新文章
+                  </div>
+                </div>
+                <div className="p-2.5 bg-white/50 backdrop-blur-sm flex-1">
+                  <h4 className="font-bold text-stone-700 text-xs leading-tight mb-1 line-clamp-2">{latestPost.title}</h4>
+                  <div className="text-[9px] text-stone-400">{new Date(latestPost.publishAt).toLocaleDateString()}</div>
+                </div>
+              </div>
+            ) : (
+              <div className="h-full flex items-center justify-center text-stone-300 text-xs">It's quiet here...</div>
+            )}
+          </BentoItem>
+        </div>
+
+        {/* ==================== CENTER ZONE ==================== */}
+
+        {/* Cat Image Widget - Decorative hero image */}
+        <div className="absolute left-[50%] -translate-x-1/2 top-[4%] w-[250px]">
+          <BentoItem className="h-[155px] !p-0 overflow-hidden group relative shadow-lg !rounded-[2rem]">
+            <div className="absolute inset-0">
+              <img src={catImage} alt="Decorative cat" className="w-full h-full object-cover object-[center_35%] transition-transform duration-700 group-hover:scale-105" />
+            </div>
+            <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[9px] font-bold text-stone-500 shadow-sm">
+              Do not disturb
+            </div>
+          </BentoItem>
+        </div>
+
+        {/* Profile Widget - User greeting and introduction */}
+        <div className="absolute left-[50%] -translate-x-1/2 top-[26%] w-[280px]">
+          <BentoItem className="h-[220px] flex items-center justify-center bg-gradient-to-b from-white/80 to-orange-50/50 shadow-xl border-white/60">
+            <ProfileWidget />
+          </BentoItem>
+        </div>
+
+        {/* Social Widget - Social media links */}
+        <div className="absolute left-[50%] -translate-x-1/2 top-[58%] w-[250px]">
+          <div className="h-[50px]">
+            <SocialWidget />
+          </div>
+        </div>
+
+        {/* Random Pick Widget - Random content recommendation */}
+        <div className="absolute left-[34%] top-[70%] w-[170px]">
+          <BentoItem className="h-[100px] bg-gradient-to-br from-orange-200/80 to-rose-200/80 !text-stone-700 !border-none !p-3 shadow-md">
+            <div className="flex flex-col h-full justify-between">
+              <span className="text-[8px] opacity-60 uppercase tracking-wider">Random Pick</span>
+              <div className="flex items-center gap-2">
+                <div className="text-xl" aria-hidden="true">🌤️</div>
+                <div>
+                  <div className="font-bold text-xs leading-tight">Summer</div>
+                  <div className="text-[8px] opacity-60">Afternoon</div>
+                </div>
+              </div>
+            </div>
+          </BentoItem>
+        </div>
+
+        {/* Music Widget - Now playing music */}
+        <div className="absolute left-[54%] top-[70%] w-[220px]">
+          <BentoItem className="h-[60px] !bg-orange-50/60 !p-1.5 !border-none shadow-sm flex items-center">
+            <MediaWidget />
+          </BentoItem>
+        </div>
+
+        {/* ==================== RIGHT ZONE ==================== */}
+
+        {/* Auth Buttons - Login/Dashboard and Settings */}
+        <div className="absolute right-[12%] top-[6%] flex gap-2">
+          {user && (
+            <button
+              onClick={handleDashboardClick}
+              className="bg-red-400 text-white px-4 py-2 rounded-xl shadow-red-200 shadow-md font-bold text-sm hover:bg-red-500 transition-colors"
+              aria-label="Go to dashboard"
+            >
+              Dashboard
+            </button>
+          )}
+
+          <div className="flex items-center gap-1.5 bg-white/50 backdrop-blur-md rounded-xl px-2 shadow-sm">
+            {!user && (
+              <button
+                onClick={handleLoginClick}
+                className="text-[10px] text-stone-400 font-bold px-1.5 hover:text-stone-600 transition-colors"
+                aria-label="Sign in to your account"
+              >
+                SIGN IN
+              </button>
+            )}
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="w-7 h-7 rounded-lg hover:bg-stone-200/50 flex items-center justify-center text-stone-400 transition-colors"
+              aria-label="Open settings menu"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="5" cy="5" r="2" fill="currentColor" />
+                <circle cx="12" cy="5" r="2" fill="currentColor" />
+                <circle cx="19" cy="5" r="2" fill="currentColor" />
+                <circle cx="5" cy="12" r="2" fill="currentColor" />
+                <circle cx="12" cy="12" r="2" fill="currentColor" />
+                <circle cx="19" cy="12" r="2" fill="currentColor" />
+                <circle cx="5" cy="19" r="2" fill="currentColor" />
+                <circle cx="12" cy="19" r="2" fill="currentColor" />
+                <circle cx="19" cy="19" r="2" fill="currentColor" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Clock Widget - Current time display */}
+        <div className="absolute right-[10%] top-[14%] w-[170px]">
+          <BentoItem className="h-[100px] !p-0 !bg-stone-100/70 !border-white/30 shadow-inner">
+            <ClockWidget />
+          </BentoItem>
+        </div>
+
+        {/* Calendar Widget - Monthly calendar view */}
+        <div className="absolute right-[8%] top-[32%] w-[240px]">
+          <BentoItem className="h-[260px] shadow-sm">
+            <CalendarWidget />
+          </BentoItem>
+        </div>
+
+        {/* Decorative Elements */}
+        <div className="absolute right-[20%] top-[78%] text-xl opacity-30 animate-pulse" aria-hidden="true">
+          💕
+        </div>
+        <div className="absolute left-[25%] top-[82%] text-base opacity-40" aria-hidden="true">
+          ✨
+        </div>
+
+      </div>
     </div>
   );
 };
 
-import { postService } from '../services/postService';
-import type { BlogPost } from '../types';
-
-// ... (Reveal Component stays same)
-
-const HomePage: React.FC = () => {
-  const { categories } = useBlog();
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [isLoadingPosts, setIsLoadingPosts] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
-  const navigate = useNavigate();
-
-  const itemsPerPage = 5;
-
-  // Fetch Posts Server-Side
-  useEffect(() => {
-    // If filtering by category, wait for categories to load
-    if (selectedCategory !== 'All' && categories.length === 0) {
-      return;
-    }
-
-    const fetchPosts = async () => {
-      setIsLoadingPosts(true);
-      try {
-        const params: any = {
-          page: pagination.page,
-          limit: itemsPerPage
-        };
-
-        if (selectedCategory !== 'All') {
-          // Find category ID from name
-          const cat = categories.find(c => c.name === selectedCategory);
-          if (cat) params.category = cat.id;
-        }
-
-        const { data, pagination: meta } = await postService.getPosts(params);
-        setPosts(data);
-        if (meta) {
-          setPagination(prev => ({ ...prev, totalPages: meta.totalPages, total: meta.total }));
-        }
-      } catch (error) {
-        console.error("Failed to fetch posts", error);
-      } finally {
-        setIsLoadingPosts(false);
-      }
-    };
-
-    fetchPosts();
-    // Only depend on categories.length when filtering by category
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory, pagination.page]);
-
-  // Extract unique categories for filter bar (Using Context Categories is better/source of truth, but user might want only categories with posts? API returns all categories. Let's use Context Categories + All)
-  const categoryList = ['All', ...categories.map(c => c.name)];
-
-  const scrollToContent = () => {
-    const element = document.getElementById('journal-feed');
-    if (element) {
-      const y = element.getBoundingClientRect().top + window.scrollY - 80;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
-  };
-
-  const toggleCategory = (cat: string) => {
-    if (selectedCategory === cat) return; // No op if same
-    setSelectedCategory(cat);
-    setPagination(prev => ({ ...prev, page: 1 })); // Reset to page 1
-  };
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= pagination.totalPages) {
-      setPagination(prev => ({ ...prev, page: newPage }));
-      scrollToContent();
-    }
-  };
-
-  // Skip global loading check, handle local loading
-  // if (isLoading) ... (removed)
-
-  // Hero Post (Static Content)
-  const heroPost = HERO_CONTENT;
-
-  return (
-    <div className="min-h-screen pb-20 bg-transparent">
-      <SEO title="Voocel Journal" />
-
-      {/* Magazine Cover Hero */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src={heroPost.cover}
-            alt="Hero"
-            className="w-full h-full object-cover filter saturate-[0.8] sepia-[0.15] opacity-90 animate-slow-pan"
-          />
-        </div>
-        {/* Light gradient fade to match global bg */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FDFBF7] via-[#FDFBF7]/40 to-transparent"></div>
-
-        <div className="relative z-10 text-center max-w-4xl px-6 flex flex-col items-center">
-
-          <Reveal delay={0}>
-            <p className="text-ink text-xs uppercase tracking-[0.4em] mb-6 px-4 py-2 rounded-full border border-ink/10 bg-white/50 backdrop-blur-md inline-block">
-              Featured Story
-            </p>
-          </Reveal>
-
-          <Reveal delay={200}>
-            <h1
-              className="text-5xl md:text-8xl font-serif font-bold text-ink mb-8 leading-[1.1] cursor-default hover:text-gold-600 transition-colors drop-shadow-sm"
-            >
-              {heroPost.title}
-            </h1>
-          </Reveal>
-
-          <Reveal delay={400}>
-            <p className="text-xl text-stone-600 font-light font-serif italic mb-10 max-w-2xl mx-auto">
-              {heroPost.excerpt}
-            </p>
-          </Reveal>
-
-          {/* Artistic Scroll Down Button with Border Beam */}
-          <Reveal delay={600}>
-            <button
-              onClick={scrollToContent}
-              className="group cursor-pointer flex flex-col items-center gap-4 text-stone-500 hover:text-ink transition-all duration-500 mt-8"
-            >
-              <span className="text-[10px] uppercase tracking-[0.4em] font-light group-hover:tracking-[0.5em] transition-all">Begin Journey</span>
-
-              {/* Button Container with Hover Effect */}
-              <div className="relative rounded-full overflow-hidden p-[1px] transform transition-transform duration-500 group-hover:scale-105">
-                {/* Border Beam - Conic Gradient Animation */}
-                <span className="absolute inset-[-100%] bg-[conic-gradient(from_90deg_at_50%_50%,#FDFBF7_0%,#FDFBF7_50%,#CA8A04_100%)] opacity-0 group-hover:opacity-100 animate-spin-slow" />
-
-                {/* Inner Button */}
-                <div className="relative p-3 bg-white/80 rounded-full border border-stone-300 group-hover:border-transparent transition-colors bg-white/50 backdrop-blur-sm z-10">
-                  <IconArrowDown className="w-5 h-5 group-hover:animate-bounce group-hover:text-gold-600" />
-                </div>
-              </div>
-            </button>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* Filter Bar (Curated Index) */}
-      <div id="journal-feed" className="sticky top-[55px] z-30 bg-[#FDFBF7]/90 backdrop-blur-md border-b border-stone-200 py-4 mb-12 shadow-sm transition-all">
-        <div className="max-w-6xl mx-auto px-6 overflow-x-auto">
-          <div className="flex gap-8 md:gap-12 min-w-max justify-center items-center">
-            <span className="text-[10px] uppercase text-stone-400 tracking-widest mr-4 border-r border-stone-200 pr-6 hidden md:block">Filter By</span>
-            <div className="flex justify-center gap-8 animate-fade-in-up delay-200">
-              {categoryList.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => toggleCategory(cat)}
-                  className={`text-xs uppercase tracking-[0.2em] transition-all duration-300 relative py-2 cursor-pointer ${selectedCategory === cat
-                    ? 'text-ink font-bold after:content-[""] after:absolute after:bottom-0 after:left-0 after:w-full after:h-px after:bg-gold-500'
-                    : 'text-stone-400 hover:text-stone-600'
-                    }`}
-                >
-                  {cat}
-                  {selectedCategory === cat && (
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[5px] border-t-gold-500"></div>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Content Grid (Wider Layout) */}
-      <main className="max-w-6xl mx-auto px-6 min-h-[500px]">
-        {isLoadingPosts ? (
-          <div className="flex flex-col items-center justify-center py-32 opacity-50">
-            <div className="w-8 h-8 border-2 border-stone-200 border-t-gold-600 rounded-full animate-spin mb-4"></div>
-            <span className="text-stone-400 font-serif text-sm tracking-widest italic">Fetching entries...</span>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-16 md:gap-20">
-            {posts.map((post, index) => (
-              <Reveal key={post.id} delay={index * 150} threshold={0.05}>
-                <PostCard post={post} onClick={(id) => navigate(`/post/${id}`)} />
-              </Reveal>
-            ))}
-          </div>
-        )}
-
-        {!isLoadingPosts && posts.length === 0 && (
-          <div className="py-20 text-center text-stone-400 italic font-serif text-lg">
-            No entries found in this collection.
-          </div>
-        )}
-
-        {/* Pagination Controls */}
-        {pagination.totalPages > 1 && (
-          <div className="mt-24 flex items-center justify-center gap-8 text-sm font-serif border-t border-stone-200 pt-12 max-w-lg mx-auto">
-            <button
-              onClick={() => handlePageChange(pagination.page - 1)}
-              disabled={pagination.page === 1}
-              className="flex items-center gap-2 text-stone-400 hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors uppercase tracking-widest text-xs"
-            >
-              <IconArrowLeft className="w-4 h-4" />
-              Previous
-            </button>
-
-            <div className="flex items-center gap-2">
-              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
-                <button
-                  key={page}
-                  onClick={() => handlePageChange(page)}
-                  className={`w-8 h-8 flex items-center justify-center rounded-full transition-all leading-none cursor-pointer ${pagination.page === page
-                    ? 'bg-gold-600 text-white shadow-sm'
-                    : 'text-stone-500 hover:bg-stone-100'
-                    }`}
-                >
-                  {page}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => handlePageChange(pagination.page + 1)}
-              disabled={pagination.page === pagination.totalPages}
-              className="flex items-center gap-2 text-stone-400 hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors uppercase tracking-widest text-xs"
-            >
-              Next
-              <IconArrowDown className="w-4 h-4 -rotate-90" />
-            </button>
-          </div>
-        )}
-      </main>
-
-      {/* Footer */}
-      <footer className="mt-32 border-t border-stone-200 py-20 text-center bg-transparent">
-        <h2 className="text-2xl font-serif text-ink mb-6">Voocel.</h2>
-        <p className="text-stone-500 text-sm mb-8 max-w-md mx-auto">
-          A digital sanctuary for thoughts, aesthetics, and the silent rhythm of algorithms.
-        </p>
-        <div className="text-stone-400 text-xs uppercase tracking-widest">
-          © 2024 Voocel Journal. All Rights Reserved.
-        </div>
-      </footer>
-    </div >
-  );
-};
-
 export default HomePage;
-
