@@ -106,3 +106,9 @@ type CommentRepo interface {
 	ListAll(ctx context.Context) ([]entity.Comment, error)
 	DeleteCascade(ctx context.Context, id string) error
 }
+
+// LikeRepo like repository interface
+type LikeRepo interface {
+	Create(ctx context.Context, like *entity.Like) error
+	GetCount(ctx context.Context, slug string) (int64, error)
+}

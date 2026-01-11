@@ -103,7 +103,7 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
     return (
         <motion.div
             layoutId="nav-container"
-            className="h-auto shadow-sm hover:shadow-md transition-shadow bg-white/40 backdrop-blur-xl border border-white/50 rounded-3xl p-6"
+            className="h-auto shadow-sm hover:shadow-md transition-shadow bg-white/40 backdrop-blur-xl border border-white/50 rounded-3xl p-7"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
@@ -112,7 +112,7 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
             <motion.div layoutId="nav-header" className="flex items-center gap-3 mb-4">
                 <motion.div
                     layoutId="nav-avatar"
-                    className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-lg cursor-pointer hover:bg-orange-200 transition-colors"
+                    className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-xl cursor-pointer hover:bg-orange-200 transition-colors"
                     onClick={() => navigate('/')}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -120,14 +120,14 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                     🐱
                 </motion.div>
                 <div>
-                    <h3 className="font-bold text-stone-800 text-sm">Voocel</h3>
-                    <span className="text-[9px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-bold">开发中</span>
+                    <h3 className="font-bold text-stone-800 text-base">Voocel</h3>
+                    <span className="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-bold">开发中</span>
                 </div>
             </motion.div>
 
             {/* Section Label */}
             <motion.div
-                className="text-[9px] text-stone-400 font-bold mb-2 uppercase tracking-wider"
+                className="text-[10px] text-stone-400 font-bold mb-3 uppercase tracking-wider"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -136,14 +136,14 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
             </motion.div>
 
             {/* Navigation Items with Sliding Indicator */}
-            <div className="relative flex flex-col gap-1">
+            <div className="relative flex flex-col gap-1.5">
                 {/* Sliding White Background Indicator */}
                 <motion.div
                     className="absolute left-0 right-0 bg-white rounded-xl shadow-sm pointer-events-none"
-                    style={{ height: 40 }}
+                    style={{ height: 48 }}
                     initial={false}
                     animate={{
-                        y: indicatorIndex * 44, // 40px button height + 4px gap
+                        y: indicatorIndex * 54, // 48px button height + 6px gap
                     }}
                     transition={{
                         type: 'spring',
@@ -159,19 +159,19 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                         onClick={() => handleNavClick(item.path)}
                         onMouseEnter={() => setHoveredIndex(index)}
                         onMouseLeave={() => setHoveredIndex(null)}
-                        className="w-full h-10 text-left px-3 rounded-xl flex items-center gap-3 cursor-pointer transition-colors duration-200 relative z-10 group"
+                        className="w-full h-12 text-left px-4 rounded-xl flex items-center gap-4 cursor-pointer transition-colors duration-200 relative z-10 group"
                         whileTap={{ scale: 0.98 }}
                     >
                         <div
-                            className={`p-1.5 rounded-lg transition-all duration-200 ${isActive(item.path) || hoveredIndex === index
+                            className={`p-2 rounded-lg transition-all duration-200 ${isActive(item.path) || hoveredIndex === index
                                 ? 'bg-orange-400 text-white'
                                 : 'bg-stone-100 text-stone-500'
                                 }`}
                         >
-                            <span className="text-sm">{item.icon}</span>
+                            <span className="text-base">{item.icon}</span>
                         </div>
                         <span
-                            className={`text-sm font-medium transition-colors duration-200 ${isActive(item.path) || hoveredIndex === index
+                            className={`text-base font-medium transition-colors duration-200 ${isActive(item.path) || hoveredIndex === index
                                 ? 'text-stone-800'
                                 : 'text-stone-500'
                                 }`}

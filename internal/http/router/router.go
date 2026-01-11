@@ -67,6 +67,10 @@ func setupPublicRoutes(v1 *gin.RouterGroup, c *Container) {
 		tags.GET("", c.TagHandler.ListTags)
 	}
 
+	// Likes - Public
+	v1.GET("/likes", c.LikeHandler.GetLikes)
+	v1.POST("/likes", c.LikeHandler.Like)
+
 	// Analytics - Public tracking
 	v1.POST("/analytics/visit", c.AnalyticsHandler.LogVisit)
 }

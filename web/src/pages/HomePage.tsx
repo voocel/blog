@@ -9,6 +9,7 @@ import ClockWidget from '../components/bento/widgets/ClockWidget';
 import CalendarWidget from '../components/bento/widgets/CalendarWidget';
 import MediaWidget from '../components/bento/widgets/MediaWidget';
 import SocialWidget from '../components/bento/widgets/SocialWidget';
+import LikeButton from '../components/LikeButton';
 import SettingsModal from '../components/SettingsModal';
 import SEO from '../components/SEO';
 import { postService } from '../services/postService';
@@ -46,8 +47,9 @@ const HomePage: React.FC = () => {
   const { user, setAuthModalOpen } = useAuth();
   const [latestPost, setLatestPost] = useState<BlogPost | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [homepageLikes, setHomepageLikes] = useState(0);
 
-  // Fetch latest post on mount
+  // Fetch latest post and homepage likes on mount
   useEffect(() => {
     postService.getPosts({ page: 1, limit: 1 })
       .then(res => {
@@ -58,6 +60,10 @@ const HomePage: React.FC = () => {
       .catch(err => {
         console.error('Failed to fetch latest post:', err);
       });
+
+    postService.getLikes('home')
+      .then(count => setHomepageLikes(count))
+      .catch(err => console.error('Failed to fetch homepage likes:', err));
   }, []);
 
   const catImage = "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2643&auto=format&fit=crop";
@@ -170,11 +176,15 @@ const HomePage: React.FC = () => {
           </BentoItem>
         </motion.div>
 
-        {/* Music Widget - Now playing music */}
-        <motion.div className="absolute left-[54%] top-[70%] w-[220px]" variants={itemVariants}>
-          <BentoItem className="h-[60px] !bg-orange-50/60 !p-1.5 !border-none shadow-sm flex items-center">
+        {/* Music Widget with Like Button */}
+        <motion.div className="absolute left-[54%] top-[70%] flex items-center gap-3" variants={itemVariants}>
+          <BentoItem className="h-[60px] w-[220px] !bg-orange-50/60 !p-1.5 !border-none shadow-sm flex items-center">
             <MediaWidget />
           </BentoItem>
+          <LikeButton
+            initialCount={homepageLikes}
+            onLike={async () => { await postService.like('home'); }}
+          />
         </motion.div>
 
         {/* ==================== RIGHT ZONE ==================== */}

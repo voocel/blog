@@ -65,5 +65,21 @@ export const postService = {
 
     deletePost: async (id: string): Promise<void> => {
         await apiClient.delete(`/admin/posts/${id}`);
-    }
+    },
+
+    // Like Endpoints
+    getLikes: async (slug: string): Promise<number> => {
+        try {
+            const response = await apiClient.get('/likes', { params: { slug } });
+            return response.data?.count ?? 0;
+        } catch (error) {
+            console.error(`Failed to get likes for ${slug}:`, error);
+            return 0;
+        }
+    },
+
+    like: async (slug: string): Promise<number> => {
+        const response = await apiClient.post('/likes', null, { params: { slug } });
+        return response.data?.count ?? 0;
+    },
 };
