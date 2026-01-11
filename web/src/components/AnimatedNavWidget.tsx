@@ -42,7 +42,7 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
         return (
             <motion.div
                 layoutId="nav-container"
-                className="fixed top-6 left-6 z-50 flex items-center gap-1 bg-white/60 backdrop-blur-xl rounded-2xl p-1.5 shadow-lg border border-white/50"
+                className="fixed top-6 left-1/2 -translate-x-1/2 md:left-6 md:translate-x-0 z-50 flex items-center gap-1 bg-white/60 backdrop-blur-xl rounded-2xl p-1.5 shadow-lg border border-white/50"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}

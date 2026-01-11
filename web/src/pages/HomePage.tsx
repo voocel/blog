@@ -42,6 +42,8 @@ const itemVariants = {
   },
 };
 
+const catImage = "/images/cute_cat.png";
+
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { user, setAuthModalOpen } = useAuth();
@@ -66,8 +68,6 @@ const HomePage: React.FC = () => {
       .catch(err => console.error('Failed to fetch homepage likes:', err));
   }, []);
 
-  const catImage = "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2643&auto=format&fit=crop";
-
   // Open auth modal for login
   const handleLoginClick = () => {
     setAuthModalOpen(true);
@@ -88,9 +88,111 @@ const HomePage: React.FC = () => {
       <div className="fixed top-20 right-10 w-64 h-64 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000 pointer-events-none" aria-hidden="true"></div>
       <div className="fixed -bottom-8 left-20 w-64 h-64 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000 pointer-events-none" aria-hidden="true"></div>
 
-      {/* Main Layout Container - Scattered organic positioning with staggered animations */}
+
+      {/* Mobile Navigation - Fixed at top, outside animation container */}
+      <div className="md:hidden">
+        <AnimatedNavWidget isCompact={true} />
+      </div>
+
+      {/* ==================== MOBILE LAYOUT (< md) ==================== */}
       <motion.div
-        className="relative w-full max-w-[1100px] mx-auto h-screen p-8"
+        className="md:hidden flex flex-col gap-4 p-4 pt-24"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+
+        {/* Cat Image */}
+        <motion.div variants={itemVariants}>
+          <BentoItem className="h-[180px] !p-0 overflow-hidden group relative shadow-lg !rounded-[2rem]">
+            <div className="absolute inset-0">
+              <img src={catImage} alt="Decorative cat" className="w-full h-full object-cover object-[center_35%]" />
+            </div>
+            <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[9px] font-bold text-stone-500 shadow-sm">
+              Do not disturb
+            </div>
+          </BentoItem>
+        </motion.div>
+
+        {/* Profile */}
+        <motion.div variants={itemVariants}>
+          <BentoItem className="py-8 flex items-center justify-center bg-gradient-to-b from-white/80 to-orange-50/50 shadow-xl border-white/60">
+            <ProfileWidget />
+          </BentoItem>
+        </motion.div>
+
+        {/* Social Links */}
+        <motion.div variants={itemVariants}>
+          <SocialWidget />
+        </motion.div>
+
+        {/* Latest Post */}
+        <motion.div variants={itemVariants}>
+          <BentoItem className="h-[140px] hover:!bg-white cursor-pointer relative group p-0 overflow-hidden shadow-sm">
+            {latestPost ? (
+              <div
+                onClick={() => navigate(`/post/${latestPost.id}`)}
+                className="h-full flex"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${latestPost.id}`)}
+              >
+                <div className="w-32 h-full bg-stone-100 shrink-0">
+                  <img src={latestPost.cover} className="w-full h-full object-cover" alt={latestPost.title} />
+                </div>
+                <div className="p-3 flex-1 flex flex-col justify-center">
+                  <div className="text-[9px] text-stone-400 mb-1">最新文章</div>
+                  <h4 className="font-bold text-stone-700 text-sm leading-tight mb-1 line-clamp-2">{latestPost.title}</h4>
+                  <div className="text-[10px] text-stone-400">{new Date(latestPost.publishAt).toLocaleDateString()}</div>
+                </div>
+              </div>
+            ) : (
+              <div className="h-full flex items-center justify-center text-stone-300 text-xs">It's quiet here...</div>
+            )}
+          </BentoItem>
+        </motion.div>
+
+        {/* Music + Like */}
+        <motion.div className="flex items-center gap-3" variants={itemVariants}>
+          <BentoItem className="h-[60px] flex-1 !bg-orange-50/60 !p-1.5 !border-none shadow-sm flex items-center">
+            <MediaWidget />
+          </BentoItem>
+          <LikeButton
+            initialCount={homepageLikes}
+            onLike={async () => { await postService.like('home'); }}
+          />
+        </motion.div>
+
+        {/* Login/Settings on mobile */}
+        <motion.div className="flex justify-center gap-2 pt-4" variants={itemVariants}>
+          {user && (
+            <button
+              onClick={handleDashboardClick}
+              className="bg-red-400 text-white px-4 py-2 rounded-xl shadow-red-200 shadow-md font-bold text-sm"
+            >
+              Dashboard
+            </button>
+          )}
+          {!user && (
+            <button
+              onClick={handleLoginClick}
+              className="bg-white/70 text-stone-500 px-4 py-2 rounded-xl shadow-sm font-bold text-sm"
+            >
+              Sign In
+            </button>
+          )}
+          <button
+            onClick={() => setIsSettingsOpen(true)}
+            className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center text-stone-400"
+          >
+            ⚙️
+          </button>
+        </motion.div>
+      </motion.div>
+
+      {/* ==================== DESKTOP LAYOUT (>= md) ==================== */}
+      <motion.div
+        className="hidden md:block relative w-full max-w-[1100px] mx-auto h-screen p-8"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -98,12 +200,12 @@ const HomePage: React.FC = () => {
 
         {/* ==================== LEFT ZONE ==================== */}
 
-        {/* Navigation Widget - Site navigation menu with animation */}
+        {/* Navigation Widget */}
         <motion.div className="absolute left-[10%] top-[8%] w-[280px]" variants={itemVariants}>
           <AnimatedNavWidget isCompact={false} />
         </motion.div>
 
-        {/* Recent Post Widget - Latest blog post preview */}
+        {/* Recent Post Widget */}
         <motion.div className="absolute left-[12%] top-[62%] w-[210px]" variants={itemVariants}>
           <BentoItem className="h-[170px] hover:!bg-white cursor-pointer relative group p-0 overflow-hidden shadow-sm">
             {latestPost ? (
@@ -134,7 +236,7 @@ const HomePage: React.FC = () => {
 
         {/* ==================== CENTER ZONE ==================== */}
 
-        {/* Cat Image Widget - Decorative hero image */}
+        {/* Cat Image Widget */}
         <motion.div className="absolute left-[50%] -translate-x-1/2 top-[4%] w-[250px]" variants={itemVariants}>
           <BentoItem className="h-[155px] !p-0 overflow-hidden group relative shadow-lg !rounded-[2rem]">
             <div className="absolute inset-0">
@@ -146,21 +248,21 @@ const HomePage: React.FC = () => {
           </BentoItem>
         </motion.div>
 
-        {/* Profile Widget - User greeting and introduction */}
+        {/* Profile Widget */}
         <motion.div className="absolute left-[50%] -translate-x-1/2 top-[26%] w-[280px]" variants={itemVariants}>
           <BentoItem className="h-[220px] flex items-center justify-center bg-gradient-to-b from-white/80 to-orange-50/50 shadow-xl border-white/60">
             <ProfileWidget />
           </BentoItem>
         </motion.div>
 
-        {/* Social Widget - Social media links */}
+        {/* Social Widget */}
         <motion.div className="absolute left-[50%] -translate-x-1/2 top-[58%] w-[250px]" variants={itemVariants}>
           <div className="h-[50px]">
             <SocialWidget />
           </div>
         </motion.div>
 
-        {/* Random Pick Widget - Random content recommendation */}
+        {/* Random Pick Widget */}
         <motion.div className="absolute left-[34%] top-[70%] w-[170px]" variants={itemVariants}>
           <BentoItem className="h-[100px] bg-gradient-to-br from-orange-200/80 to-rose-200/80 !text-stone-700 !border-none !p-3 shadow-md">
             <div className="flex flex-col h-full justify-between">
@@ -189,7 +291,7 @@ const HomePage: React.FC = () => {
 
         {/* ==================== RIGHT ZONE ==================== */}
 
-        {/* Auth Buttons - Login/Dashboard and Settings */}
+        {/* Auth Buttons */}
         <motion.div className="absolute right-[12%] top-[6%] flex gap-2" variants={itemVariants}>
           {user && (
             <button
@@ -231,14 +333,14 @@ const HomePage: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* Clock Widget - Current time display */}
+        {/* Clock Widget */}
         <motion.div className="absolute right-[10%] top-[14%] w-[170px]" variants={itemVariants}>
           <BentoItem className="h-[100px] !p-0 !bg-stone-100/70 !border-white/30 shadow-inner">
             <ClockWidget />
           </BentoItem>
         </motion.div>
 
-        {/* Calendar Widget - Monthly calendar view */}
+        {/* Calendar Widget */}
         <motion.div className="absolute right-[8%] top-[32%] w-[240px]" variants={itemVariants}>
           <BentoItem className="h-[260px] shadow-sm">
             <CalendarWidget />
