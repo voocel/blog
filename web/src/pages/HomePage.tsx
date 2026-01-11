@@ -1,9 +1,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import BentoItem from '../components/bento/BentoItem';
 import ProfileWidget from '../components/bento/widgets/ProfileWidget';
-import NavWidget from '../components/bento/widgets/NavWidget';
+import AnimatedNavWidget from '../components/AnimatedNavWidget';
 import ClockWidget from '../components/bento/widgets/ClockWidget';
 import CalendarWidget from '../components/bento/widgets/CalendarWidget';
 import MediaWidget from '../components/bento/widgets/MediaWidget';
@@ -13,6 +14,32 @@ import SEO from '../components/SEO';
 import { postService } from '../services/postService';
 import type { BlogPost } from '../types';
 import { useAuth } from '../context/AuthContext';
+
+// Staggered animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 100,
+      damping: 15,
+    },
+  },
+};
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -55,28 +82,23 @@ const HomePage: React.FC = () => {
       <div className="fixed top-20 right-10 w-64 h-64 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000 pointer-events-none" aria-hidden="true"></div>
       <div className="fixed -bottom-8 left-20 w-64 h-64 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000 pointer-events-none" aria-hidden="true"></div>
 
-      {/* Main Layout Container - Scattered organic positioning */}
-      <div className="relative w-full max-w-[1100px] mx-auto h-screen p-8">
+      {/* Main Layout Container - Scattered organic positioning with staggered animations */}
+      <motion.div
+        className="relative w-full max-w-[1100px] mx-auto h-screen p-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
 
         {/* ==================== LEFT ZONE ==================== */}
 
-        {/* Navigation Widget - Site navigation menu */}
-        <div className="absolute left-[10%] top-[8%] w-[280px]">
-          <BentoItem className="h-auto shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-lg" aria-hidden="true">🐱</div>
-              <div>
-                <h3 className="font-bold text-stone-800 text-sm">Voocel</h3>
-                <span className="text-[9px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-bold">开发中</span>
-              </div>
-            </div>
-            <div className="text-[9px] text-stone-400 font-bold mb-2 uppercase tracking-wider">General</div>
-            <NavWidget />
-          </BentoItem>
-        </div>
+        {/* Navigation Widget - Site navigation menu with animation */}
+        <motion.div className="absolute left-[10%] top-[8%] w-[280px]" variants={itemVariants}>
+          <AnimatedNavWidget isCompact={false} />
+        </motion.div>
 
         {/* Recent Post Widget - Latest blog post preview */}
-        <div className="absolute left-[12%] top-[62%] w-[210px]">
+        <motion.div className="absolute left-[12%] top-[62%] w-[210px]" variants={itemVariants}>
           <BentoItem className="h-[170px] hover:!bg-white cursor-pointer relative group p-0 overflow-hidden shadow-sm">
             {latestPost ? (
               <div
@@ -102,12 +124,12 @@ const HomePage: React.FC = () => {
               <div className="h-full flex items-center justify-center text-stone-300 text-xs">It's quiet here...</div>
             )}
           </BentoItem>
-        </div>
+        </motion.div>
 
         {/* ==================== CENTER ZONE ==================== */}
 
         {/* Cat Image Widget - Decorative hero image */}
-        <div className="absolute left-[50%] -translate-x-1/2 top-[4%] w-[250px]">
+        <motion.div className="absolute left-[50%] -translate-x-1/2 top-[4%] w-[250px]" variants={itemVariants}>
           <BentoItem className="h-[155px] !p-0 overflow-hidden group relative shadow-lg !rounded-[2rem]">
             <div className="absolute inset-0">
               <img src={catImage} alt="Decorative cat" className="w-full h-full object-cover object-[center_35%] transition-transform duration-700 group-hover:scale-105" />
@@ -116,24 +138,24 @@ const HomePage: React.FC = () => {
               Do not disturb
             </div>
           </BentoItem>
-        </div>
+        </motion.div>
 
         {/* Profile Widget - User greeting and introduction */}
-        <div className="absolute left-[50%] -translate-x-1/2 top-[26%] w-[280px]">
+        <motion.div className="absolute left-[50%] -translate-x-1/2 top-[26%] w-[280px]" variants={itemVariants}>
           <BentoItem className="h-[220px] flex items-center justify-center bg-gradient-to-b from-white/80 to-orange-50/50 shadow-xl border-white/60">
             <ProfileWidget />
           </BentoItem>
-        </div>
+        </motion.div>
 
         {/* Social Widget - Social media links */}
-        <div className="absolute left-[50%] -translate-x-1/2 top-[58%] w-[250px]">
+        <motion.div className="absolute left-[50%] -translate-x-1/2 top-[58%] w-[250px]" variants={itemVariants}>
           <div className="h-[50px]">
             <SocialWidget />
           </div>
-        </div>
+        </motion.div>
 
         {/* Random Pick Widget - Random content recommendation */}
-        <div className="absolute left-[34%] top-[70%] w-[170px]">
+        <motion.div className="absolute left-[34%] top-[70%] w-[170px]" variants={itemVariants}>
           <BentoItem className="h-[100px] bg-gradient-to-br from-orange-200/80 to-rose-200/80 !text-stone-700 !border-none !p-3 shadow-md">
             <div className="flex flex-col h-full justify-between">
               <span className="text-[8px] opacity-60 uppercase tracking-wider">Random Pick</span>
@@ -146,19 +168,19 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           </BentoItem>
-        </div>
+        </motion.div>
 
         {/* Music Widget - Now playing music */}
-        <div className="absolute left-[54%] top-[70%] w-[220px]">
+        <motion.div className="absolute left-[54%] top-[70%] w-[220px]" variants={itemVariants}>
           <BentoItem className="h-[60px] !bg-orange-50/60 !p-1.5 !border-none shadow-sm flex items-center">
             <MediaWidget />
           </BentoItem>
-        </div>
+        </motion.div>
 
         {/* ==================== RIGHT ZONE ==================== */}
 
         {/* Auth Buttons - Login/Dashboard and Settings */}
-        <div className="absolute right-[12%] top-[6%] flex gap-2">
+        <motion.div className="absolute right-[12%] top-[6%] flex gap-2" variants={itemVariants}>
           {user && (
             <button
               onClick={handleDashboardClick}
@@ -197,31 +219,43 @@ const HomePage: React.FC = () => {
               </svg>
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Clock Widget - Current time display */}
-        <div className="absolute right-[10%] top-[14%] w-[170px]">
+        <motion.div className="absolute right-[10%] top-[14%] w-[170px]" variants={itemVariants}>
           <BentoItem className="h-[100px] !p-0 !bg-stone-100/70 !border-white/30 shadow-inner">
             <ClockWidget />
           </BentoItem>
-        </div>
+        </motion.div>
 
         {/* Calendar Widget - Monthly calendar view */}
-        <div className="absolute right-[8%] top-[32%] w-[240px]">
+        <motion.div className="absolute right-[8%] top-[32%] w-[240px]" variants={itemVariants}>
           <BentoItem className="h-[260px] shadow-sm">
             <CalendarWidget />
           </BentoItem>
-        </div>
+        </motion.div>
 
         {/* Decorative Elements */}
-        <div className="absolute right-[20%] top-[78%] text-xl opacity-30 animate-pulse" aria-hidden="true">
+        <motion.div
+          className="absolute right-[20%] top-[78%] text-xl opacity-30"
+          aria-hidden="true"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 0.3, scale: 1 }}
+          transition={{ delay: 1.2, type: 'spring' }}
+        >
           💕
-        </div>
-        <div className="absolute left-[25%] top-[82%] text-base opacity-40" aria-hidden="true">
+        </motion.div>
+        <motion.div
+          className="absolute left-[25%] top-[82%] text-base opacity-40"
+          aria-hidden="true"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 0.4, scale: 1 }}
+          transition={{ delay: 1.4, type: 'spring' }}
+        >
           ✨
-        </div>
+        </motion.div>
 
-      </div>
+      </motion.div>
     </div>
   );
 };

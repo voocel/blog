@@ -14,6 +14,7 @@ import { ToastProvider } from './components/Toast';
 // Lazy Load Pages
 const HomePage = React.lazy(() => import('./pages/HomePage'));
 const PostPage = React.lazy(() => import('./pages/PostPage'));
+const PostsListPage = React.lazy(() => import('./pages/PostsListPage'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 const AboutPage = React.lazy(() => import('./pages/AboutPage'));
 const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
@@ -46,7 +47,7 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen text-ink font-sans selection:bg-gold-500/30 selection:text-white bg-transparent">
       <AuthModal />
 
-      {location.pathname !== '/settings' && location.pathname !== '/' && (
+      {location.pathname !== '/settings' && location.pathname !== '/' && location.pathname !== '/posts' && (
         <Header />
       )}
 
@@ -60,6 +61,7 @@ const AppContent: React.FC = () => {
       }>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/posts" element={<PostsListPage />} />
           <Route path="/post/:id" element={<PostPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/settings" element={<SettingsPage onExit={() => window.location.href = '/'} />} />
