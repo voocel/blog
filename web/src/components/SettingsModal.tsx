@@ -31,10 +31,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <button className="text-stone-400 hover:text-stone-600 text-sm font-medium" onClick={onClose}>取消</button>
-                        <button className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm font-bold shadow-red-200 shadow-md hover:bg-red-600 transition-colors">
-                            导入密钥
-                        </button>
+                        <button className="text-stone-400 hover:text-stone-600 text-sm font-medium cursor-pointer" onClick={onClose}>取消</button>
                     </div>
                 </div>
 
@@ -110,7 +107,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                                         <button className="text-xs text-red-400 hover:text-red-500 px-2 font-medium">删除</button>
                                     </div>
 
-                                    <button className="w-full py-2 border border-dashed border-stone-300 rounded-lg text-stone-400 text-sm hover:border-stone-400 hover:text-stone-500 transition-colors">
+                                    <button className="w-full py-2 border border-dashed border-stone-300 rounded-lg text-stone-400 text-sm hover:border-stone-400 hover:text-stone-500 transition-colors cursor-pointer">
                                         + 添加按钮
                                     </button>
                                 </div>

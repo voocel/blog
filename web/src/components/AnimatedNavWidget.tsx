@@ -79,12 +79,12 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                 <motion.button
                     layoutId="nav-avatar"
                     onClick={() => navigate('/')}
-                    className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-lg cursor-pointer hover:bg-orange-200 transition-colors relative z-10"
+                    className="w-10 h-10 rounded-full overflow-hidden border border-stone-200/50 relative z-10"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     aria-label="Go to homepage"
                 >
-                    🐱
+                    <img src="/images/avatar.jpg" alt="Home" className="w-full h-full object-cover" />
                 </motion.button>
 
                 {/* Navigation Icons with Sliding Indicator */}
@@ -141,16 +141,16 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
             <motion.div layoutId="nav-header" className="flex items-center gap-3 mb-4">
                 <motion.div
                     layoutId="nav-avatar"
-                    className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-xl cursor-pointer hover:bg-orange-200 transition-colors"
+                    className="w-12 h-12 rounded-full overflow-hidden border border-stone-200 cursor-pointer shadow-sm group-hover:shadow-md transition-all"
                     onClick={() => navigate('/')}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                 >
-                    🐱
+                    <img src="/images/avatar.jpg" alt="Home" className="w-full h-full object-cover" />
                 </motion.div>
                 <div>
                     <h3 className="font-bold text-stone-800 text-base">Voocel</h3>
-                    <span className="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-bold">开发中</span>
+                    <span className="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">LAB</span>
                 </div>
             </motion.div>
 

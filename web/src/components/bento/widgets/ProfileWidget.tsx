@@ -6,9 +6,9 @@ const ProfileWidget: React.FC = () => {
     // Using a soft gradient text effect
     return (
         <div className="flex flex-col items-center justify-center h-full text-center p-2">
-            <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-4 border-white shadow-sm hover:scale-105 transition-transform duration-500">
+            <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-4 border-white shadow-sm hover:scale-105 transition-transform duration-500 shrink-0 aspect-square">
                 <img
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
+                    src="/images/avatar.jpg"
                     alt="Profile"
                     className="w-full h-full object-cover"
                 />

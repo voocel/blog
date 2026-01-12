@@ -4,7 +4,6 @@ import { AuthProvider } from './context/AuthContext';
 import { BlogProvider } from './context/BlogContext';
 import { AdminProvider } from './context/AdminContext';
 import type { AdminSection } from './types';
-import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import AuthModal from './components/AuthModal';
 import AIChat from './components/AIChat';
@@ -47,9 +46,7 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen text-ink font-sans selection:bg-gold-500/30 selection:text-white bg-transparent">
       <AuthModal />
 
-      {location.pathname !== '/settings' && location.pathname !== '/' && location.pathname !== '/posts' && (
-        <Header />
-      )}
+
 
       <Suspense fallback={
         <div className="min-h-screen flex items-center justify-center bg-transparent">

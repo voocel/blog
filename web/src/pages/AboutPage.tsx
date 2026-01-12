@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { IconSparkles, IconBrain, IconMessage, IconSend } from '../components/Icons';
+import AnimatedNavWidget from '../components/AnimatedNavWidget';
 
 
 // --- Reusable Reveal Component (Same as HomePage) ---
@@ -44,12 +46,21 @@ const Reveal: React.FC<RevealProps> = ({ children, className = "", delay = 0, th
 };
 
 const AboutPage: React.FC = () => {
+    const navigate = useNavigate();
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
     return (
         <div className="min-h-screen pt-20 pb-32 bg-[#FDFBF7] text-ink">
+            <div className="fixed top-8 left-8 z-50">
+                <AnimatedNavWidget
+                    isCompact={true}
+                    disableFixed={true}
+                    showBackButton={true}
+                    onBackClick={() => navigate('/')}
+                />
+            </div>
             {/* Hero Section */}
             <section className="relative py-20 md:py-32 px-6 overflow-hidden">
                 <div className="max-w-4xl mx-auto text-center relative z-10">

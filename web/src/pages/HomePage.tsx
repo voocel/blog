@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import BentoItem from '../components/bento/BentoItem';
-import ProfileWidget from '../components/bento/widgets/ProfileWidget';
+import QuoteWidget from '../components/bento/widgets/QuoteWidget';
 import AnimatedNavWidget from '../components/AnimatedNavWidget';
 import ClockWidget from '../components/bento/widgets/ClockWidget';
 import CalendarWidget from '../components/bento/widgets/CalendarWidget';
@@ -117,7 +117,7 @@ const HomePage: React.FC = () => {
         {/* Profile */}
         <motion.div variants={itemVariants}>
           <BentoItem className="py-8 flex items-center justify-center bg-gradient-to-b from-white/80 to-orange-50/50 shadow-xl border-white/60">
-            <ProfileWidget />
+            <QuoteWidget />
           </BentoItem>
         </motion.div>
 
@@ -126,34 +126,42 @@ const HomePage: React.FC = () => {
           <SocialWidget />
         </motion.div>
 
-        {/* Latest Post */}
+        {/* Latest Post - Mobile Redesigned */}
         <motion.div variants={itemVariants}>
-          <BentoItem className="h-[140px] hover:!bg-white cursor-pointer relative group p-0 overflow-hidden shadow-sm">
+          <BentoItem className="h-auto !bg-[#FFFBF0] hover:!bg-[#FFFBF0] cursor-pointer relative group !p-4 overflow-hidden shadow-sm border border-orange-100/30">
             {latestPost ? (
               <div
                 onClick={() => navigate(`/post/${latestPost.id}`)}
-                className="h-full flex"
+                className="flex flex-col gap-3"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${latestPost.id}`)}
               >
-                <div className="w-32 h-full bg-stone-100 shrink-0">
-                  <img src={latestPost.cover} className="w-full h-full object-cover" alt={latestPost.title} />
-                </div>
-                <div className="p-3 flex-1 flex flex-col justify-center">
-                  <div className="text-[9px] text-stone-400 mb-1">最新文章</div>
-                  <h4 className="font-bold text-stone-700 text-sm leading-tight mb-1 line-clamp-2">{latestPost.title}</h4>
-                  <div className="text-[10px] text-stone-400">{new Date(latestPost.publishAt).toLocaleDateString()}</div>
+                {/* Header */}
+                <div className="text-sm font-bold text-stone-500 tracking-wide">最新文章</div>
+
+                <div className="flex gap-4 items-start">
+                  {/* Small Image */}
+                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 shadow-sm border border-white/50">
+                    <img src={latestPost.cover} className="w-full h-full object-cover" alt={latestPost.title} />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0 flex flex-col gap-1">
+                    <h4 className="font-bold text-stone-700 text-sm leading-snug line-clamp-2">{latestPost.title}</h4>
+                    <p className="text-xs text-stone-500 line-clamp-1">{latestPost.excerpt || "点击阅读更多内容..."}</p>
+                    <div className="text-[10px] text-stone-400 mt-1">{new Date(latestPost.publishAt).toLocaleDateString()}</div>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="h-full flex items-center justify-center text-stone-300 text-xs">It's quiet here...</div>
+              <div className="h-24 flex items-center justify-center text-stone-300 text-xs">It's quiet here...</div>
             )}
           </BentoItem>
         </motion.div>
 
         {/* Music + Like */}
-        <motion.div className="flex items-center gap-3" variants={itemVariants}>
+        <motion.div className="flex items-center gap-8" variants={itemVariants}>
           <BentoItem className="h-[60px] flex-1 !bg-orange-50/60 !p-1.5 !border-none shadow-sm flex items-center">
             <MediaWidget />
           </BentoItem>
@@ -168,7 +176,7 @@ const HomePage: React.FC = () => {
           {user && (
             <button
               onClick={handleDashboardClick}
-              className="bg-red-400 text-white px-4 py-2 rounded-xl shadow-red-200 shadow-md font-bold text-sm"
+              className="bg-red-400 text-white px-4 py-2 rounded-xl shadow-red-200 shadow-md font-bold text-sm cursor-pointer"
             >
               Dashboard
             </button>
@@ -176,7 +184,7 @@ const HomePage: React.FC = () => {
           {!user && (
             <button
               onClick={handleLoginClick}
-              className="bg-white/70 text-stone-500 px-4 py-2 rounded-xl shadow-sm font-bold text-sm"
+              className="bg-white/70 text-stone-500 px-4 py-2 rounded-xl shadow-sm font-bold text-sm cursor-pointer"
             >
               Sign In
             </button>
@@ -205,31 +213,37 @@ const HomePage: React.FC = () => {
           <AnimatedNavWidget isCompact={false} />
         </motion.div>
 
-        {/* Recent Post Widget */}
-        <motion.div className="absolute left-[12%] top-[62%] w-[210px]" variants={itemVariants}>
-          <BentoItem className="h-[170px] hover:!bg-white cursor-pointer relative group p-0 overflow-hidden shadow-sm">
+        {/* Recent Post Widget - Redesigned */}
+        <motion.div className="absolute left-[12%] top-[62%] w-[220px]" variants={itemVariants}>
+          <BentoItem className="h-auto !bg-[#FFFBF0] hover:!bg-[#FFFBF0] cursor-pointer relative group !p-5 overflow-hidden shadow-sm border border-orange-100/30 !rounded-[1.5rem]">
             {latestPost ? (
               <div
                 onClick={() => navigate(`/post/${latestPost.id}`)}
-                className="h-full flex flex-col"
+                className="flex flex-col gap-4"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${latestPost.id}`)}
                 aria-label={`Read article: ${latestPost.title}`}
               >
-                <div className="h-20 w-full bg-stone-100 relative">
-                  <img src={latestPost.cover} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" alt={latestPost.title} />
-                  <div className="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-0.5 rounded text-[9px] font-bold text-stone-600">
-                    最新文章
+                {/* Header */}
+                <div className="text-sm font-bold text-stone-500 tracking-wide">最新文章</div>
+
+                <div className="flex gap-4">
+                  {/* Image */}
+                  <div className="w-14 h-14 rounded-[0.8rem] overflow-hidden shrink-0 shadow-sm border border-white/50 bg-stone-100">
+                    <img src={latestPost.cover} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={latestPost.title} />
                   </div>
-                </div>
-                <div className="p-2.5 bg-white/50 backdrop-blur-sm flex-1">
-                  <h4 className="font-bold text-stone-700 text-xs leading-tight mb-1 line-clamp-2">{latestPost.title}</h4>
-                  <div className="text-[9px] text-stone-400">{new Date(latestPost.publishAt).toLocaleDateString()}</div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+                    <h4 className="font-bold text-stone-700 text-[13px] leading-snug line-clamp-2 group-hover:text-orange-600 transition-colors">{latestPost.title}</h4>
+                    <p className="text-[10px] text-stone-500 line-clamp-1 opacity-80">{latestPost.excerpt || "点击阅读..."}</p>
+                    <div className="text-[10px] text-stone-400 font-mono">{new Date(latestPost.publishAt).toLocaleDateString()}</div>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="h-full flex items-center justify-center text-stone-300 text-xs">It's quiet here...</div>
+              <div className="h-24 flex items-center justify-center text-stone-300 text-xs">It's quiet here...</div>
             )}
           </BentoItem>
         </motion.div>
@@ -251,7 +265,7 @@ const HomePage: React.FC = () => {
         {/* Profile Widget */}
         <motion.div className="absolute left-[50%] -translate-x-1/2 top-[26%] w-[280px]" variants={itemVariants}>
           <BentoItem className="h-[220px] flex items-center justify-center bg-gradient-to-b from-white/80 to-orange-50/50 shadow-xl border-white/60">
-            <ProfileWidget />
+            <QuoteWidget />
           </BentoItem>
         </motion.div>
 
@@ -279,7 +293,7 @@ const HomePage: React.FC = () => {
         </motion.div>
 
         {/* Music Widget with Like Button */}
-        <motion.div className="absolute left-[54%] top-[70%] flex items-center gap-3" variants={itemVariants}>
+        <motion.div className="absolute left-[54%] top-[70%] flex items-center gap-8" variants={itemVariants}>
           <BentoItem className="h-[60px] w-[220px] !bg-orange-50/60 !p-1.5 !border-none shadow-sm flex items-center">
             <MediaWidget />
           </BentoItem>
@@ -292,11 +306,11 @@ const HomePage: React.FC = () => {
         {/* ==================== RIGHT ZONE ==================== */}
 
         {/* Auth Buttons */}
-        <motion.div className="absolute right-[12%] top-[6%] flex gap-2" variants={itemVariants}>
+        <motion.div className="absolute right-[14%] top-[6%] flex gap-2" variants={itemVariants}>
           {user && (
             <button
               onClick={handleDashboardClick}
-              className="bg-red-400 text-white px-4 py-2 rounded-xl shadow-red-200 shadow-md font-bold text-sm hover:bg-red-500 transition-colors"
+              className="bg-red-400 text-white px-4 py-2 rounded-xl shadow-red-200 shadow-md font-bold text-sm hover:bg-red-500 transition-colors cursor-pointer"
               aria-label="Go to dashboard"
             >
               Dashboard
@@ -307,7 +321,7 @@ const HomePage: React.FC = () => {
             {!user && (
               <button
                 onClick={handleLoginClick}
-                className="text-[10px] text-stone-400 font-bold px-1.5 hover:text-stone-600 transition-colors"
+                className="text-[10px] text-stone-400 font-bold px-1.5 hover:text-stone-600 transition-colors cursor-pointer"
                 aria-label="Sign in to your account"
               >
                 SIGN IN
@@ -315,7 +329,7 @@ const HomePage: React.FC = () => {
             )}
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="w-7 h-7 rounded-lg hover:bg-stone-200/50 flex items-center justify-center text-stone-400 transition-colors"
+              className="w-7 h-7 rounded-lg hover:bg-stone-200/50 flex items-center justify-center text-stone-400 transition-colors cursor-pointer"
               aria-label="Open settings menu"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
