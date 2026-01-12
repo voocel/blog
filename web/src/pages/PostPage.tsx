@@ -59,10 +59,9 @@ const PostPage: React.FC = () => {
 
     return (
         <>
-            <PostDetail post={post} onBack={() => navigate('/')} />
-            <div className="bg-[#FDFBF7] pb-24 px-4">
+            <PostDetail post={post}>
                 <CommentSection postId={post.id} />
-            </div>
+            </PostDetail>
         </>
     );
 };

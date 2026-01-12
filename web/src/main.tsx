@@ -59,7 +59,7 @@ const AppContent: React.FC = () => {
           </div>
         </div>
       }>
-        <Routes>
+        <Routes location={location} key={location.pathname}>
           <Route path="/" element={<HomePage />} />
           <Route path="/posts" element={<PostsListPage />} />
           <Route path="/post/:id" element={<PostPage />} />

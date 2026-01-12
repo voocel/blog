@@ -142,16 +142,12 @@ const PostsListPage: React.FC = () => {
         <div className="min-h-screen w-full bg-[#fdfaf6] bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-orange-100/40 via-rose-100/20 to-transparent">
             <SEO title="Posts - Voocel Blog" />
 
-            {/* Animated Navigation - Compact mode */}
-            <AnimatedNavWidget isCompact={true} />
-
-            {/* Edit Button - Top Right */}
-            <button
-                className="fixed top-6 right-6 z-50 bg-white/60 backdrop-blur-xl rounded-xl px-4 py-2 text-sm text-stone-500 hover:bg-white hover:text-orange-500 cursor-pointer transition-colors shadow-sm border border-white/50"
-                aria-label="Edit mode"
-            >
-                编辑
-            </button>
+            {/* Back Button and Nav */}
+            {/* Back Button and Nav */}
+            <div className="fixed top-6 left-6 z-50 flex items-center gap-4">
+                {/* Animated Navigation - Compact mode with Embedded Back Button */}
+                <AnimatedNavWidget isCompact={true} disableFixed={true} showBackButton={true} onBackClick={() => navigate('/')} />
+            </div>
 
             {/* Background Decorations */}
             <div className="fixed top-20 left-10 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob pointer-events-none" aria-hidden="true"></div>
