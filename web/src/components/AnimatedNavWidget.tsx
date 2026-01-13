@@ -29,6 +29,7 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
     const navigate = useNavigate();
     const location = useLocation();
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const [lastHoveredIndex, setLastHoveredIndex] = useState<number>(0);
 
     const isActive = (path: string) => location.pathname === path;
     const activeIndex = navItems.findIndex(item => isActive(item.path));
@@ -37,8 +38,11 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
         navigate(path);
     };
 
-    // Get the indicator position (hover takes priority, then active, then first item)
-    const indicatorIndex = hoveredIndex !== null ? hoveredIndex : (activeIndex >= 0 ? activeIndex : 0);
+    // Get the indicator position (hover takes priority, then active, then last hovered)
+    // On homepage (activeIndex = -1), use lastHoveredIndex instead of defaulting to 0
+    const indicatorIndex = hoveredIndex !== null
+        ? hoveredIndex
+        : (activeIndex >= 0 ? activeIndex : lastHoveredIndex);
 
     // Compact horizontal layout
     if (isCompact) {
@@ -108,7 +112,10 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                             key={item.path}
                             layoutId={`nav-item-${index}`}
                             onClick={() => handleNavClick(item.path)}
-                            onMouseEnter={() => setHoveredIndex(index)}
+                            onMouseEnter={() => {
+                                setHoveredIndex(index);
+                                setLastHoveredIndex(index);
+                            }}
                             onMouseLeave={() => setHoveredIndex(null)}
                             className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg cursor-pointer transition-colors duration-200 relative z-10 ${isActive(item.path)
                                 ? 'text-orange-500'
@@ -186,7 +193,10 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                         key={item.path}
                         layoutId={`nav-item-${index}`}
                         onClick={() => handleNavClick(item.path)}
-                        onMouseEnter={() => setHoveredIndex(index)}
+                        onMouseEnter={() => {
+                            setHoveredIndex(index);
+                            setLastHoveredIndex(index);
+                        }}
                         onMouseLeave={() => setHoveredIndex(null)}
                         className="w-full h-12 text-left px-4 rounded-xl flex items-center gap-4 cursor-pointer transition-colors duration-200 relative z-10 group"
                         whileTap={{ scale: 0.98 }}
