@@ -4,6 +4,7 @@ import (
 	"blog/internal/entity"
 	"blog/pkg/geoip"
 	"blog/pkg/log"
+	"blog/pkg/util"
 	"context"
 	"fmt"
 	"math"
@@ -103,14 +104,21 @@ func (uc *PostUseCase) GetByIDWithAnalytics(ctx context.Context, id, ip, userAge
 	}
 
 	// Increment views (async with timeout)
-	go func() {
+	util.SafeGo(func() {
 		bgCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
-		uc.postRepo.IncrementViews(bgCtx, id)
-	}()
+		if err := uc.postRepo.IncrementViews(bgCtx, id); err != nil {
+			log.Warnw("Failed to increment views",
+				log.Pair("post_id", id),
+				log.Pair("error", err.Error()),
+			)
+		}
+	})
 
 	// Log visit (async)
-	go uc.logVisit(id, post.Title, ip, userAgent)
+	util.SafeGo(func() {
+		uc.logVisit(id, post.Title, ip, userAgent)
+	})
 
 	return uc.assemblePostResponse(ctx, post)
 }
@@ -124,7 +132,7 @@ func (uc *PostUseCase) logVisit(postID, postTitle, ip, userAgent string) {
 	location := geoip.Lookup(ip)
 
 	pID := postID
-	log := &entity.Analytics{
+	analyticsLog := &entity.Analytics{
 		PagePath:  "/post/" + postID,
 		PostID:    &pID,
 		PostTitle: postTitle,
@@ -136,7 +144,12 @@ func (uc *PostUseCase) logVisit(postID, postTitle, ip, userAgent string) {
 
 	bgCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	_ = uc.analyticsRepo.Create(bgCtx, log)
+	if err := uc.analyticsRepo.Create(bgCtx, analyticsLog); err != nil {
+		log.Warnw("Failed to create post visit analytics",
+			log.Pair("post_id", postID),
+			log.Pair("error", err.Error()),
+		)
+	}
 }
 
 // LogHomeVisit records a homepage visit to analytics
@@ -147,7 +160,7 @@ func (uc *PostUseCase) LogHomeVisit(ip, userAgent string) {
 
 	location := geoip.Lookup(ip)
 
-	log := &entity.Analytics{
+	analyticsLog := &entity.Analytics{
 		PagePath:  "/",
 		IP:        ip,
 		Location:  location,
@@ -157,7 +170,11 @@ func (uc *PostUseCase) LogHomeVisit(ip, userAgent string) {
 
 	bgCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	_ = uc.analyticsRepo.Create(bgCtx, log)
+	if err := uc.analyticsRepo.Create(bgCtx, analyticsLog); err != nil {
+		log.Warnw("Failed to create home visit analytics",
+			log.Pair("error", err.Error()),
+		)
+	}
 }
 
 func (uc *PostUseCase) List(ctx context.Context, filters map[string]interface{}, page, limit int) (interface{}, error) {
