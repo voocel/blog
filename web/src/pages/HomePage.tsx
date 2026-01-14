@@ -48,10 +48,11 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { user, setAuthModalOpen } = useAuth();
   const [latestPost, setLatestPost] = useState<BlogPost | null>(null);
+  const [randomPost, setRandomPost] = useState<BlogPost | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [homepageLikes, setHomepageLikes] = useState(0);
 
-  // Fetch latest post and homepage likes on mount
+  // Fetch latest post, random post and homepage likes on mount
   useEffect(() => {
     postService.getPosts({ page: 1, limit: 1 })
       .then(res => {
@@ -61,6 +62,19 @@ const HomePage: React.FC = () => {
       })
       .catch(err => {
         console.error('Failed to fetch latest post:', err);
+      });
+
+    // Fetch posts for random selection (get more posts to pick from)
+    postService.getPosts({ page: 1, limit: 20 })
+      .then(res => {
+        if (res.data.length > 0) {
+          // Pick a random post from the list
+          const randomIndex = Math.floor(Math.random() * res.data.length);
+          setRandomPost(res.data[randomIndex]);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch random post:', err);
       });
 
     postService.getLikes('home')
@@ -276,24 +290,43 @@ const HomePage: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* Random Pick Widget */}
-        <motion.div className="absolute left-[34%] top-[70%] w-[170px]" variants={itemVariants}>
-          <BentoItem className="h-[100px] bg-gradient-to-br from-orange-200/80 to-rose-200/80 !text-stone-700 !border-none !p-3 shadow-md">
-            <div className="flex flex-col h-full justify-between">
-              <span className="text-[8px] opacity-60 uppercase tracking-wider">Random Pick</span>
-              <div className="flex items-center gap-2">
-                <div className="text-xl" aria-hidden="true">🌤️</div>
-                <div>
-                  <div className="font-bold text-xs leading-tight">Summer</div>
-                  <div className="text-[8px] opacity-60">Afternoon</div>
+        {/* Random Pick Widget - Same design as Latest Post */}
+        <motion.div className="absolute left-[34%] top-[70%] w-[220px]" variants={itemVariants}>
+          <BentoItem className="h-auto !bg-[#FFF5F0] hover:!bg-[#FFF5F0] cursor-pointer relative group !p-5 overflow-hidden shadow-sm border border-rose-100/30 !rounded-[1.5rem]">
+            {randomPost ? (
+              <div
+                onClick={() => navigate(`/post/${randomPost.id}`)}
+                className="flex flex-col gap-4"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${randomPost.id}`)}
+                aria-label={`Read article: ${randomPost.title}`}
+              >
+                {/* Header */}
+                <div className="text-sm font-bold text-rose-400 tracking-wide">随机推荐</div>
+
+                <div className="flex gap-4">
+                  {/* Image */}
+                  <div className="w-14 h-14 rounded-[0.8rem] overflow-hidden shrink-0 shadow-sm border border-white/50 bg-stone-100">
+                    <img src={randomPost.cover} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={randomPost.title} />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+                    <h4 className="font-bold text-stone-700 text-[13px] leading-snug line-clamp-2 group-hover:text-rose-500 transition-colors">{randomPost.title}</h4>
+                    <p className="text-[10px] text-stone-500 line-clamp-1 opacity-80">{randomPost.excerpt || "点击阅读..."}</p>
+                    <div className="text-[10px] text-stone-400 font-mono">{new Date(randomPost.publishAt).toLocaleDateString()}</div>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="h-24 flex items-center justify-center text-stone-300 text-xs">暂无推荐...</div>
+            )}
           </BentoItem>
         </motion.div>
 
         {/* Music Widget with Like Button */}
-        <motion.div className="absolute left-[54%] top-[70%] flex items-center gap-8" variants={itemVariants}>
+        <motion.div className="absolute left-[60%] top-[70%] flex items-center gap-8" variants={itemVariants}>
           <BentoItem className="h-[60px] w-[220px] !bg-orange-50/60 !p-1.5 !border-none shadow-sm flex items-center">
             <MediaWidget />
           </BentoItem>
