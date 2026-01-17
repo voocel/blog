@@ -325,11 +325,15 @@ const HomePage: React.FC = () => {
           </BentoItem>
         </motion.div>
 
-        {/* Music Widget with Like Button */}
-        <motion.div className="absolute left-[60%] top-[70%] flex items-center gap-8" variants={itemVariants}>
+        {/* Music Widget */}
+        <motion.div className="absolute left-[60%] top-[73%]" variants={itemVariants}>
           <BentoItem className="h-[60px] w-[220px] !bg-orange-50/60 !p-1.5 !border-none shadow-sm flex items-center">
             <MediaWidget />
           </BentoItem>
+        </motion.div>
+
+        {/* Like Button */}
+        <motion.div className="absolute left-[82%] top-[70%]" variants={itemVariants}>
           <LikeButton
             initialCount={homepageLikes}
             onLike={async () => { await postService.like('home'); }}
