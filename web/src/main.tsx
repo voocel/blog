@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'r
 import { AuthProvider } from './context/AuthContext';
 import { BlogProvider } from './context/BlogContext';
 import { AdminProvider } from './context/AdminContext';
+import { SettingsProvider } from './context/SettingsContext';
 import type { AdminSection } from './types';
 import Sidebar from './components/Sidebar';
 import AuthModal from './components/AuthModal';
@@ -76,17 +77,19 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <ToastProvider>
-      <AuthProvider>
-        <BlogProvider>
-          <AdminProvider>
-            <Router>
-              <ErrorBoundary>
-                <AppContent />
-              </ErrorBoundary>
-            </Router>
-          </AdminProvider>
-        </BlogProvider>
-      </AuthProvider>
+      <SettingsProvider>
+        <AuthProvider>
+          <BlogProvider>
+            <AdminProvider>
+              <Router>
+                <ErrorBoundary>
+                  <AppContent />
+                </ErrorBoundary>
+              </Router>
+            </AdminProvider>
+          </BlogProvider>
+        </AuthProvider>
+      </SettingsProvider>
     </ToastProvider>
   );
 };

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { PLAYER_CONFIG } from '../config/musicConfig';
+import { useSettings } from '../context/SettingsContext';
 
 export interface Song {
   id: string;
@@ -31,11 +31,12 @@ export interface UseAudioPlayerReturn {
 }
 
 export const useAudioPlayer = (playlist: Song[] = []): UseAudioPlayerReturn => {
+  const { settings } = useSettings();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolumeState] = useState(PLAYER_CONFIG.defaultVolume);
+  const [volume, setVolumeState] = useState(settings.music.defaultVolume);
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,10 +96,10 @@ export const useAudioPlayer = (playlist: Song[] = []): UseAudioPlayerReturn => {
     const handleEnded = () => {
       setIsPlaying(false);
       // Auto play next song if enabled
-      if (PLAYER_CONFIG.autoPlayNext && playlist.length > 1) {
+      if (settings.music.autoPlayNext && playlist.length > 1) {
         const nextIndex = (currentSongIndex + 1) % playlist.length;
         // If loop is disabled and we're at the end, don't play
-        if (!PLAYER_CONFIG.loop && nextIndex === 0) {
+        if (!settings.music.loop && nextIndex === 0) {
           return;
         }
         setCurrentSongIndex(nextIndex);

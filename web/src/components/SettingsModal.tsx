@@ -1,6 +1,6 @@
-
 import React, { useState } from 'react';
-import { IconGithub, IconMail } from './Icons';
+import { useSettings } from '../context/SettingsContext';
+import { ThemeMode } from '../config/settings';
 
 interface SettingsModalProps {
     isOpen: boolean;
@@ -10,111 +10,206 @@ interface SettingsModalProps {
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
-    const [activeTab, setActiveTab] = useState('site');
+    const { settings, updateTheme, updateAnimations, updateMusicSettings, resetSettings } = useSettings();
+    const [activeTab, setActiveTab] = useState<'appearance' | 'music'>('appearance');
+    const [showSaveToast, setShowSaveToast] = useState(false);
+
+    const handleSave = () => {
+        setShowSaveToast(true);
+        setTimeout(() => setShowSaveToast(false), 2000);
+    };
+
+    const handleReset = () => {
+        if (confirm('Reset all settings to default?')) {
+            resetSettings();
+            setShowSaveToast(true);
+            setTimeout(() => setShowSaveToast(false), 2000);
+        }
+    };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm">
-            <div className="bg-[#fdfaf6] w-full max-w-4xl h-[80vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-fade-in-up">
+            <div className="bg-[#fdfaf6] w-full max-w-2xl max-h-[85vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-fade-in-up">
 
                 {/* Header */}
                 <div className="px-8 py-6 border-b border-stone-100 flex items-center justify-between bg-white/50 backdrop-blur-md">
                     <div className="flex gap-8 text-sm font-bold text-stone-400">
                         <button
-                            onClick={() => setActiveTab('site')}
-                            className={`${activeTab === 'site' ? 'text-red-500 relative after:absolute after:-bottom-6 after:left-0 after:w-full after:h-0.5 after:bg-red-500' : 'hover:text-stone-600'} transition-colors`}
+                            onClick={() => setActiveTab('appearance')}
+                            className={`${activeTab === 'appearance' ? 'text-red-500 relative after:absolute after:-bottom-6 after:left-0 after:w-full after:h-0.5 after:bg-red-500' : 'hover:text-stone-600'} transition-colors cursor-pointer`}
                         >
-                            网站设置
+                            Appearance
                         </button>
-                        <button className="hover:text-stone-600 cursor-not-allowed opacity-50">色彩配置</button>
-                        <button className="hover:text-stone-600 cursor-not-allowed opacity-50">首页布局</button>
-                        <button className="hover:text-stone-600 cursor-not-allowed opacity-50">预览</button>
+                        <button
+                            onClick={() => setActiveTab('music')}
+                            className={`${activeTab === 'music' ? 'text-red-500 relative after:absolute after:-bottom-6 after:left-0 after:w-full after:h-0.5 after:bg-red-500' : 'hover:text-stone-600'} transition-colors cursor-pointer`}
+                        >
+                            Music Player
+                        </button>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <button className="text-stone-400 hover:text-stone-600 text-sm font-medium cursor-pointer" onClick={onClose}>取消</button>
+                        <button
+                            className="text-stone-400 hover:text-stone-600 text-sm font-medium cursor-pointer"
+                            onClick={onClose}
+                        >
+                            Close
+                        </button>
                     </div>
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto p-8 bg-stone-50/30">
-                    <div className="grid grid-cols-2 gap-12 max-w-4xl mx-auto">
-                        {/* Left Column */}
-                        <div className="space-y-8">
+                    {activeTab === 'appearance' && (
+                        <div className="max-w-xl mx-auto space-y-8">
+                            {/* Theme Mode */}
                             <div>
-                                <h3 className="text-xs font-bold text-stone-400 mb-4">Favicon</h3>
-                                <div className="w-20 h-20 bg-stone-100 rounded-2xl flex items-center justify-center border-2 border-dashed border-stone-200 cursor-pointer hover:border-red-300 hover:bg-red-50 transition-colors">
-                                    <span className="text-2xl">🍬</span>
+                                <h3 className="text-sm font-bold text-stone-700 mb-4">Theme Mode</h3>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {(['light', 'dark', 'auto'] as ThemeMode[]).map((theme) => (
+                                        <button
+                                            key={theme}
+                                            onClick={() => updateTheme(theme)}
+                                            className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                                                settings.appearance.theme === theme
+                                                    ? 'border-red-400 bg-red-50'
+                                                    : 'border-stone-200 bg-white hover:border-stone-300'
+                                            }`}
+                                        >
+                                            <div className="text-2xl mb-2">
+                                                {theme === 'light' && '☀️'}
+                                                {theme === 'dark' && '🌙'}
+                                                {theme === 'auto' && '🌓'}
+                                            </div>
+                                            <div className="text-sm font-medium text-stone-700 capitalize">
+                                                {theme}
+                                            </div>
+                                        </button>
+                                    ))}
                                 </div>
+                                <p className="text-xs text-stone-500 mt-2">
+                                    {settings.appearance.theme === 'auto'
+                                        ? 'Theme follows your system preference'
+                                        : `Using ${settings.appearance.theme} theme`}
+                                </p>
                             </div>
 
+                            {/* Animations */}
                             <div>
-                                <h3 className="text-xs font-bold text-stone-400 mb-3">站点标题</h3>
-                                <input type="text" defaultValue="YYsuni" className="w-full bg-stone-200/50 border-none rounded-lg px-4 py-3 text-stone-700 font-medium focus:ring-2 focus:ring-red-200 outline-none" />
-                            </div>
-
-                            <div>
-                                <h3 className="text-xs font-bold text-stone-400 mb-3">站点描述</h3>
-                                <textarea
-                                    defaultValue="YYsuni 的个人博客，记录前端开发、探索、笔记。"
-                                    className="w-full bg-stone-200/50 border-none rounded-lg px-4 py-3 text-stone-700 font-medium h-32 resize-none focus:ring-2 focus:ring-red-200 outline-none"
-                                />
-                            </div>
-
-                            <div>
-                                <h3 className="text-xs font-bold text-stone-400 mb-3">备案信息</h3>
-                                <div className="flex gap-4">
-                                    <input type="text" placeholder="备案号" className="flex-1 bg-stone-200/50 border-none rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-red-200 outline-none" />
-                                    <input type="text" placeholder="备案链接" className="flex-1 bg-stone-200/50 border-none rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-red-200 outline-none" />
-                                </div>
+                                <h3 className="text-sm font-bold text-stone-700 mb-4">Animations</h3>
+                                <label className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-stone-200 cursor-pointer hover:border-stone-300 transition-colors">
+                                    <div>
+                                        <div className="text-sm font-medium text-stone-700">Enable Animations</div>
+                                        <div className="text-xs text-stone-500 mt-1">Page transitions and effects</div>
+                                    </div>
+                                    <input
+                                        type="checkbox"
+                                        checked={settings.appearance.enableAnimations}
+                                        onChange={(e) => updateAnimations(e.target.checked)}
+                                        className="w-5 h-5 text-red-500 rounded focus:ring-2 focus:ring-red-200"
+                                    />
+                                </label>
                             </div>
                         </div>
+                    )}
 
-                        {/* Right Column */}
-                        <div className="space-y-8">
+                    {activeTab === 'music' && (
+                        <div className="max-w-xl mx-auto space-y-8">
+                            {/* Show Player */}
                             <div>
-                                <h3 className="text-xs font-bold text-stone-400 mb-4">Avatar</h3>
-                                <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-sm">
-                                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" className="w-full h-full object-cover" />
+                                <h3 className="text-sm font-bold text-stone-700 mb-4">Display</h3>
+                                <label className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-stone-200 cursor-pointer hover:border-stone-300 transition-colors">
+                                    <div>
+                                        <div className="text-sm font-medium text-stone-700">Show Music Player</div>
+                                        <div className="text-xs text-stone-500 mt-1">Display player on homepage</div>
+                                    </div>
+                                    <input
+                                        type="checkbox"
+                                        checked={settings.music.showPlayer}
+                                        onChange={(e) => updateMusicSettings({ showPlayer: e.target.checked })}
+                                        className="w-5 h-5 text-red-500 rounded focus:ring-2 focus:ring-red-200"
+                                    />
+                                </label>
+                            </div>
+
+                            {/* Volume */}
+                            <div>
+                                <h3 className="text-sm font-bold text-stone-700 mb-4">Default Volume</h3>
+                                <div className="p-4 bg-white rounded-xl border-2 border-stone-200">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <span className="text-sm text-stone-600">Volume</span>
+                                        <span className="text-sm font-bold text-red-500">
+                                            {Math.round(settings.music.defaultVolume * 100)}%
+                                        </span>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="100"
+                                        value={settings.music.defaultVolume * 100}
+                                        onChange={(e) => updateMusicSettings({ defaultVolume: Number(e.target.value) / 100 })}
+                                        className="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-red-500"
+                                    />
                                 </div>
                             </div>
 
+                            {/* Playback Options */}
                             <div>
-                                <h3 className="text-xs font-bold text-stone-400 mb-3">用户名</h3>
-                                <input type="text" defaultValue="Suni" className="w-full bg-stone-200/50 border-none rounded-lg px-4 py-3 text-stone-700 font-medium focus:ring-2 focus:ring-red-200 outline-none" />
-                            </div>
-
-                            <div>
-                                <h3 className="text-xs font-bold text-stone-400 mb-3">社交按钮</h3>
+                                <h3 className="text-sm font-bold text-stone-700 mb-4">Playback</h3>
                                 <div className="space-y-3">
-                                    {/* Mail */}
-                                    <div className="flex items-center gap-2 bg-stone-200/50 p-2 rounded-lg">
-                                        <div className="w-8 h-8 bg-white rounded flex items-center justify-center text-stone-400"><IconMail className="w-4 h-4" /></div>
-                                        <input type="text" defaultValue="yysuni1001@gmail.com" className="flex-1 bg-transparent border-none text-sm text-stone-600 focus:outline-none" />
-                                        <button className="text-xs text-red-400 hover:text-red-500 px-2 font-medium">删除</button>
-                                    </div>
+                                    <label className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-stone-200 cursor-pointer hover:border-stone-300 transition-colors">
+                                        <div>
+                                            <div className="text-sm font-medium text-stone-700">Auto Play Next</div>
+                                            <div className="text-xs text-stone-500 mt-1">Automatically play next song</div>
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            checked={settings.music.autoPlayNext}
+                                            onChange={(e) => updateMusicSettings({ autoPlayNext: e.target.checked })}
+                                            className="w-5 h-5 text-red-500 rounded focus:ring-2 focus:ring-red-200"
+                                        />
+                                    </label>
 
-                                    {/* Juejin/Twitter */}
-                                    <div className="flex items-center gap-2 bg-stone-200/50 p-2 rounded-lg">
-                                        <div className="w-8 h-8 bg-white rounded flex items-center justify-center text-stone-400"><span className="text-xs font-bold">X</span></div>
-                                        <input type="text" defaultValue="https://twitter.com/voocel" className="flex-1 bg-transparent border-none text-sm text-stone-600 focus:outline-none" />
-                                        <button className="text-xs text-red-400 hover:text-red-500 px-2 font-medium">删除</button>
-                                    </div>
-
-                                    {/* Github */}
-                                    <div className="flex items-center gap-2 bg-stone-200/50 p-2 rounded-lg">
-                                        <div className="w-8 h-8 bg-white rounded flex items-center justify-center text-stone-400"><IconGithub className="w-4 h-4" /></div>
-                                        <input type="text" defaultValue="https://github.com/voocel" className="flex-1 bg-transparent border-none text-sm text-stone-600 focus:outline-none" />
-                                        <button className="text-xs text-red-400 hover:text-red-500 px-2 font-medium">删除</button>
-                                    </div>
-
-                                    <button className="w-full py-2 border border-dashed border-stone-300 rounded-lg text-stone-400 text-sm hover:border-stone-400 hover:text-stone-500 transition-colors cursor-pointer">
-                                        + 添加按钮
-                                    </button>
+                                    <label className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-stone-200 cursor-pointer hover:border-stone-300 transition-colors">
+                                        <div>
+                                            <div className="text-sm font-medium text-stone-700">Loop Playlist</div>
+                                            <div className="text-xs text-stone-500 mt-1">Repeat playlist when finished</div>
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            checked={settings.music.loop}
+                                            onChange={(e) => updateMusicSettings({ loop: e.target.checked })}
+                                            className="w-5 h-5 text-red-500 rounded focus:ring-2 focus:ring-red-200"
+                                        />
+                                    </label>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
+
+                {/* Footer */}
+                <div className="px-8 py-4 border-t border-stone-100 bg-white/50 backdrop-blur-md flex items-center justify-between">
+                    <button
+                        onClick={handleReset}
+                        className="text-sm text-stone-500 hover:text-red-500 font-medium transition-colors cursor-pointer"
+                    >
+                        Reset to Default
+                    </button>
+                    <button
+                        onClick={handleSave}
+                        className="px-6 py-2 bg-red-500 text-white rounded-xl font-medium text-sm hover:bg-red-600 transition-colors shadow-sm cursor-pointer"
+                    >
+                        Save Changes
+                    </button>
+                </div>
+
+                {/* Save Toast */}
+                {showSaveToast && (
+                    <div className="absolute top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-fade-in-up">
+                        ✓ Settings saved!
+                    </div>
+                )}
             </div>
         </div>
     );

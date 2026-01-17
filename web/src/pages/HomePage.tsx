@@ -15,6 +15,7 @@ import SEO from '../components/SEO';
 import { postService } from '../services/postService';
 import type { BlogPost } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { useSettings } from '../context/SettingsContext';
 
 // Staggered animation variants
 const containerVariants = {
@@ -47,6 +48,7 @@ const catImage = "/images/cute_cat.png";
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { user, setAuthModalOpen } = useAuth();
+  const { settings } = useSettings();
   const [latestPost, setLatestPost] = useState<BlogPost | null>(null);
   const [randomPost, setRandomPost] = useState<BlogPost | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -175,15 +177,17 @@ const HomePage: React.FC = () => {
         </motion.div>
 
         {/* Music + Like */}
-        <motion.div className="flex items-center gap-8" variants={itemVariants}>
-          <BentoItem className="h-[60px] flex-1 !bg-orange-50/60 !p-1.5 !border-none shadow-sm flex items-center">
-            <MediaWidget />
-          </BentoItem>
-          <LikeButton
-            initialCount={homepageLikes}
-            onLike={async () => { await postService.like('home'); }}
-          />
-        </motion.div>
+        {settings.music.showPlayer && (
+          <motion.div className="flex items-center gap-8" variants={itemVariants}>
+            <BentoItem className="h-[60px] flex-1 !bg-orange-50/60 !p-1.5 !border-none shadow-sm flex items-center">
+              <MediaWidget />
+            </BentoItem>
+            <LikeButton
+              initialCount={homepageLikes}
+              onLike={async () => { await postService.like('home'); }}
+            />
+          </motion.div>
+        )}
 
         {/* Login/Settings on mobile */}
         <motion.div className="flex justify-center gap-2 pt-4" variants={itemVariants}>
@@ -326,11 +330,13 @@ const HomePage: React.FC = () => {
         </motion.div>
 
         {/* Music Widget */}
-        <motion.div className="absolute left-[60%] top-[73%]" variants={itemVariants}>
-          <BentoItem className="h-[60px] w-[220px] !bg-orange-50/60 !p-1.5 !border-none shadow-sm flex items-center">
-            <MediaWidget />
-          </BentoItem>
-        </motion.div>
+        {settings.music.showPlayer && (
+          <motion.div className="absolute left-[60%] top-[73%]" variants={itemVariants}>
+            <BentoItem className="h-[60px] w-[220px] !bg-orange-50/60 !p-1.5 !border-none shadow-sm flex items-center">
+              <MediaWidget />
+            </BentoItem>
+          </motion.div>
+        )}
 
         {/* Like Button */}
         <motion.div className="absolute left-[82%] top-[70%]" variants={itemVariants}>
