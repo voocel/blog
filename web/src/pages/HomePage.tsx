@@ -16,6 +16,7 @@ import { postService } from '../services/postService';
 import type { BlogPost } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
+import { useTranslation } from '../hooks/useTranslation';
 
 // Staggered animation variants
 const containerVariants = {
@@ -49,6 +50,7 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { user, setAuthModalOpen } = useAuth();
   const { settings } = useSettings();
+  const { t } = useTranslation();
   const [latestPost, setLatestPost] = useState<BlogPost | null>(null);
   const [randomPost, setRandomPost] = useState<BlogPost | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -154,7 +156,7 @@ const HomePage: React.FC = () => {
                 onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${latestPost.id}`)}
               >
                 {/* Header */}
-                <div className="text-sm font-bold text-stone-500 tracking-wide">最新文章</div>
+                <div className="text-sm font-bold text-stone-500 tracking-wide">{t.home.latestPost}</div>
 
                 <div className="flex gap-4 items-start">
                   {/* Small Image */}
@@ -196,7 +198,7 @@ const HomePage: React.FC = () => {
               onClick={handleDashboardClick}
               className="bg-red-400 text-white px-4 py-2 rounded-xl shadow-red-200 shadow-md font-bold text-sm cursor-pointer"
             >
-              Dashboard
+              {t.home.dashboard}
             </button>
           )}
           {!user && (
@@ -204,7 +206,7 @@ const HomePage: React.FC = () => {
               onClick={handleLoginClick}
               className="bg-white/70 text-stone-500 px-4 py-2 rounded-xl shadow-sm font-bold text-sm cursor-pointer"
             >
-              Sign In
+              {t.home.signIn}
             </button>
           )}
           <button
@@ -244,7 +246,7 @@ const HomePage: React.FC = () => {
                 aria-label={`Read article: ${latestPost.title}`}
               >
                 {/* Header */}
-                <div className="text-sm font-bold text-stone-500 tracking-wide">最新文章</div>
+                <div className="text-sm font-bold text-stone-500 tracking-wide">{t.home.latestPost}</div>
 
                 <div className="flex gap-4">
                   {/* Image */}
@@ -307,7 +309,7 @@ const HomePage: React.FC = () => {
                 aria-label={`Read article: ${randomPost.title}`}
               >
                 {/* Header */}
-                <div className="text-sm font-bold text-rose-400 tracking-wide">随机推荐</div>
+                <div className="text-sm font-bold text-rose-400 tracking-wide">{t.home.randomPick}</div>
 
                 <div className="flex gap-4">
                   {/* Image */}
@@ -367,7 +369,7 @@ const HomePage: React.FC = () => {
                 className="text-[10px] text-stone-400 font-bold px-1.5 hover:text-stone-600 transition-colors cursor-pointer"
                 aria-label="Sign in to your account"
               >
-                SIGN IN
+                {t.home.signIn.toUpperCase()}
               </button>
             )}
             <button

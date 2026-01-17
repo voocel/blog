@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface NavItem {
     icon: string;
@@ -28,6 +29,7 @@ const navItems: NavItem[] = [
 const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false, disableFixed = false, showBackButton = false, onBackClick }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { locale } = useTranslation();
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const [lastHoveredIndex, setLastHoveredIndex] = useState<number>(0);
 
@@ -37,6 +39,9 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
     const handleNavClick = (path: string) => {
         navigate(path);
     };
+
+    // Get label based on current locale
+    const getLabel = (item: NavItem) => locale === 'zh' ? item.labelCn : item.label;
 
     // Get the indicator position (hover takes priority, then active, then last hovered)
     // On homepage (activeIndex = -1), use lastHoveredIndex instead of defaulting to 0
@@ -123,8 +128,8 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                                 }`}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            aria-label={item.label}
-                            title={item.label}
+                            aria-label={getLabel(item)}
+                            title={getLabel(item)}
                         >
                             {item.icon}
                         </motion.button>
@@ -215,7 +220,7 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                                 : 'text-stone-500'
                                 }`}
                         >
-                            {item.labelCn}
+                            {getLabel(item)}
                         </span>
                     </motion.button>
                 ))}

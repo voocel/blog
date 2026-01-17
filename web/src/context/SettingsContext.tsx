@@ -9,12 +9,14 @@ import {
   getEffectiveTheme,
   getSystemTheme,
 } from '../config/settings';
+import { Locale } from '../locales';
 
 interface SettingsContextType {
   settings: UserSettings;
   updateTheme: (theme: ThemeMode) => void;
   updateAnimations: (enabled: boolean) => void;
   updateMusicSettings: (music: Partial<MusicSettings>) => void;
+  updateLocale: (locale: Locale) => void;
   resetSettings: () => void;
   effectiveTheme: 'light' | 'dark';
 }
@@ -85,6 +87,13 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     }));
   };
 
+  const updateLocale = (locale: Locale) => {
+    setSettings((prev) => ({
+      ...prev,
+      language: { ...prev.language, locale },
+    }));
+  };
+
   const resetSettings = () => {
     const defaults = resetSettingsUtil();
     setSettings(defaults);
@@ -97,6 +106,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         updateTheme,
         updateAnimations,
         updateMusicSettings,
+        updateLocale,
         resetSettings,
         effectiveTheme,
       }}

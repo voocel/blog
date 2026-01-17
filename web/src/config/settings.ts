@@ -1,5 +1,7 @@
 // Settings Types and Default Configuration
 
+import { Locale, defaultLocale } from '../locales';
+
 export type ThemeMode = 'light' | 'dark' | 'auto';
 
 export interface MusicSettings {
@@ -14,9 +16,14 @@ export interface AppearanceSettings {
   enableAnimations: boolean;
 }
 
+export interface LanguageSettings {
+  locale: Locale;
+}
+
 export interface UserSettings {
   appearance: AppearanceSettings;
   music: MusicSettings;
+  language: LanguageSettings;
 }
 
 // Default settings
@@ -30,6 +37,9 @@ export const DEFAULT_SETTINGS: UserSettings = {
     autoPlayNext: true,
     loop: true,
     showPlayer: true,
+  },
+  language: {
+    locale: defaultLocale,
   },
 };
 
@@ -46,6 +56,7 @@ export const loadSettings = (): UserSettings => {
       return {
         appearance: { ...DEFAULT_SETTINGS.appearance, ...parsed.appearance },
         music: { ...DEFAULT_SETTINGS.music, ...parsed.music },
+        language: { ...DEFAULT_SETTINGS.language, ...parsed.language },
       };
     }
   } catch (error) {

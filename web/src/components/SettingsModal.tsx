@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useSettings } from '../context/SettingsContext';
+import { useTranslation } from '../hooks/useTranslation';
 import { ThemeMode } from '../config/settings';
+import { Locale, localeNames } from '../locales';
 
 interface SettingsModalProps {
     isOpen: boolean;
@@ -10,8 +12,9 @@ interface SettingsModalProps {
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
-    const { settings, updateTheme, updateAnimations, updateMusicSettings, resetSettings } = useSettings();
-    const [activeTab, setActiveTab] = useState<'appearance' | 'music'>('appearance');
+    const { settings, updateTheme, updateAnimations, updateMusicSettings, updateLocale, resetSettings } = useSettings();
+    const { t } = useTranslation();
+    const [activeTab, setActiveTab] = useState<'appearance' | 'music' | 'language'>('appearance');
     const [showSaveToast, setShowSaveToast] = useState(false);
 
     const handleSave = () => {
@@ -20,7 +23,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     };
 
     const handleReset = () => {
-        if (confirm('Reset all settings to default?')) {
+        if (confirm(t.settings.resetConfirm)) {
             resetSettings();
             setShowSaveToast(true);
             setTimeout(() => setShowSaveToast(false), 2000);
@@ -38,13 +41,19 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                             onClick={() => setActiveTab('appearance')}
                             className={`${activeTab === 'appearance' ? 'text-red-500 relative after:absolute after:-bottom-6 after:left-0 after:w-full after:h-0.5 after:bg-red-500' : 'hover:text-stone-600'} transition-colors cursor-pointer`}
                         >
-                            Appearance
+                            {t.settings.appearance}
                         </button>
                         <button
                             onClick={() => setActiveTab('music')}
                             className={`${activeTab === 'music' ? 'text-red-500 relative after:absolute after:-bottom-6 after:left-0 after:w-full after:h-0.5 after:bg-red-500' : 'hover:text-stone-600'} transition-colors cursor-pointer`}
                         >
-                            Music Player
+                            {t.settings.music}
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('language')}
+                            className={`${activeTab === 'language' ? 'text-red-500 relative after:absolute after:-bottom-6 after:left-0 after:w-full after:h-0.5 after:bg-red-500' : 'hover:text-stone-600'} transition-colors cursor-pointer`}
+                        >
+                            {t.settings.language}
                         </button>
                     </div>
 
@@ -53,7 +62,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                             className="text-stone-400 hover:text-stone-600 text-sm font-medium cursor-pointer"
                             onClick={onClose}
                         >
-                            Close
+                            {t.settings.close}
                         </button>
                     </div>
                 </div>
@@ -64,7 +73,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                         <div className="max-w-xl mx-auto space-y-8">
                             {/* Theme Mode */}
                             <div>
-                                <h3 className="text-sm font-bold text-stone-700 mb-4">Theme Mode</h3>
+                                <h3 className="text-sm font-bold text-stone-700 mb-4">{t.appearance.themeMode}</h3>
                                 <div className="grid grid-cols-3 gap-3">
                                     {(['light', 'dark', 'auto'] as ThemeMode[]).map((theme) => (
                                         <button
@@ -82,25 +91,25 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                                                 {theme === 'auto' && '🌓'}
                                             </div>
                                             <div className="text-sm font-medium text-stone-700 capitalize">
-                                                {theme}
+                                                {t.appearance[theme]}
                                             </div>
                                         </button>
                                     ))}
                                 </div>
                                 <p className="text-xs text-stone-500 mt-2">
                                     {settings.appearance.theme === 'auto'
-                                        ? 'Theme follows your system preference'
-                                        : `Using ${settings.appearance.theme} theme`}
+                                        ? t.appearance.themeFollows
+                                        : t.appearance.usingTheme.replace('{theme}', t.appearance[settings.appearance.theme])}
                                 </p>
                             </div>
 
                             {/* Animations */}
                             <div>
-                                <h3 className="text-sm font-bold text-stone-700 mb-4">Animations</h3>
+                                <h3 className="text-sm font-bold text-stone-700 mb-4">{t.appearance.animations}</h3>
                                 <label className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-stone-200 cursor-pointer hover:border-stone-300 transition-colors">
                                     <div>
-                                        <div className="text-sm font-medium text-stone-700">Enable Animations</div>
-                                        <div className="text-xs text-stone-500 mt-1">Page transitions and effects</div>
+                                        <div className="text-sm font-medium text-stone-700">{t.appearance.enableAnimations}</div>
+                                        <div className="text-xs text-stone-500 mt-1">{t.appearance.animationsDesc}</div>
                                     </div>
                                     <input
                                         type="checkbox"
@@ -117,11 +126,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                         <div className="max-w-xl mx-auto space-y-8">
                             {/* Show Player */}
                             <div>
-                                <h3 className="text-sm font-bold text-stone-700 mb-4">Display</h3>
+                                <h3 className="text-sm font-bold text-stone-700 mb-4">{t.music.display}</h3>
                                 <label className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-stone-200 cursor-pointer hover:border-stone-300 transition-colors">
                                     <div>
-                                        <div className="text-sm font-medium text-stone-700">Show Music Player</div>
-                                        <div className="text-xs text-stone-500 mt-1">Display player on homepage</div>
+                                        <div className="text-sm font-medium text-stone-700">{t.music.showPlayer}</div>
+                                        <div className="text-xs text-stone-500 mt-1">{t.music.showPlayerDesc}</div>
                                     </div>
                                     <input
                                         type="checkbox"
@@ -134,10 +143,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
                             {/* Volume */}
                             <div>
-                                <h3 className="text-sm font-bold text-stone-700 mb-4">Default Volume</h3>
+                                <h3 className="text-sm font-bold text-stone-700 mb-4">{t.music.defaultVolume}</h3>
                                 <div className="p-4 bg-white rounded-xl border-2 border-stone-200">
                                     <div className="flex items-center justify-between mb-3">
-                                        <span className="text-sm text-stone-600">Volume</span>
+                                        <span className="text-sm text-stone-600">{t.music.volume}</span>
                                         <span className="text-sm font-bold text-red-500">
                                             {Math.round(settings.music.defaultVolume * 100)}%
                                         </span>
@@ -155,12 +164,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
                             {/* Playback Options */}
                             <div>
-                                <h3 className="text-sm font-bold text-stone-700 mb-4">Playback</h3>
+                                <h3 className="text-sm font-bold text-stone-700 mb-4">{t.music.playback}</h3>
                                 <div className="space-y-3">
                                     <label className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-stone-200 cursor-pointer hover:border-stone-300 transition-colors">
                                         <div>
-                                            <div className="text-sm font-medium text-stone-700">Auto Play Next</div>
-                                            <div className="text-xs text-stone-500 mt-1">Automatically play next song</div>
+                                            <div className="text-sm font-medium text-stone-700">{t.music.autoPlayNext}</div>
+                                            <div className="text-xs text-stone-500 mt-1">{t.music.autoPlayNextDesc}</div>
                                         </div>
                                         <input
                                             type="checkbox"
@@ -172,8 +181,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
                                     <label className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-stone-200 cursor-pointer hover:border-stone-300 transition-colors">
                                         <div>
-                                            <div className="text-sm font-medium text-stone-700">Loop Playlist</div>
-                                            <div className="text-xs text-stone-500 mt-1">Repeat playlist when finished</div>
+                                            <div className="text-sm font-medium text-stone-700">{t.music.loopPlaylist}</div>
+                                            <div className="text-xs text-stone-500 mt-1">{t.music.loopPlaylistDesc}</div>
                                         </div>
                                         <input
                                             type="checkbox"
@@ -186,6 +195,39 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                             </div>
                         </div>
                     )}
+
+                    {activeTab === 'language' && (
+                        <div className="max-w-xl mx-auto space-y-8">
+                            {/* Language Selection */}
+                            <div>
+                                <h3 className="text-sm font-bold text-stone-700 mb-4">{t.languageSettings.selectLanguage}</h3>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {(['en', 'zh'] as Locale[]).map((locale) => (
+                                        <button
+                                            key={locale}
+                                            onClick={() => updateLocale(locale)}
+                                            className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                                                settings.language.locale === locale
+                                                    ? 'border-red-400 bg-red-50'
+                                                    : 'border-stone-200 bg-white hover:border-stone-300'
+                                            }`}
+                                        >
+                                            <div className="text-2xl mb-2">
+                                                {locale === 'en' && '🇺🇸'}
+                                                {locale === 'zh' && '🇨🇳'}
+                                            </div>
+                                            <div className="text-sm font-medium text-stone-700">
+                                                {localeNames[locale]}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                                <p className="text-xs text-stone-500 mt-2">
+                                    {t.languageSettings.languageDesc}
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Footer */}
@@ -194,20 +236,20 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                         onClick={handleReset}
                         className="text-sm text-stone-500 hover:text-red-500 font-medium transition-colors cursor-pointer"
                     >
-                        Reset to Default
+                        {t.settings.reset}
                     </button>
                     <button
                         onClick={handleSave}
                         className="px-6 py-2 bg-red-500 text-white rounded-xl font-medium text-sm hover:bg-red-600 transition-colors shadow-sm cursor-pointer"
                     >
-                        Save Changes
+                        {t.settings.save}
                     </button>
                 </div>
 
                 {/* Save Toast */}
                 {showSaveToast && (
                     <div className="absolute top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-fade-in-up">
-                        ✓ Settings saved!
+                        ✓ {t.settings.saved}
                     </div>
                 )}
             </div>
