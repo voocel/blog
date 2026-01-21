@@ -3,6 +3,7 @@ package handler
 import (
 	"blog/internal/entity"
 	"blog/internal/usecase"
+	"blog/pkg/util"
 	"errors"
 	"net/http"
 	"strconv"
@@ -87,6 +88,10 @@ func (h *PostHandler) ListAllPosts(c *gin.Context) {
 // GetPost - GET /posts/:id (Public API)
 func (h *PostHandler) GetPost(c *gin.Context) {
 	id := c.Param("id")
+	if !util.IsValidUUID(id) {
+		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
+		return
+	}
 	ip := c.ClientIP()
 	userAgent := c.GetHeader("User-Agent")
 
@@ -113,6 +118,10 @@ func (h *PostHandler) GetPost(c *gin.Context) {
 // GetPostAdmin - GET /admin/posts/:id (Admin API)
 func (h *PostHandler) GetPostAdmin(c *gin.Context) {
 	id := c.Param("id")
+	if !util.IsValidUUID(id) {
+		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
+		return
+	}
 
 	post, err := h.postUseCase.GetByID(c.Request.Context(), id)
 	if err != nil {
@@ -152,6 +161,10 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 // UpdatePost - PUT /posts/:id
 func (h *PostHandler) UpdatePost(c *gin.Context) {
 	id := c.Param("id")
+	if !util.IsValidUUID(id) {
+		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
+		return
+	}
 
 	var req entity.UpdatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -179,6 +192,10 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 // DeletePost - DELETE /posts/:id
 func (h *PostHandler) DeletePost(c *gin.Context) {
 	id := c.Param("id")
+	if !util.IsValidUUID(id) {
+		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
+		return
+	}
 
 	if err := h.postUseCase.Delete(c.Request.Context(), id); err != nil {
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)

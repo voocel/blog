@@ -4,6 +4,7 @@ import (
 	"blog/internal/entity"
 	"context"
 	"errors"
+	"regexp"
 	"strings"
 )
 
@@ -277,6 +278,7 @@ func (uc *CommentUseCase) DeleteAdmin(ctx context.Context, id string) error {
 }
 
 func containsHTML(content string) bool {
-	// Lightweight guard: reject if HTML tag markers appear.
-	return strings.Contains(content, "<") || strings.Contains(content, ">")
+	return htmlTagPattern.MatchString(content)
 }
+
+var htmlTagPattern = regexp.MustCompile(`(?i)<\s*/?\s*[a-z][^>]*>`)
