@@ -2,7 +2,9 @@ package handler
 
 import (
 	"blog/internal/usecase"
+	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,10 +31,14 @@ func (h *MediaHandler) UploadFile(c *gin.Context) {
 		uploadType = "post"
 	}
 
-	baseURL := "http://" + c.Request.Host
+	baseURL := buildBaseURL(c)
 
 	media, err := h.mediaUseCase.Upload(c.Request.Context(), file, baseURL, uploadType)
 	if err != nil {
+		if errors.Is(err, usecase.ErrInvalidArgument) {
+			JSONError(c, http.StatusBadRequest, err.Error(), err)
+			return
+		}
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
@@ -48,10 +54,14 @@ func (h *MediaHandler) UploadAvatar(c *gin.Context) {
 		return
 	}
 
-	baseURL := "http://" + c.Request.Host
+	baseURL := buildBaseURL(c)
 
 	media, err := h.mediaUseCase.Upload(c.Request.Context(), file, baseURL, "avatar")
 	if err != nil {
+		if errors.Is(err, usecase.ErrInvalidArgument) {
+			JSONError(c, http.StatusBadRequest, err.Error(), err)
+			return
+		}
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
@@ -80,4 +90,18 @@ func (h *MediaHandler) DeleteFile(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+func buildBaseURL(c *gin.Context) string {
+	scheme := strings.TrimSpace(c.GetHeader("X-Forwarded-Proto"))
+	if scheme != "" {
+		if idx := strings.Index(scheme, ","); idx > -1 {
+			scheme = strings.TrimSpace(scheme[:idx])
+		}
+	} else if c.Request.TLS != nil {
+		scheme = "https"
+	} else {
+		scheme = "http"
+	}
+	return scheme + "://" + c.Request.Host
 }
