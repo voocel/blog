@@ -24,6 +24,7 @@ func NewPostHandler(postUseCase *usecase.PostUseCase) *PostHandler {
 func (h *PostHandler) ListPublishedPosts(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
+	limit = clampLimit(limit, 100)
 	category := c.Query("category")
 	search := c.Query("search")
 
@@ -57,6 +58,7 @@ func (h *PostHandler) ListPublishedPosts(c *gin.Context) {
 func (h *PostHandler) ListAllPosts(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
+	limit = clampLimit(limit, 100)
 	category := c.Query("category")
 	status := strings.ToLower(strings.TrimSpace(c.Query("status"))) // all | published | draft
 	search := c.Query("search")
@@ -150,29 +152,11 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 // UpdatePost - PUT /posts/:id
 func (h *PostHandler) UpdatePost(c *gin.Context) {
 	id := c.Param("id")
-	username, exists := c.Get("username")
-	if !exists {
-		JSONError(c, http.StatusUnauthorized, "Unauthorized", nil)
-		return
-	}
-	role, _ := c.Get("role")
 
 	var req entity.UpdatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		JSONError(c, http.StatusBadRequest, "Invalid request", err)
 		return
-	}
-
-	if role != "admin" {
-		post, err := h.postUseCase.GetByID(c.Request.Context(), id)
-		if err != nil {
-			JSONError(c, http.StatusNotFound, "Post not found", err)
-			return
-		}
-		if post.Author != username.(string) {
-			JSONError(c, http.StatusForbidden, "Forbidden", nil)
-			return
-		}
 	}
 
 	if err := h.postUseCase.Update(c.Request.Context(), id, req); err != nil {
@@ -195,24 +179,6 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 // DeletePost - DELETE /posts/:id
 func (h *PostHandler) DeletePost(c *gin.Context) {
 	id := c.Param("id")
-	username, exists := c.Get("username")
-	if !exists {
-		JSONError(c, http.StatusUnauthorized, "Unauthorized", nil)
-		return
-	}
-	role, _ := c.Get("role")
-
-	if role != "admin" {
-		post, err := h.postUseCase.GetByID(c.Request.Context(), id)
-		if err != nil {
-			JSONError(c, http.StatusNotFound, "Post not found", err)
-			return
-		}
-		if post.Author != username.(string) {
-			JSONError(c, http.StatusForbidden, "Forbidden", nil)
-			return
-		}
-	}
 
 	if err := h.postUseCase.Delete(c.Request.Context(), id); err != nil {
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
@@ -220,4 +186,11 @@ func (h *PostHandler) DeletePost(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+func clampLimit(limit int, max int) int {
+	if limit > max {
+		return max
+	}
+	return limit
 }

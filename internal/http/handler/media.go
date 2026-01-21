@@ -19,16 +19,18 @@ func NewMediaHandler(mediaUseCase *usecase.MediaUseCase) *MediaHandler {
 
 // UploadFile - POST /upload?type=avatar|post
 func (h *MediaHandler) UploadFile(c *gin.Context) {
-	file, err := c.FormFile("file")
-	if err != nil {
-		JSONError(c, http.StatusBadRequest, "No file uploaded", err)
-		return
-	}
-
 	// Get upload type from query parameter: avatar | post | default: post
 	uploadType := c.DefaultQuery("type", "post")
 	if uploadType != "avatar" && uploadType != "post" {
 		uploadType = "post"
+	}
+
+	applyUploadLimit(c, uploadType)
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		handleUploadError(c, err)
+		return
 	}
 
 	baseURL := buildBaseURL(c)
@@ -48,9 +50,11 @@ func (h *MediaHandler) UploadFile(c *gin.Context) {
 
 // UploadAvatar - POST /users/avatar (Dedicated avatar upload endpoint)
 func (h *MediaHandler) UploadAvatar(c *gin.Context) {
+	applyUploadLimit(c, "avatar")
+
 	file, err := c.FormFile("file")
 	if err != nil {
-		JSONError(c, http.StatusBadRequest, "No file uploaded", err)
+		handleUploadError(c, err)
 		return
 	}
 
@@ -90,6 +94,27 @@ func (h *MediaHandler) DeleteFile(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+const (
+	maxAvatarUploadBytes int64 = 2 * 1024 * 1024
+	maxPostUploadBytes   int64 = 50 * 1024 * 1024
+)
+
+func applyUploadLimit(c *gin.Context, uploadType string) {
+	limit := maxPostUploadBytes
+	if uploadType == "avatar" {
+		limit = maxAvatarUploadBytes
+	}
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, limit)
+}
+
+func handleUploadError(c *gin.Context, err error) {
+	if strings.Contains(err.Error(), "http: request body too large") {
+		JSONError(c, http.StatusRequestEntityTooLarge, "File too large", err)
+		return
+	}
+	JSONError(c, http.StatusBadRequest, "No file uploaded", err)
 }
 
 func buildBaseURL(c *gin.Context) string {
