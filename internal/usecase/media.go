@@ -5,7 +5,9 @@ import (
 	"blog/internal/entity"
 	"context"
 	"fmt"
+	"io"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,7 +25,11 @@ func NewMediaUseCase(mediaRepo MediaRepo) *MediaUseCase {
 }
 
 func (uc *MediaUseCase) Upload(ctx context.Context, file *multipart.FileHeader, baseURL string, uploadType string) (*entity.MediaResponse, error) {
-	mediaType := getMediaType(file.Header.Get("Content-Type"))
+	detectedMime, ext, err := validateUpload(file, uploadType)
+	if err != nil {
+		return nil, err
+	}
+	mediaType := getMediaType(detectedMime)
 
 	// Determine upload directory based on type
 	var uploadPath string
@@ -42,7 +48,6 @@ func (uc *MediaUseCase) Upload(ctx context.Context, file *multipart.FileHeader, 
 	}
 
 	// Generate unique filename: UUID + original extension
-	ext := filepath.Ext(file.Filename)
 	uniqueFilename := uuid.New().String() + ext
 	savePath := filepath.Join(fullUploadPath, uniqueFilename)
 
@@ -69,7 +74,7 @@ func (uc *MediaUseCase) Upload(ctx context.Context, file *multipart.FileHeader, 
 		Name:     file.Filename,
 		Type:     mediaType,
 		Size:     file.Size,
-		MimeType: file.Header.Get("Content-Type"),
+		MimeType: detectedMime,
 		Path:     savePath,
 		Date:     time.Now().Format(time.RFC3339),
 	}
@@ -140,6 +145,78 @@ func getMediaType(contentType string) string {
 		return "video"
 	}
 	return "document"
+}
+
+const (
+	maxAvatarSize    int64 = 2 * 1024 * 1024
+	maxPostMediaSize int64 = 50 * 1024 * 1024
+	maxSniffBytes          = 512
+)
+
+var (
+	avatarAllowedTypes = map[string]map[string]struct{}{
+		"image/jpeg": {".jpg": {}, ".jpeg": {}},
+		"image/png":  {".png": {}},
+		"image/gif":  {".gif": {}},
+		"image/webp": {".webp": {}},
+	}
+	postAllowedTypes = map[string]map[string]struct{}{
+		"image/jpeg":    {".jpg": {}, ".jpeg": {}},
+		"image/png":     {".png": {}},
+		"image/gif":     {".gif": {}},
+		"image/webp":    {".webp": {}},
+		"video/mp4":     {".mp4": {}},
+		"video/webm":    {".webm": {}},
+		"video/quicktime": {".mov": {}},
+	}
+)
+
+func validateUpload(file *multipart.FileHeader, uploadType string) (string, string, error) {
+	if file == nil {
+		return "", "", fmt.Errorf("%w: missing file", ErrInvalidArgument)
+	}
+
+	maxSize := maxPostMediaSize
+	allowed := postAllowedTypes
+	if uploadType == "avatar" {
+		maxSize = maxAvatarSize
+		allowed = avatarAllowedTypes
+	}
+
+	if file.Size <= 0 {
+		return "", "", fmt.Errorf("%w: empty file", ErrInvalidArgument)
+	}
+	if file.Size > maxSize {
+		return "", "", fmt.Errorf("%w: file too large", ErrInvalidArgument)
+	}
+
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+	if ext == "" {
+		return "", "", fmt.Errorf("%w: missing file extension", ErrInvalidArgument)
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		return "", "", fmt.Errorf("failed to open uploaded file: %w", err)
+	}
+	defer src.Close()
+
+	buf := make([]byte, maxSniffBytes)
+	n, readErr := src.Read(buf)
+	if readErr != nil && readErr != io.EOF {
+		return "", "", fmt.Errorf("failed to read uploaded file: %w", readErr)
+	}
+	detectedMime := http.DetectContentType(buf[:n])
+
+	allowedExts, ok := allowed[detectedMime]
+	if !ok {
+		return "", "", fmt.Errorf("%w: unsupported file type", ErrInvalidArgument)
+	}
+	if _, ok := allowedExts[ext]; !ok {
+		return "", "", fmt.Errorf("%w: file extension mismatch", ErrInvalidArgument)
+	}
+
+	return detectedMime, ext, nil
 }
 
 // getFileExtension gets file extension

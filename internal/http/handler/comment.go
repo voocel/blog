@@ -3,6 +3,7 @@ package handler
 import (
 	"blog/internal/entity"
 	"blog/internal/usecase"
+	"blog/pkg/util"
 	"net/http"
 	"strconv"
 	"strings"
@@ -21,6 +22,10 @@ func NewCommentHandler(commentUseCase *usecase.CommentUseCase) *CommentHandler {
 // ListComments - GET /posts/:postId/comments
 func (h *CommentHandler) ListComments(c *gin.Context) {
 	postID := c.Param("id")
+	if !util.IsValidUUID(postID) {
+		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
+		return
+	}
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
 	order := strings.ToLower(c.DefaultQuery("order", "desc"))
@@ -33,7 +38,7 @@ func (h *CommentHandler) ListComments(c *gin.Context) {
 
 	resp, err := h.commentUseCase.List(c.Request.Context(), postID, page, limit, order, withReplies)
 	if err != nil {
-		JSONError(c, http.StatusBadRequest, err.Error(), err)
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
@@ -43,6 +48,10 @@ func (h *CommentHandler) ListComments(c *gin.Context) {
 // CreateComment - POST /posts/:postId/comments
 func (h *CommentHandler) CreateComment(c *gin.Context) {
 	postID := c.Param("id")
+	if !util.IsValidUUID(postID) {
+		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
+		return
+	}
 
 	userIDVal, exists := c.Get("user_id")
 	if !exists {
@@ -84,7 +93,7 @@ func (h *CommentHandler) DeleteCommentAdmin(c *gin.Context) {
 			JSONError(c, http.StatusNotFound, "Comment not found", err)
 			return
 		}
-		JSONError(c, http.StatusBadRequest, err.Error(), err)
+		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 	c.Status(http.StatusNoContent)

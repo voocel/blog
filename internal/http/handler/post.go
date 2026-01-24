@@ -3,6 +3,7 @@ package handler
 import (
 	"blog/internal/entity"
 	"blog/internal/usecase"
+	"blog/pkg/util"
 	"errors"
 	"net/http"
 	"strconv"
@@ -24,6 +25,7 @@ func NewPostHandler(postUseCase *usecase.PostUseCase) *PostHandler {
 func (h *PostHandler) ListPublishedPosts(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
+	limit = clampLimit(limit, 100)
 	category := c.Query("category")
 	search := c.Query("search")
 
@@ -57,6 +59,7 @@ func (h *PostHandler) ListPublishedPosts(c *gin.Context) {
 func (h *PostHandler) ListAllPosts(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
+	limit = clampLimit(limit, 100)
 	category := c.Query("category")
 	status := strings.ToLower(strings.TrimSpace(c.Query("status"))) // all | published | draft
 	search := c.Query("search")
@@ -85,6 +88,10 @@ func (h *PostHandler) ListAllPosts(c *gin.Context) {
 // GetPost - GET /posts/:id (Public API)
 func (h *PostHandler) GetPost(c *gin.Context) {
 	id := c.Param("id")
+	if !util.IsValidUUID(id) {
+		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
+		return
+	}
 	ip := c.ClientIP()
 	userAgent := c.GetHeader("User-Agent")
 
@@ -111,6 +118,10 @@ func (h *PostHandler) GetPost(c *gin.Context) {
 // GetPostAdmin - GET /admin/posts/:id (Admin API)
 func (h *PostHandler) GetPostAdmin(c *gin.Context) {
 	id := c.Param("id")
+	if !util.IsValidUUID(id) {
+		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
+		return
+	}
 
 	post, err := h.postUseCase.GetByID(c.Request.Context(), id)
 	if err != nil {
@@ -150,6 +161,10 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 // UpdatePost - PUT /posts/:id
 func (h *PostHandler) UpdatePost(c *gin.Context) {
 	id := c.Param("id")
+	if !util.IsValidUUID(id) {
+		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
+		return
+	}
 
 	var req entity.UpdatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -166,13 +181,21 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 		return
 	}
 
-	post, _ := h.postUseCase.GetByID(c.Request.Context(), id)
+	post, err := h.postUseCase.GetByID(c.Request.Context(), id)
+	if err != nil {
+		JSONError(c, http.StatusNotFound, "Post not found", err)
+		return
+	}
 	c.JSON(http.StatusOK, post)
 }
 
 // DeletePost - DELETE /posts/:id
 func (h *PostHandler) DeletePost(c *gin.Context) {
 	id := c.Param("id")
+	if !util.IsValidUUID(id) {
+		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
+		return
+	}
 
 	if err := h.postUseCase.Delete(c.Request.Context(), id); err != nil {
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
@@ -180,4 +203,11 @@ func (h *PostHandler) DeletePost(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+func clampLimit(limit int, max int) int {
+	if limit > max {
+		return max
+	}
+	return limit
 }

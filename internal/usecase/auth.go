@@ -76,12 +76,17 @@ func (uc *AuthUseCase) Register(ctx context.Context, req entity.RegisterRequest)
 		username = util.GenerateRandomUsername()
 	}
 
-	for {
+	const maxUsernameAttempts = 20
+	for i := 0; i < maxUsernameAttempts; i++ {
 		existByUsername, _ := uc.userRepo.GetByUsername(ctx, username)
 		if existByUsername == nil {
 			break // Username available
 		}
 		username = util.GenerateRandomUsername()
+	}
+	existByUsername, _ := uc.userRepo.GetByUsername(ctx, username)
+	if existByUsername != nil {
+		return nil, errors.New("failed to allocate unique username")
 	}
 
 	hashedPassword, err := util.HashPassword(req.Password)
