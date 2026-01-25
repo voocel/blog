@@ -3,6 +3,7 @@ package usecase
 import (
 	"blog/config"
 	"blog/internal/entity"
+	"blog/pkg/log"
 	"context"
 	"fmt"
 	"io"
@@ -129,7 +130,7 @@ func (uc *MediaUseCase) Delete(ctx context.Context, id string) error {
 		if err := os.Remove(media.Path); err != nil {
 			// If file doesn't exist or deletion fails, only log but don't return error
 			// Because database record has been deleted
-			fmt.Printf("Warning: failed to delete file %s: %v\n", media.Path, err)
+			log.Warnf("failed to delete file %s: %v", media.Path, err)
 		}
 	}
 
@@ -217,9 +218,4 @@ func validateUpload(file *multipart.FileHeader, uploadType string) (string, stri
 	}
 
 	return detectedMime, ext, nil
-}
-
-// getFileExtension gets file extension
-func getFileExtension(filename string) string {
-	return strings.ToLower(filepath.Ext(filename))
 }

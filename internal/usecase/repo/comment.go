@@ -84,8 +84,10 @@ func normalizeOrder(order string) string {
 
 func (r *commentRepo) ListAll(ctx context.Context) ([]entity.Comment, error) {
 	var comments []entity.Comment
+	// Add default limit to prevent memory issues with large comment counts
 	err := r.db.WithContext(ctx).
 		Order("created_at DESC").
+		Limit(1000).
 		Find(&comments).Error
 	return comments, err
 }

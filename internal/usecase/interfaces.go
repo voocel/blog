@@ -111,4 +111,5 @@ type CommentRepo interface {
 type LikeRepo interface {
 	Create(ctx context.Context, like *entity.Like) error
 	GetCount(ctx context.Context, slug string) (int64, error)
+	ExistsBySlugAndIP(ctx context.Context, slug, ip string) (bool, error)
 }

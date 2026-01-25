@@ -25,18 +25,24 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
+	userIDStr, ok := userID.(string)
+	if !ok {
+		JSONError(c, http.StatusInternalServerError, "Invalid user ID type", nil)
+		return
+	}
+
 	var req entity.UpdateProfileRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		JSONError(c, http.StatusBadRequest, "Invalid request", err)
 		return
 	}
 
-	if err := h.userUseCase.UpdateProfile(c.Request.Context(), userID.(string), req); err != nil {
+	if err := h.userUseCase.UpdateProfile(c.Request.Context(), userIDStr, req); err != nil {
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
-	user, _ := h.userUseCase.GetByID(c.Request.Context(), userID.(string))
+	user, _ := h.userUseCase.GetByID(c.Request.Context(), userIDStr)
 	c.JSON(http.StatusOK, user)
 }
 

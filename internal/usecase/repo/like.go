@@ -27,3 +27,12 @@ func (r *likeRepo) GetCount(ctx context.Context, slug string) (int64, error) {
 	err := r.db.WithContext(ctx).Model(&entity.Like{}).Where("slug = ?", slug).Count(&count).Error
 	return count, err
 }
+
+// ExistsBySlugAndIP checks if a like already exists for the given slug and IP
+func (r *likeRepo) ExistsBySlugAndIP(ctx context.Context, slug, ip string) (bool, error) {
+	var count int64
+	err := r.db.WithContext(ctx).Model(&entity.Like{}).
+		Where("slug = ? AND ip = ?", slug, ip).
+		Count(&count).Error
+	return count > 0, err
+}

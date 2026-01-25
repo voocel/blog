@@ -3,13 +3,24 @@ package config
 import (
 	"log"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
 
-var Conf = new(config)
+var (
+	Conf   = new(config)
+	confMu sync.RWMutex
+)
+
+// GetConf returns config with read lock protection
+func GetConf() *config {
+	confMu.RLock()
+	defer confMu.RUnlock()
+	return Conf
+}
 
 type config struct {
 	Mode            string
@@ -109,9 +120,17 @@ func LoadConfig(paths ...string) {
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		log.Printf("config change: %s, %s, %s\n", e.Op.String(), e.Name, e.String())
+		confMu.Lock()
+		defer confMu.Unlock()
 		if err := viper.Unmarshal(Conf); err != nil {
 			log.Printf("config change unmarshal err: %v", err)
 		}
 	})
+
+	// Validate JWT secret in release mode
+	if Conf.Mode == "release" && Conf.App.JwtSecret == "change-this-secret-in-production" {
+		log.Panicf("SECURITY ERROR: JWT secret must be changed in production mode")
+	}
+
 	log.Println("load config successfully")
 }

@@ -87,17 +87,8 @@ func (d *dbRepo) DbWClose() error {
 }
 
 func dbConnect(user, pass, addr, dbName, sslMode string) (*gorm.DB, error) {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=Asia/Shanghai",
-		addr, // host:port format
-		user,
-		pass,
-		dbName,
-		"",
-		sslMode)
-
-	// Reformat DSN, correctly separate host and port
 	host, port := parseAddress(addr)
-	dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=Asia/Shanghai",
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=Asia/Shanghai",
 		host,
 		port,
 		user,

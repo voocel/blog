@@ -3,6 +3,7 @@ package usecase
 import (
 	"blog/internal/entity"
 	"blog/pkg/geoip"
+	"blog/pkg/log"
 	"context"
 	"time"
 )
@@ -75,12 +76,27 @@ func (uc *AnalyticsUseCase) GetLogs(ctx context.Context, startDate, endDate stri
 
 // GetDashboardOverview retrieves dashboard overview data
 func (uc *AnalyticsUseCase) GetDashboardOverview(ctx context.Context) (*entity.DashboardOverviewResponse, error) {
-	postsCount, _ := uc.postRepo.Count(ctx)
-	categoriesCount, _ := uc.categoryRepo.Count(ctx)
-	tagsCount, _ := uc.tagRepo.Count(ctx)
-	filesCount, _ := uc.mediaRepo.Count(ctx)
+	postsCount, err := uc.postRepo.Count(ctx)
+	if err != nil {
+		log.Warnf("failed to get posts count: %v", err)
+	}
+	categoriesCount, err := uc.categoryRepo.Count(ctx)
+	if err != nil {
+		log.Warnf("failed to get categories count: %v", err)
+	}
+	tagsCount, err := uc.tagRepo.Count(ctx)
+	if err != nil {
+		log.Warnf("failed to get tags count: %v", err)
+	}
+	filesCount, err := uc.mediaRepo.Count(ctx)
+	if err != nil {
+		log.Warnf("failed to get files count: %v", err)
+	}
 
-	recentPosts, _ := uc.postRepo.GetRecent(ctx, 3)
+	recentPosts, err := uc.postRepo.GetRecent(ctx, 3)
+	if err != nil {
+		log.Warnf("failed to get recent posts: %v", err)
+	}
 
 	recentPostResponses := make([]entity.PostResponse, 0, len(recentPosts))
 	for _, post := range recentPosts {

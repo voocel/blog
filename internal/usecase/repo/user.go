@@ -84,7 +84,8 @@ func (r *userRepo) Delete(ctx context.Context, id string) error {
 
 func (r *userRepo) List(ctx context.Context) ([]entity.User, error) {
 	var users []entity.User
-	if err := r.db.WithContext(ctx).Order("created_at DESC").Find(&users).Error; err != nil {
+	// Add default limit to prevent memory issues with large user counts
+	if err := r.db.WithContext(ctx).Order("created_at DESC").Limit(1000).Find(&users).Error; err != nil {
 		return nil, err
 	}
 	return users, nil

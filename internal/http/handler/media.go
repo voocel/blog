@@ -2,6 +2,7 @@ package handler
 
 import (
 	"blog/internal/usecase"
+	"blog/pkg/util"
 	"errors"
 	"net/http"
 	"strings"
@@ -87,6 +88,10 @@ func (h *MediaHandler) ListFiles(c *gin.Context) {
 // DeleteFile - DELETE /files/:id
 func (h *MediaHandler) DeleteFile(c *gin.Context) {
 	id := c.Param("id")
+	if !util.IsValidUUID(id) {
+		JSONError(c, http.StatusBadRequest, "Invalid file id", nil)
+		return
+	}
 
 	if err := h.mediaUseCase.Delete(c.Request.Context(), id); err != nil {
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)

@@ -58,7 +58,11 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 		JSONError(c, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
-	userID := userIDVal.(string)
+	userID, ok := userIDVal.(string)
+	if !ok {
+		JSONError(c, http.StatusInternalServerError, "Invalid user ID type", nil)
+		return
+	}
 
 	var req entity.CreateCommentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
