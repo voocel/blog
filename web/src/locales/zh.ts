@@ -1,5 +1,5 @@
 // Chinese translations
-import { TranslationKeys } from './en';
+import type { TranslationKeys } from './en';
 
 export const zh: TranslationKeys = {
   // 设置弹窗

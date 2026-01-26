@@ -125,7 +125,7 @@ apiClient.interceptors.response.use(
                 processQueue(null, access_token);
                 return apiClient(originalRequest);
             } catch (refreshError) {
-                processQueue(refreshError, null);
+                processQueue(refreshError instanceof Error ? refreshError : null, null);
                 clearTokens();
                 // window.location.href = '/login'; // Redirect to login on failed refresh
                 return Promise.reject(refreshError);

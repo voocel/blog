@@ -1,15 +1,15 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import {
-  UserSettings,
-  ThemeMode,
-  MusicSettings,
+  type UserSettings,
+  type ThemeMode,
+  type MusicSettings,
   loadSettings,
   saveSettings,
   resetSettings as resetSettingsUtil,
   getEffectiveTheme,
   getSystemTheme,
 } from '../config/settings';
-import { Locale } from '../locales';
+import type { Locale } from '../locales';
 
 interface SettingsContextType {
   settings: UserSettings;

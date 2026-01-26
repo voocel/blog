@@ -1,6 +1,6 @@
 // Settings Types and Default Configuration
 
-import { Locale, defaultLocale } from '../locales';
+import { type Locale, defaultLocale } from '../locales';
 
 export type ThemeMode = 'light' | 'dark' | 'auto';
 

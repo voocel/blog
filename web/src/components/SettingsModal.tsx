@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useSettings } from '../context/SettingsContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { ThemeMode } from '../config/settings';
-import { Locale, localeNames } from '../locales';
+import type { ThemeMode } from '../config/settings';
+import { type Locale, localeNames } from '../locales';
 
 interface SettingsModalProps {
     isOpen: boolean;
