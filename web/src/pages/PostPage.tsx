@@ -60,7 +60,7 @@ const PostPage: React.FC = () => {
     return (
         <>
             <PostDetail post={post}>
-                <CommentSection postId={post.id} />
+                <CommentSection postSlug={post.slug} />
             </PostDetail>
         </>
     );

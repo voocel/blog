@@ -15,9 +15,9 @@ import apiClient from './apiClient';
 // ... interface CommentResponse remains the same ...
 
 export const commentService = {
-    getComments: async (postId: string, page = 1, limit = 20): Promise<CommentResponse> => {
+    getComments: async (postSlug: string, page = 1, limit = 20): Promise<CommentResponse> => {
         try {
-            const response = await apiClient.get(`/posts/${postId}/comments`, {
+            const response = await apiClient.get(`/posts/${postSlug}/comments`, {
                 params: { page, limit, withReplies: true }
             });
             // Handle both structure: { data: [...], pagination: {...} } or direct array [...]
@@ -37,12 +37,12 @@ export const commentService = {
         }
     },
 
-    createComment: async (postId: string, content: string, parentId?: string): Promise<Comment> => {
+    createComment: async (postSlug: string, content: string, parentId?: string): Promise<Comment> => {
         const payload: any = { content };
         if (parentId) {
             payload.parentId = parentId;
         }
-        const response = await apiClient.post(`/posts/${postId}/comments`, payload);
+        const response = await apiClient.post(`/posts/${postSlug}/comments`, payload);
         return response.data;
     },
 

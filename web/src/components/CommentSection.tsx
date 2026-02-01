@@ -5,10 +5,10 @@ import type { Comment } from '../types';
 import { IconUserCircle, IconSparkles } from './Icons';
 
 interface CommentSectionProps {
-    postId: string;
+    postSlug: string;
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
+const CommentSection: React.FC<CommentSectionProps> = ({ postSlug }) => {
     const { user, setAuthModalOpen } = useAuth();
     const [comments, setComments] = useState<Comment[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -20,7 +20,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     useEffect(() => {
         const fetchComments = async () => {
             try {
-                const response = await commentService.getComments(postId);
+                const response = await commentService.getComments(postSlug);
                 setComments(response.data);
             } catch (error) {
                 console.error("Failed to load comments", error);
@@ -29,7 +29,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
             }
         };
         fetchComments();
-    }, [postId]);
+    }, [postSlug]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -38,7 +38,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
         setIsSubmitting(true);
         try {
             const parentId = replyingTo ? replyingTo.id : undefined;
-            const created = await commentService.createComment(postId, newComment, parentId);
+            const created = await commentService.createComment(postSlug, newComment, parentId);
 
             if (parentId) {
                 // Optimistically update replies
