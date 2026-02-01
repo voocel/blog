@@ -61,9 +61,6 @@ const PostsListPage: React.FC = () => {
 
     // Group posts based on active filter
     const groupedPosts: PostGroup[] = React.useMemo(() => {
-        console.log('Posts count:', posts.length);
-        console.log('Active filter:', activeFilter);
-
         if (posts.length === 0) {
             return [];
         }
@@ -106,8 +103,6 @@ const PostsListPage: React.FC = () => {
             groups[key].push(post);
         });
 
-        console.log('Groups:', Object.keys(groups));
-
         const result = Object.entries(groups)
             .map(([label, posts]) => ({
                 label,
@@ -121,7 +116,6 @@ const PostsListPage: React.FC = () => {
                 return 0;
             });
 
-        console.log('Grouped posts result:', result);
         return result;
     }, [posts, activeFilter]);
 
