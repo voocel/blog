@@ -13,19 +13,28 @@ import (
 
 type CommentHandler struct {
 	commentUseCase *usecase.CommentUseCase
+	postUseCase    *usecase.PostUseCase
 }
 
-func NewCommentHandler(commentUseCase *usecase.CommentUseCase) *CommentHandler {
-	return &CommentHandler{commentUseCase: commentUseCase}
+func NewCommentHandler(commentUseCase *usecase.CommentUseCase, postUseCase *usecase.PostUseCase) *CommentHandler {
+	return &CommentHandler{commentUseCase: commentUseCase, postUseCase: postUseCase}
 }
 
-// ListComments - GET /posts/:postId/comments
+// ListComments - GET /posts/:slug/comments
 func (h *CommentHandler) ListComments(c *gin.Context) {
-	postID := c.Param("id")
-	if !util.IsValidUUID(postID) {
-		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
+	slug := c.Param("slug")
+	if !util.IsValidSlug(slug) {
+		JSONError(c, http.StatusBadRequest, "Invalid post slug", nil)
 		return
 	}
+
+	// Look up post by slug to get its ID
+	post, err := h.postUseCase.GetBySlug(c.Request.Context(), slug)
+	if err != nil {
+		JSONError(c, http.StatusNotFound, "Post not found", err)
+		return
+	}
+
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
 	order := strings.ToLower(c.DefaultQuery("order", "desc"))
@@ -36,7 +45,7 @@ func (h *CommentHandler) ListComments(c *gin.Context) {
 		}
 	}
 
-	resp, err := h.commentUseCase.List(c.Request.Context(), postID, page, limit, order, withReplies)
+	resp, err := h.commentUseCase.List(c.Request.Context(), post.ID, page, limit, order, withReplies)
 	if err != nil {
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
@@ -45,11 +54,18 @@ func (h *CommentHandler) ListComments(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// CreateComment - POST /posts/:postId/comments
+// CreateComment - POST /posts/:slug/comments
 func (h *CommentHandler) CreateComment(c *gin.Context) {
-	postID := c.Param("id")
-	if !util.IsValidUUID(postID) {
-		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
+	slug := c.Param("slug")
+	if !util.IsValidSlug(slug) {
+		JSONError(c, http.StatusBadRequest, "Invalid post slug", nil)
+		return
+	}
+
+	// Look up post by slug to get its ID
+	post, err := h.postUseCase.GetBySlug(c.Request.Context(), slug)
+	if err != nil {
+		JSONError(c, http.StatusNotFound, "Post not found", err)
 		return
 	}
 
@@ -70,7 +86,7 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 		return
 	}
 
-	comment, err := h.commentUseCase.Create(c.Request.Context(), postID, userID, req)
+	comment, err := h.commentUseCase.Create(c.Request.Context(), post.ID, userID, req)
 	if err != nil {
 		JSONError(c, http.StatusBadRequest, err.Error(), err)
 		return

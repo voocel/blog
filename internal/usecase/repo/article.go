@@ -53,6 +53,30 @@ func (r *postRepo) GetByID(ctx context.Context, id string) (*entity.Post, error)
 	return &post, nil
 }
 
+func (r *postRepo) GetBySlug(ctx context.Context, slug string) (*entity.Post, error) {
+	var post entity.Post
+	err := r.db.WithContext(ctx).Where("slug = ?", slug).First(&post).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("post not found")
+		}
+		return nil, err
+	}
+	return &post, nil
+}
+
+func (r *postRepo) SlugExists(ctx context.Context, slug string, excludeID string) (bool, error) {
+	var count int64
+	query := r.db.WithContext(ctx).Model(&entity.Post{}).Where("slug = ?", slug)
+	if excludeID != "" {
+		query = query.Where("id != ?", excludeID)
+	}
+	if err := query.Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
 func (r *postRepo) GetByIDs(ctx context.Context, ids []string) ([]entity.Post, error) {
 	if len(ids) == 0 {
 		return []entity.Post{}, nil

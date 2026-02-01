@@ -198,6 +198,18 @@ const PostEditor: React.FC<PostEditorProps> = ({
                             </div>
                         </div>
 
+                        {/* Slug */}
+                        <div>
+                            <label className="block text-xs uppercase tracking-widest text-stone-500 mb-3 font-bold">URL Slug</label>
+                            <input
+                                className="w-full bg-white border border-stone-200 rounded-xl p-3 text-sm focus:outline-none focus:border-gold-500 shadow-sm font-mono"
+                                value={editingPost.slug || ''}
+                                onChange={e => setEditingPost({ ...editingPost, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                                placeholder="auto-generated-from-title"
+                            />
+                            <p className="text-xs text-stone-400 mt-2">Leave empty to auto-generate from title. URL: /post/{editingPost.slug || 'your-slug'}</p>
+                        </div>
+
                         {/* Category */}
                         <div>
                             <label className="block text-xs uppercase tracking-widest text-stone-500 mb-3 font-bold">Category</label>

@@ -61,7 +61,7 @@ const AppContent: React.FC = () => {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<HomePage />} />
           <Route path="/posts" element={<PostsListPage />} />
-          <Route path="/post/:id" element={<PostPage />} />
+          <Route path="/post/:slug" element={<PostPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/clock" element={<ClockPage />} />
           <Route path="/settings" element={<SettingsPage onExit={() => window.location.href = '/'} />} />

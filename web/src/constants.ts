@@ -42,6 +42,7 @@ export const MOCK_FILES: MediaFile[] = [
 export const MOCK_POSTS: BlogPost[] = [
   {
     id: '1',
+    slug: 'the-aesthetics-of-code',
     title: 'The Aesthetics of Code',
     excerpt: 'Exploring the silent rhythm of algorithms and why the most beautiful functions are often the most dangerous.',
     content: `> *Generative art has moved from the fringes to the center of the design world.*
@@ -74,6 +75,7 @@ We often fear the empty space in our editors, rushing to fill it with logic. But
   },
   {
     id: '2',
+    slug: 'silence-in-the-signal',
     title: 'Silence in the Signal',
     excerpt: 'Why minimalism is not just an aesthetic choice, but a survival mechanism in the age of infinite information.',
     content: `> *We are drowning in notifications.*
@@ -101,6 +103,7 @@ When we strip away the non-essential, we are left with the truth.`,
   },
   {
     id: '3',
+    slug: 'tokyo-golden-hour',
     title: 'Tokyo: Golden Hour',
     excerpt: 'A visual journey through the warm, lantern-lit streets and hidden alleyways of the metropolis.',
     content: `> *Tokyo is a sensory overload, but at golden hour, it breathes.*
@@ -126,6 +129,7 @@ I found myself walking for hours, camera in hand, looking for the quiet moments 
   },
   {
     id: '4',
+    slug: 'the-architecture-of-data',
     title: 'The Architecture of Data',
     excerpt: 'Breaking down the hype and understanding the architectural shift in the modern web ecosystem.',
     content: `> *React is evolving, and so are we.*
@@ -156,6 +160,7 @@ This is not just a syntax change; it is a mental model shift.`,
   },
   {
     id: '5',
+    slug: 'the-analog-web',
     title: 'The Analog Web',
     excerpt: 'Revisiting the textures of early computing and how to bring tactile feeling back to digital interfaces.',
     content: `> *Before flat design took over, the web had texture.*
@@ -175,6 +180,7 @@ Buttons should feel clickable. Transitions should feel physical. The web is a me
   },
   {
     id: '7',
+    slug: 'digital-gardens',
     title: 'Digital Gardens',
     excerpt: 'Why we should stop building "streams" and start cultivating "gardens" of knowledge that grow over time.',
     content: `> *The stream is ephemeral. The garden is eternal.*
@@ -199,6 +205,7 @@ Let's build spaces that age well.`,
   },
   {
     id: '8',
+    slug: 'typography-as-voice',
     title: 'Typography as Voice',
     excerpt: 'How typefaces subconsciously alter the meaning of the words we read, and the responsibility of the designer.',
     content: `> *Type is the clothes words wear.*
@@ -218,6 +225,7 @@ You wouldn't wear a tuxedo to a beach party. Why use Helvetica for a romance nov
   },
   {
     id: '9',
+    slug: 'the-slow-web',
     title: 'The Slow Web',
     excerpt: 'A manifesto for building websites that respect attention, bandwidth, and the user\'s cognitive load.',
     content: `> *Speed is a feature, but stillness is a virtue.*
@@ -237,6 +245,7 @@ Make it fast, yes. But make it calm.`,
   },
   {
     id: '6',
+    slug: 'notes-on-solitude',
     title: 'Notes on Solitude',
     excerpt: 'A personal reflection on working alone and the silence required to build great things.',
     content: '# Notes on Solitude\n\nThis is a draft post about the importance of being alone with your thoughts...',

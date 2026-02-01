@@ -7,7 +7,7 @@ import { postService } from '../services/postService';
 import type { BlogPost } from '../types';
 
 const PostPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
     const { isLoading } = useAuth();
     const [post, setPost] = useState<BlogPost | null>(null);
@@ -15,11 +15,11 @@ const PostPage: React.FC = () => {
 
     useEffect(() => {
         const fetchPost = async () => {
-            if (!id) return;
+            if (!slug) return;
 
             // Always fetch from API to trigger view count increment
             try {
-                const fetchedPost = await postService.getPost(id);
+                const fetchedPost = await postService.getPost(slug);
                 setPost(fetchedPost || null);
             } catch (error) {
                 console.error("Failed to load post", error);
@@ -29,7 +29,7 @@ const PostPage: React.FC = () => {
         };
 
         fetchPost();
-    }, [id]);
+    }, [slug]);
 
     if (loading || isLoading) {
         return (

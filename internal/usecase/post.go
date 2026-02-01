@@ -43,8 +43,20 @@ func (uc *PostUseCase) Create(ctx context.Context, req entity.CreatePostRequest,
 		return err
 	}
 
+	// Generate slug if not provided
+	slug := strings.TrimSpace(req.Slug)
+	if slug == "" {
+		slug = util.GenerateSlug(req.Title)
+	}
+	// Ensure slug uniqueness
+	slug, err = uc.ensureUniqueSlug(ctx, slug, "")
+	if err != nil {
+		return err
+	}
+
 	post := &entity.Post{
 		Title:      req.Title,
+		Slug:       slug,
 		Excerpt:    req.Excerpt,
 		Content:    req.Content,
 		Author:     author,
@@ -96,7 +108,44 @@ func (uc *PostUseCase) GetByID(ctx context.Context, id string) (*entity.PostResp
 	return uc.assemblePostResponse(ctx, post)
 }
 
-// GetByIDWithAnalytics retrieves a post and logs the visit (used by public API)
+// GetBySlug retrieves a post by slug
+func (uc *PostUseCase) GetBySlug(ctx context.Context, slug string) (*entity.PostResponse, error) {
+	post, err := uc.postRepo.GetBySlug(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+
+	return uc.assemblePostResponse(ctx, post)
+}
+
+// GetBySlugWithAnalytics retrieves a post by slug and logs the visit (used by public API)
+func (uc *PostUseCase) GetBySlugWithAnalytics(ctx context.Context, slug, ip, userAgent string) (*entity.PostResponse, error) {
+	post, err := uc.postRepo.GetBySlug(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+
+	// Increment views (async with timeout)
+	util.SafeGo(func() {
+		bgCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		if err := uc.postRepo.IncrementViews(bgCtx, post.ID); err != nil {
+			log.Warnw("Failed to increment views",
+				log.Pair("post_id", post.ID),
+				log.Pair("error", err.Error()),
+			)
+		}
+	})
+
+	// Log visit (async) - use slug in PagePath for SEO-friendly URLs
+	util.SafeGo(func() {
+		uc.logVisit(post.ID, post.Slug, post.Title, ip, userAgent)
+	})
+
+	return uc.assemblePostResponse(ctx, post)
+}
+
+// GetByIDWithAnalytics retrieves a post by ID and logs the visit
 func (uc *PostUseCase) GetByIDWithAnalytics(ctx context.Context, id, ip, userAgent string) (*entity.PostResponse, error) {
 	post, err := uc.postRepo.GetByID(ctx, id)
 	if err != nil {
@@ -117,14 +166,14 @@ func (uc *PostUseCase) GetByIDWithAnalytics(ctx context.Context, id, ip, userAge
 
 	// Log visit (async)
 	util.SafeGo(func() {
-		uc.logVisit(id, post.Title, ip, userAgent)
+		uc.logVisit(id, post.Slug, post.Title, ip, userAgent)
 	})
 
 	return uc.assemblePostResponse(ctx, post)
 }
 
 // logVisit records a page visit to analytics
-func (uc *PostUseCase) logVisit(postID, postTitle, ip, userAgent string) {
+func (uc *PostUseCase) logVisit(postID, postSlug, postTitle, ip, userAgent string) {
 	if uc.analyticsRepo == nil {
 		return
 	}
@@ -133,7 +182,7 @@ func (uc *PostUseCase) logVisit(postID, postTitle, ip, userAgent string) {
 
 	pID := postID
 	analyticsLog := &entity.Analytics{
-		PagePath:  "/post/" + postID,
+		PagePath:  "/post/" + postSlug,
 		PostID:    &pID,
 		PostTitle: postTitle,
 		IP:        ip,
@@ -150,6 +199,22 @@ func (uc *PostUseCase) logVisit(postID, postTitle, ip, userAgent string) {
 			log.Pair("error", err.Error()),
 		)
 	}
+}
+
+// ensureUniqueSlug ensures the slug is unique by appending a number suffix if needed
+func (uc *PostUseCase) ensureUniqueSlug(ctx context.Context, baseSlug, excludeID string) (string, error) {
+	slug := baseSlug
+	for i := 2; i <= 100; i++ {
+		exists, err := uc.postRepo.SlugExists(ctx, slug, excludeID)
+		if err != nil {
+			return "", err
+		}
+		if !exists {
+			return slug, nil
+		}
+		slug = fmt.Sprintf("%s-%d", baseSlug, i)
+	}
+	return "", fmt.Errorf("%w: unable to generate unique slug", ErrInvalidArgument)
 }
 
 // LogHomeVisit records a homepage visit to analytics
@@ -270,6 +335,7 @@ func (uc *PostUseCase) assemblePostResponsesBatch(ctx context.Context, posts []e
 		p := posts[i]
 		resp := entity.PostResponse{
 			ID:         p.ID,
+			Slug:       p.Slug,
 			Title:      p.Title,
 			Excerpt:    p.Excerpt,
 			Content:    p.Content,
@@ -303,6 +369,17 @@ func (uc *PostUseCase) Update(ctx context.Context, id string, req entity.UpdateP
 	// Update fields
 	if req.Title != "" {
 		post.Title = req.Title
+	}
+	if req.Slug != "" {
+		slug := strings.TrimSpace(req.Slug)
+		if slug != post.Slug {
+			// Ensure new slug is unique
+			slug, err = uc.ensureUniqueSlug(ctx, slug, post.ID)
+			if err != nil {
+				return err
+			}
+			post.Slug = slug
+		}
 	}
 	if req.Excerpt != "" {
 		post.Excerpt = req.Excerpt
@@ -382,6 +459,7 @@ func (uc *PostUseCase) Delete(ctx context.Context, id string) error {
 func (uc *PostUseCase) assemblePostResponse(ctx context.Context, post *entity.Post) (*entity.PostResponse, error) {
 	resp := &entity.PostResponse{
 		ID:         post.ID,
+		Slug:       post.Slug,
 		Title:      post.Title,
 		Excerpt:    post.Excerpt,
 		Content:    post.Content,

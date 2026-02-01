@@ -17,13 +17,13 @@ export const postService = {
         return { data: [], pagination: undefined };
     },
 
-    getPost: async (id: string): Promise<BlogPost | undefined> => {
+    getPost: async (slug: string): Promise<BlogPost | undefined> => {
         try {
-            // Public API: /posts/:id (only published)
-            const response = await apiClient.get(`/posts/${id}`);
+            // Public API: /posts/:slug (only published)
+            const response = await apiClient.get(`/posts/${slug}`);
             return response.data;
         } catch (error) {
-            console.error(`Failed to get post ${id}`, error);
+            console.error(`Failed to get post ${slug}`, error);
             return undefined;
         }
     },

@@ -28,7 +28,9 @@ type PostRepo interface {
 	// CreateWithTags creates the post and its tag associations atomically.
 	CreateWithTags(ctx context.Context, post *entity.Post, tagIDs []string) error
 	GetByID(ctx context.Context, id string) (*entity.Post, error)
+	GetBySlug(ctx context.Context, slug string) (*entity.Post, error)
 	GetByIDs(ctx context.Context, ids []string) ([]entity.Post, error)
+	SlugExists(ctx context.Context, slug string, excludeID string) (bool, error)
 	List(ctx context.Context, filters map[string]interface{}, page, limit int) ([]entity.Post, int64, error)
 	Update(ctx context.Context, post *entity.Post) error
 	// UpdateWithTags updates the post and replaces tag associations atomically.

@@ -84,7 +84,7 @@ func NewContainer(db *gorm.DB) *Container {
 	c.MediaHandler = handler.NewMediaHandler(c.MediaUseCase)
 	c.AnalyticsHandler = handler.NewAnalyticsHandler(c.AnalyticsUseCase)
 	c.SystemEventHandler = handler.NewSystemEventHandler(c.SystemEventUseCase)
-	c.CommentHandler = handler.NewCommentHandler(c.CommentUseCase)
+	c.CommentHandler = handler.NewCommentHandler(c.CommentUseCase, c.PostUseCase)
 	c.LikeHandler = handler.NewLikeHandler(c.LikeUseCase)
 
 	return c

@@ -6,6 +6,7 @@ import (
 
 type Post struct {
 	ID      string `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	Slug    string `gorm:"type:varchar(255);uniqueIndex;not null" json:"slug"`
 	Title   string `gorm:"type:varchar(255);not null" json:"title"`
 	Excerpt string `gorm:"type:varchar(500);not null" json:"excerpt"`
 	Content string `gorm:"type:text;not null" json:"content"` // Markdown
@@ -30,6 +31,7 @@ type PostTag struct {
 
 type PostResponse struct {
 	ID         string    `json:"id"`
+	Slug       string    `json:"slug"`
 	Title      string    `json:"title"`
 	Excerpt    string    `json:"excerpt"`
 	Content    string    `json:"content"`
@@ -46,7 +48,8 @@ type PostResponse struct {
 
 type CreatePostRequest struct {
 	Title      string   `json:"title" binding:"required"`
-	Excerpt    string   `json:"excerpt"` // Optional: if empty, backend will derive from content
+	Slug       string   `json:"slug"`                    // Optional: if empty, auto-generated from title
+	Excerpt    string   `json:"excerpt"`                 // Optional: if empty, backend will derive from content
 	Content    string   `json:"content" binding:"required"`
 	CategoryID string   `json:"categoryId" binding:"required"`
 	Tags       []string `json:"tags"` // Tag IDs
@@ -59,6 +62,7 @@ type CreatePostRequest struct {
 
 type UpdatePostRequest struct {
 	Title      string   `json:"title,omitempty"`
+	Slug       string   `json:"slug,omitempty"`
 	Excerpt    string   `json:"excerpt,omitempty"`
 	Content    string   `json:"content,omitempty"`
 	CategoryID string   `json:"categoryId,omitempty"`

@@ -85,17 +85,17 @@ func (h *PostHandler) ListAllPosts(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// GetPost - GET /posts/:id (Public API)
+// GetPost - GET /posts/:slug (Public API)
 func (h *PostHandler) GetPost(c *gin.Context) {
-	id := c.Param("id")
-	if !util.IsValidUUID(id) {
-		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
+	slug := c.Param("slug")
+	if !util.IsValidSlug(slug) {
+		JSONError(c, http.StatusBadRequest, "Invalid post slug", nil)
 		return
 	}
 	ip := c.ClientIP()
 	userAgent := c.GetHeader("User-Agent")
 
-	post, err := h.postUseCase.GetByIDWithAnalytics(c.Request.Context(), id, ip, userAgent)
+	post, err := h.postUseCase.GetBySlugWithAnalytics(c.Request.Context(), slug, ip, userAgent)
 	if err != nil {
 		JSONError(c, http.StatusNotFound, "Post not found", err)
 		return

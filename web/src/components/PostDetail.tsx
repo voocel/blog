@@ -28,7 +28,7 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
         window.scrollTo(0, 0);
 
         // Fetch article likes
-        postService.getLikes(`post-${post.id}`)
+        postService.getLikes(`post-${post.slug}`)
             .then(count => setArticleLikes(count))
             .catch(err => console.error('Failed to fetch article likes:', err));
 
@@ -41,7 +41,7 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
             level: match[1].length,
         }));
         setTocItems(items);
-    }, [post.id, post.content]);
+    }, [post.slug, post.content]);
 
     const handleGenerateSummary = async () => {
         setLoadingSummary(true);
@@ -227,7 +227,7 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
                         <div className="absolute left-0 top-0 scale-90 origin-top-left">
                             <LikeButton
                                 initialCount={articleLikes}
-                                onLike={async () => { await postService.like(`post-${post.id}`); }}
+                                onLike={async () => { await postService.like(`post-${post.slug}`); }}
                             />
                         </div>
                     </div>

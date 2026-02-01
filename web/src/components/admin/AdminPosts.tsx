@@ -7,7 +7,7 @@ interface AdminPostsProps {
     onEditPost: (post?: BlogPost) => void;
     onDeletePost: (id: string) => void;
     onPublishPost: (id: string) => void;
-    onViewPost: (id: string) => void;
+    onViewPost: (slug: string) => void;
     requestConfirm: (title: string, message: string, onConfirm: () => void, options?: { confirmText?: string; isDestructive?: boolean }) => void;
 }
 
@@ -93,14 +93,14 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
                             <div className={`w-1.5 h-full min-h-[4rem] rounded-full ${post.status === 'published' ? 'bg-emerald-400' : 'bg-stone-300'}`} />
 
                             {/* Image */}
-                            <div className="w-28 h-20 rounded-lg bg-stone-100 overflow-hidden shrink-0 relative border border-stone-100 cursor-pointer" onClick={() => onViewPost(post.id)}>
+                            <div className="w-28 h-20 rounded-lg bg-stone-100 overflow-hidden shrink-0 relative border border-stone-100 cursor-pointer" onClick={() => onViewPost(post.slug)}>
                                 <img src={post.cover} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="" />
                             </div>
 
                             {/* Content */}
                             <div className="flex-1 min-w-0 py-1">
                                 <div className="flex items-center gap-3 mb-1.5">
-                                    <h3 onClick={() => onViewPost(post.id)} className="text-xl font-serif font-bold text-ink truncate hover:text-gold-600 transition-colors cursor-pointer">{post.title}</h3>
+                                    <h3 onClick={() => onViewPost(post.slug)} className="text-xl font-serif font-bold text-ink truncate hover:text-gold-600 transition-colors cursor-pointer">{post.title}</h3>
                                     {post.status === 'draft' && (
                                         <span className="text-[10px] uppercase tracking-wider font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 animate-pulse">
                                             Draft

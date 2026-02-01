@@ -149,11 +149,11 @@ const HomePage: React.FC = () => {
           <BentoItem className="h-auto !bg-[#FFFBF0] hover:!bg-[#FFFBF0] cursor-pointer relative group !p-4 overflow-hidden shadow-sm border border-orange-100/30">
             {latestPost ? (
               <div
-                onClick={() => navigate(`/post/${latestPost.id}`)}
+                onClick={() => navigate(`/post/${latestPost.slug}`)}
                 className="flex flex-col gap-3"
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${latestPost.id}`)}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${latestPost.slug}`)}
               >
                 {/* Header */}
                 <div className="text-sm font-bold text-stone-500 tracking-wide">{t.home.latestPost}</div>
@@ -238,11 +238,11 @@ const HomePage: React.FC = () => {
           <BentoItem className="h-auto !bg-[#FFFBF0] hover:!bg-[#FFFBF0] cursor-pointer relative group !p-5 overflow-hidden shadow-sm border border-orange-100/30 !rounded-[1.5rem]">
             {latestPost ? (
               <div
-                onClick={() => navigate(`/post/${latestPost.id}`)}
+                onClick={() => navigate(`/post/${latestPost.slug}`)}
                 className="flex flex-col gap-4"
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${latestPost.id}`)}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${latestPost.slug}`)}
                 aria-label={`Read article: ${latestPost.title}`}
               >
                 {/* Header */}
@@ -301,11 +301,11 @@ const HomePage: React.FC = () => {
           <BentoItem className="h-auto !bg-[#FFF5F0] hover:!bg-[#FFF5F0] cursor-pointer relative group !p-5 overflow-hidden shadow-sm border border-rose-100/30 !rounded-[1.5rem]">
             {randomPost ? (
               <div
-                onClick={() => navigate(`/post/${randomPost.id}`)}
+                onClick={() => navigate(`/post/${randomPost.slug}`)}
                 className="flex flex-col gap-4"
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${randomPost.id}`)}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${randomPost.slug}`)}
                 aria-label={`Read article: ${randomPost.title}`}
               >
                 {/* Header */}

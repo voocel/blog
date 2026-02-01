@@ -205,11 +205,11 @@ const PostsListPage: React.FC = () => {
                             {group.posts.map((post, postIndex) => (
                                 <motion.div
                                     key={post.id}
-                                    onClick={() => navigate(`/post/${post.id}`)}
+                                    onClick={() => navigate(`/post/${post.slug}`)}
                                     className="flex items-start gap-4 py-2.5 px-3 -mx-3 rounded-xl hover:bg-white/70 cursor-pointer transition-all duration-200 group"
                                     role="button"
                                     tabIndex={0}
-                                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${post.id}`)}
+                                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${post.slug}`)}
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.3 + postIndex * 0.05 }}

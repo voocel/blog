@@ -266,7 +266,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                     onEditPost={handleEditPost}
                     onDeletePost={deletePost}
                     onPublishPost={handlePublishPost}
-                    onViewPost={(id) => { navigate(`/post/${id}`); }}
+                    onViewPost={(slug) => { navigate(`/post/${slug}`); }}
                     requestConfirm={requestConfirm}
                 />
             )}

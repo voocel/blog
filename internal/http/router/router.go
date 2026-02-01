@@ -45,15 +45,15 @@ func setupPublicRoutes(v1 *gin.RouterGroup, c *Container) {
 	posts := v1.Group("/posts")
 	{
 		posts.GET("", c.PostHandler.ListPublishedPosts)
-		posts.GET("/:id", c.PostHandler.GetPost)
-		posts.GET("/:id/comments", c.CommentHandler.ListComments)
+		posts.GET("/:slug", c.PostHandler.GetPost)
+		posts.GET("/:slug/comments", c.CommentHandler.ListComments)
 	}
 
 	// Comments - Authenticated create
 	authComments := v1.Group("/posts")
 	authComments.Use(middleware.JWTAuth(c.UserRepo))
 	{
-		authComments.POST("/:id/comments", c.CommentHandler.CreateComment)
+		authComments.POST("/:slug/comments", c.CommentHandler.CreateComment)
 	}
 
 	// Taxonomy - Public Read
