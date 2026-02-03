@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM docker.1ms.run/golang:1.25-alpine AS builder
+FROM docker.m.daocloud.io/golang:1.25-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache git

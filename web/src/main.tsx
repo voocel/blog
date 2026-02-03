@@ -7,9 +7,11 @@ import { SettingsProvider } from './context/SettingsContext';
 import type { AdminSection } from './types';
 import Sidebar from './components/Sidebar';
 import AuthModal from './components/AuthModal';
-import AIChat from './components/AIChat';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider } from './components/Toast';
+
+// Lazy Load AIChat (large deps: @uiw/react-md-editor, @google/genai)
+const AIChat = React.lazy(() => import('./components/AIChat'));
 
 // Lazy Load Pages
 const HomePage = React.lazy(() => import('./pages/HomePage'));
@@ -69,7 +71,11 @@ const AppContent: React.FC = () => {
         </Routes>
       </Suspense>
 
-      {location.pathname !== '/settings' && <AIChat />}
+      {location.pathname !== '/settings' && (
+        <Suspense fallback={null}>
+          <AIChat />
+        </Suspense>
+      )}
     </div>
   );
 };

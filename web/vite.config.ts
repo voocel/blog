@@ -15,5 +15,32 @@ export default defineConfig({
         changeOrigin: true,
       }
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          // Core React (required for all pages)
+          if (id.includes('node_modules/react-dom') ||
+              id.includes('node_modules/react/') ||
+              id.includes('node_modules/react-router')) {
+            return 'react-vendor'
+          }
+          // Markdown editor (only for AIChat and PostPage)
+          if (id.includes('node_modules/@uiw/react-md-editor') ||
+              id.includes('node_modules/@uiw/react-markdown-preview')) {
+            return 'md-editor'
+          }
+          // Gemini AI SDK (only for AIChat)
+          if (id.includes('node_modules/@google/genai')) {
+            return 'gemini'
+          }
+          // Animation library
+          if (id.includes('node_modules/framer-motion')) {
+            return 'framer'
+          }
+        }
+      }
+    }
   }
 })
