@@ -5,7 +5,7 @@ import (
 )
 
 type Category struct {
-	ID        string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	ID        int64     `gorm:"primaryKey;autoIncrement" json:"id"`
 	Name      string    `gorm:"type:varchar(100);uniqueIndex;not null" json:"name"`
 	Slug      string    `gorm:"type:varchar(150);uniqueIndex;not null" json:"slug"`
 	Count     int       `gorm:"type:int;default:0" json:"count"` // number of posts
@@ -14,7 +14,7 @@ type Category struct {
 }
 
 type CategoryResponse struct {
-	ID    string `json:"id"`
+	ID    int64  `json:"id"`
 	Name  string `json:"name"`
 	Slug  string `json:"slug"`
 	Count int    `json:"count"`

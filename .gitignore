@@ -47,6 +47,7 @@ config/GeoLite2-Country.mmdb
 *.zip
 *_backup*
 backup_*
+backup/
 
 # Docker volumes
 postgres_data/

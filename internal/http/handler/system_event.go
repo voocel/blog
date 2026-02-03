@@ -31,7 +31,9 @@ func (h *SystemEventHandler) ListEvents(c *gin.Context) {
 
 	filters := make(map[string]interface{})
 	if userID != "" {
-		filters["user_id"] = userID
+		if uid, err := strconv.ParseInt(userID, 10, 64); err == nil && uid != 0 {
+			filters["user_id"] = uid
+		}
 	}
 	if action != "" {
 		filters["action"] = action
@@ -63,7 +65,12 @@ func (h *SystemEventHandler) ListEvents(c *gin.Context) {
 
 // GetUserEvents - GET /admin/events/user/:id
 func (h *SystemEventHandler) GetUserEvents(c *gin.Context) {
-	userID := c.Param("id")
+	userIDStr := c.Param("id")
+	userID, err := strconv.ParseInt(userIDStr, 10, 64)
+	if err != nil {
+		JSONError(c, http.StatusBadRequest, "Invalid user id", nil)
+		return
+	}
 	limit, _ := strconv.Atoi(c.Query("limit"))
 	if limit <= 0 {
 		limit = 50

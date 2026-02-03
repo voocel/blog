@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { IconSearch, IconTrash, IconMessageSquare } from '../Icons';
 
 interface AdminCommentsProps {
-    comments: any[]; // Using any[] since we expect extended properties like postTitle, id, etc.
-    onDeleteComment: (id: string) => void;
+    comments: any[];
+    onDeleteComment: (id: number) => void;
 }
 
 const AdminComments: React.FC<AdminCommentsProps> = ({ comments, onDeleteComment }) => {

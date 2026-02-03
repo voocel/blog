@@ -2,7 +2,7 @@
 import type { TranslationKeys } from './en';
 
 export const zh: TranslationKeys = {
-  // 设置弹窗
+  // Settings modal
   settings: {
     title: '设置',
     appearance: '外观',
@@ -15,7 +15,7 @@ export const zh: TranslationKeys = {
     resetConfirm: '确定要恢复所有默认设置吗？',
   },
 
-  // 外观设置
+  // Appearance settings
   appearance: {
     themeMode: '主题模式',
     light: '亮色',
@@ -28,7 +28,7 @@ export const zh: TranslationKeys = {
     animationsDesc: '页面过渡和特效',
   },
 
-  // 音乐设置
+  // Music settings
   music: {
     display: '显示',
     showPlayer: '显示音乐播放器',
@@ -42,14 +42,14 @@ export const zh: TranslationKeys = {
     loopPlaylistDesc: '播放列表结束后重复',
   },
 
-  // 语言设置
+  // Language settings
   languageSettings: {
     title: '语言',
     selectLanguage: '选择语言',
     languageDesc: '选择您偏好的语言',
   },
 
-  // 首页
+  // Homepage
   home: {
     latestPost: '最新文章',
     randomPick: '随机推荐',

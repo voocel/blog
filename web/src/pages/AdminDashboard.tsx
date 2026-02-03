@@ -113,11 +113,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
     // --- Post Handlers ---
     const handleEditPost = (post?: BlogPost) => {
         if (post) {
-            const tagIds = (post.tags || []).map(t => {
-                const tagByName = tags.find(tag => tag.name === t);
-                return tagByName ? tagByName.id : t;
-            });
-            setEditingPost({ ...post, tags: tagIds });
+            setEditingPost({ ...post });
         } else {
             setEditingPost({
                 title: '',
@@ -144,10 +140,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         const payload: any = {
             ...post,
             categoryId: post.categoryId,
-            tags: (post.tags || []).map(t => {
-                const tagByName = tags.find(tag => tag.name === t);
-                return tagByName ? tagByName.id : t;
-            })
+            tags: post.tags || []
         };
 
         if (!payload.categoryId && categories.length > 0) {
@@ -170,7 +163,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         setEditingPost(null);
     };
 
-    const handlePublishPost = async (id: string) => {
+    const handlePublishPost = async (id: number) => {
         try {
             await updatePost(id, { status: 'published' });
             refreshPosts();
@@ -185,7 +178,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
     const handleAddCategory = async (name: string) => {
         try {
             await addCategory({
-                id: `c-${Date.now()}`,
+                id: Date.now(),
                 name: name,
                 slug: name.toLowerCase().replace(/ /g, '-'),
                 count: 0
@@ -197,7 +190,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         }
     };
 
-    const handleDeleteCategory = async (id: string) => {
+    const handleDeleteCategory = async (id: number) => {
         try {
             await deleteCategory(id);
             showToast("Category deleted successfully", "success");
@@ -210,7 +203,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
     const handleAddTag = async (name: string) => {
         try {
             await addTag({
-                id: `t-${Date.now()}`,
+                id: Date.now(),
                 name: name
             });
             showToast("Tag created successfully", "success");
@@ -220,7 +213,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         }
     };
 
-    const handleDeleteTag = async (id: string) => {
+    const handleDeleteTag = async (id: number) => {
         try {
             await deleteTag(id);
             showToast("Tag deleted successfully", "success");
@@ -241,7 +234,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         }
     };
 
-    const handleDeleteFile = async (id: string) => {
+    const handleDeleteFile = async (id: number) => {
         try {
             await deleteFile(id);
             showToast("File deleted successfully", "success");

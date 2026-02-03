@@ -1,6 +1,6 @@
 
 export interface BlogPost {
-  id: string;
+  id: number;
   slug: string;
   title: string;
   excerpt: string;
@@ -8,29 +8,29 @@ export interface BlogPost {
   author: string;
   // Scheduled publish time in RFC3339 (e.g. 2025-12-14T16:30:00+08:00)
   publishAt: string;
-  categoryId: string;
+  categoryId: number;
   category: string;
   readTime: string;
   cover: string;
-  tags: string[]; // Array of Tag IDs
+  tags: number[]; // Tag IDs for editing; API response returns string[] names (JS handles automatically)
   views: number;
   status: 'published' | 'draft';
 }
 
 export interface Category {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   count: number;
 }
 
 export interface Tag {
-  id: string;
+  id: number;
   name: string;
 }
 
 export interface MediaFile {
-  id: string;
+  id: number;
   url: string;
   name: string;
   type: 'image' | 'video' | 'document';
@@ -44,8 +44,8 @@ export interface ChatMessage {
 }
 
 export interface Comment {
-  id: string;
-  parentId: string | null;
+  id: number;
+  parentId: number | null;
   content: string;
   createdAt: string;
   user: {
@@ -60,12 +60,12 @@ export interface Comment {
 }
 
 export interface User {
-  id: string; // Ensure ID is present for management
+  id: number;
   username: string;
   email: string;
   role: 'admin' | 'visitor';
-  status?: 'active' | 'banned'; // Optional for backward compatibility if backend doesn't always send
-  provider?: 'email' | 'google' | 'github'; // Auth provider
+  status?: 'active' | 'banned';
+  provider?: 'email' | 'google' | 'github';
   avatar?: string;
 }
 
@@ -79,9 +79,9 @@ export type Theme = typeof Theme[keyof typeof Theme];
 export type AdminSection = 'overview' | 'posts' | 'categories' | 'tags' | 'files' | 'echoes' | 'users' | 'comments';
 
 export interface VisitLog {
-  id: string;
+  id: number;
   pagePath: string;
-  postId?: string;
+  postId?: number;
   postTitle?: string;
   ip: string;
   location: string;

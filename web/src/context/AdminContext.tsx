@@ -20,7 +20,7 @@ interface AdminContextType {
 
     // File CRUD
     addFile: (file: MediaFile) => Promise<void>;
-    deleteFile: (id: string) => Promise<void>;
+    deleteFile: (id: number) => Promise<void>;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -100,7 +100,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
     };
 
-    const deleteFile = async (id: string) => {
+    const deleteFile = async (id: number) => {
         try {
             await metaService.deleteFile(id);
             setFiles(prev => prev.filter(f => f.id !== id));

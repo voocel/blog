@@ -74,7 +74,7 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 		JSONError(c, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
-	userID, ok := userIDVal.(string)
+	userID, ok := userIDVal.(int64)
 	if !ok {
 		JSONError(c, http.StatusInternalServerError, "Invalid user ID type", nil)
 		return
@@ -107,7 +107,12 @@ func (h *CommentHandler) ListAllCommentsAdmin(c *gin.Context) {
 
 // DeleteCommentAdmin - DELETE /admin/comments/:id
 func (h *CommentHandler) DeleteCommentAdmin(c *gin.Context) {
-	id := c.Param("id")
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		JSONError(c, http.StatusBadRequest, "Invalid comment id", nil)
+		return
+	}
 	if err := h.commentUseCase.DeleteAdmin(c.Request.Context(), id); err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			JSONError(c, http.StatusNotFound, "Comment not found", err)

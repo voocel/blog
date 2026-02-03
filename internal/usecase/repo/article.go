@@ -22,7 +22,7 @@ func (r *postRepo) Create(ctx context.Context, post *entity.Post) error {
 	return r.db.WithContext(ctx).Create(post).Error
 }
 
-func (r *postRepo) CreateWithTags(ctx context.Context, post *entity.Post, tagIDs []string) error {
+func (r *postRepo) CreateWithTags(ctx context.Context, post *entity.Post, tagIDs []int64) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(post).Error; err != nil {
 			return err
@@ -41,7 +41,7 @@ func (r *postRepo) CreateWithTags(ctx context.Context, post *entity.Post, tagIDs
 	})
 }
 
-func (r *postRepo) GetByID(ctx context.Context, id string) (*entity.Post, error) {
+func (r *postRepo) GetByID(ctx context.Context, id int64) (*entity.Post, error) {
 	var post entity.Post
 	err := r.db.WithContext(ctx).Where("id = ?", id).First(&post).Error
 	if err != nil {
@@ -65,10 +65,10 @@ func (r *postRepo) GetBySlug(ctx context.Context, slug string) (*entity.Post, er
 	return &post, nil
 }
 
-func (r *postRepo) SlugExists(ctx context.Context, slug string, excludeID string) (bool, error) {
+func (r *postRepo) SlugExists(ctx context.Context, slug string, excludeID int64) (bool, error) {
 	var count int64
 	query := r.db.WithContext(ctx).Model(&entity.Post{}).Where("slug = ?", slug)
-	if excludeID != "" {
+	if excludeID != 0 {
 		query = query.Where("id != ?", excludeID)
 	}
 	if err := query.Count(&count).Error; err != nil {
@@ -77,7 +77,7 @@ func (r *postRepo) SlugExists(ctx context.Context, slug string, excludeID string
 	return count > 0, nil
 }
 
-func (r *postRepo) GetByIDs(ctx context.Context, ids []string) ([]entity.Post, error) {
+func (r *postRepo) GetByIDs(ctx context.Context, ids []int64) ([]entity.Post, error) {
 	if len(ids) == 0 {
 		return []entity.Post{}, nil
 	}
@@ -96,7 +96,7 @@ func (r *postRepo) List(ctx context.Context, filters map[string]interface{}, pag
 	query := r.db.WithContext(ctx).Model(&entity.Post{})
 
 	// Apply filter conditions
-	if categoryID, ok := filters["categoryId"].(string); ok && categoryID != "" {
+	if categoryID, ok := filters["categoryId"].(int64); ok && categoryID != 0 {
 		query = query.Where("category_id = ?", categoryID)
 	}
 	if status, ok := filters["status"].(string); ok && status != "" {
@@ -135,7 +135,7 @@ func (r *postRepo) Update(ctx context.Context, post *entity.Post) error {
 	return r.db.WithContext(ctx).Save(post).Error
 }
 
-func (r *postRepo) UpdateWithTags(ctx context.Context, post *entity.Post, tagIDs []string) error {
+func (r *postRepo) UpdateWithTags(ctx context.Context, post *entity.Post, tagIDs []int64) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Save(post).Error; err != nil {
 			return err
@@ -158,7 +158,7 @@ func (r *postRepo) UpdateWithTags(ctx context.Context, post *entity.Post, tagIDs
 	})
 }
 
-func (r *postRepo) Delete(ctx context.Context, id string) error {
+func (r *postRepo) Delete(ctx context.Context, id int64) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Where("post_id = ?", id).Delete(&entity.Comment{}).Error; err != nil {
 			return err
@@ -170,14 +170,14 @@ func (r *postRepo) Delete(ctx context.Context, id string) error {
 	})
 }
 
-func (r *postRepo) IncrementViews(ctx context.Context, id string) error {
+func (r *postRepo) IncrementViews(ctx context.Context, id int64) error {
 	return r.db.WithContext(ctx).Model(&entity.Post{}).
 		Where("id = ?", id).
 		UpdateColumn("views", gorm.Expr("views + 1")).Error
 }
 
 // AddTags adds post-tag associations
-func (r *postRepo) AddTags(ctx context.Context, postID string, tagIDs []string) error {
+func (r *postRepo) AddTags(ctx context.Context, postID int64, tagIDs []int64) error {
 	var postTags []entity.PostTag
 	for _, tagID := range tagIDs {
 		postTags = append(postTags, entity.PostTag{
@@ -189,34 +189,34 @@ func (r *postRepo) AddTags(ctx context.Context, postID string, tagIDs []string) 
 }
 
 // RemoveTags removes all tag associations for a post
-func (r *postRepo) RemoveTags(ctx context.Context, postID string) error {
+func (r *postRepo) RemoveTags(ctx context.Context, postID int64) error {
 	return r.db.WithContext(ctx).Where("post_id = ?", postID).Delete(&entity.PostTag{}).Error
 }
 
 // GetTagIDs gets tag ID list for a post
-func (r *postRepo) GetTagIDs(ctx context.Context, postID string) ([]string, error) {
+func (r *postRepo) GetTagIDs(ctx context.Context, postID int64) ([]int64, error) {
 	var postTags []entity.PostTag
 	err := r.db.WithContext(ctx).Where("post_id = ?", postID).Find(&postTags).Error
 	if err != nil {
 		return nil, err
 	}
 
-	tagIDs := make([]string, len(postTags))
+	tagIDs := make([]int64, len(postTags))
 	for i, pt := range postTags {
 		tagIDs[i] = pt.TagID
 	}
 	return tagIDs, nil
 }
 
-func (r *postRepo) GetTagIDsByPostIDs(ctx context.Context, postIDs []string) (map[string][]string, error) {
+func (r *postRepo) GetTagIDsByPostIDs(ctx context.Context, postIDs []int64) (map[int64][]int64, error) {
 	if len(postIDs) == 0 {
-		return map[string][]string{}, nil
+		return map[int64][]int64{}, nil
 	}
 	var postTags []entity.PostTag
 	if err := r.db.WithContext(ctx).Where("post_id IN ?", postIDs).Find(&postTags).Error; err != nil {
 		return nil, err
 	}
-	out := make(map[string][]string, len(postIDs))
+	out := make(map[int64][]int64, len(postIDs))
 	for _, pt := range postTags {
 		out[pt.PostID] = append(out[pt.PostID], pt.TagID)
 	}

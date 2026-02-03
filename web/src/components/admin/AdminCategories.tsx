@@ -5,7 +5,7 @@ import type { Category } from '../../types';
 interface AdminCategoriesProps {
     categories: Category[];
     onAddCategory: (name: string) => void;
-    onDeleteCategory: (id: string) => void;
+    onDeleteCategory: (id: number) => void;
     requestConfirm: (title: string, message: string, onConfirm: () => void) => void;
 }
 

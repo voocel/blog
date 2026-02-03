@@ -22,7 +22,7 @@ func (r *commentRepo) Create(ctx context.Context, comment *entity.Comment) error
 	return r.db.WithContext(ctx).Create(comment).Error
 }
 
-func (r *commentRepo) GetByID(ctx context.Context, id string) (*entity.Comment, error) {
+func (r *commentRepo) GetByID(ctx context.Context, id int64) (*entity.Comment, error) {
 	var c entity.Comment
 	err := r.db.WithContext(ctx).Where("id = ?", id).First(&c).Error
 	if err != nil {
@@ -34,7 +34,7 @@ func (r *commentRepo) GetByID(ctx context.Context, id string) (*entity.Comment, 
 	return &c, nil
 }
 
-func (r *commentRepo) ListTopLevel(ctx context.Context, postID string, page, limit int, order string) ([]entity.Comment, int64, error) {
+func (r *commentRepo) ListTopLevel(ctx context.Context, postID int64, page, limit int, order string) ([]entity.Comment, int64, error) {
 	var (
 		comments []entity.Comment
 		total    int64
@@ -60,7 +60,7 @@ func (r *commentRepo) ListTopLevel(ctx context.Context, postID string, page, lim
 	return comments, total, nil
 }
 
-func (r *commentRepo) ListReplies(ctx context.Context, postID string, parentIDs []string, order string) ([]entity.Comment, error) {
+func (r *commentRepo) ListReplies(ctx context.Context, postID int64, parentIDs []int64, order string) ([]entity.Comment, error) {
 	if len(parentIDs) == 0 {
 		return []entity.Comment{}, nil
 	}
@@ -92,6 +92,6 @@ func (r *commentRepo) ListAll(ctx context.Context) ([]entity.Comment, error) {
 	return comments, err
 }
 
-func (r *commentRepo) DeleteCascade(ctx context.Context, id string) error {
+func (r *commentRepo) DeleteCascade(ctx context.Context, id int64) error {
 	return r.db.WithContext(ctx).Where("id = ? OR parent_id = ?", id, id).Delete(&entity.Comment{}).Error
 }

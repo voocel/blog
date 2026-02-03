@@ -4,6 +4,7 @@ import (
 	"blog/internal/entity"
 	"blog/internal/usecase"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -25,7 +26,7 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	userIDStr, ok := userID.(string)
+	userIDInt, ok := userID.(int64)
 	if !ok {
 		JSONError(c, http.StatusInternalServerError, "Invalid user ID type", nil)
 		return
@@ -37,12 +38,12 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	if err := h.userUseCase.UpdateProfile(c.Request.Context(), userIDStr, req); err != nil {
+	if err := h.userUseCase.UpdateProfile(c.Request.Context(), userIDInt, req); err != nil {
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}
 
-	user, _ := h.userUseCase.GetByID(c.Request.Context(), userIDStr)
+	user, _ := h.userUseCase.GetByID(c.Request.Context(), userIDInt)
 	c.JSON(http.StatusOK, user)
 }
 
@@ -58,7 +59,12 @@ func (h *UserHandler) ListUsersAdmin(c *gin.Context) {
 
 // UpdateUserStatus - PATCH /admin/users/:id/status
 func (h *UserHandler) UpdateUserStatus(c *gin.Context) {
-	userID := c.Param("id")
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		JSONError(c, http.StatusBadRequest, "Invalid user id", nil)
+		return
+	}
 	var payload struct {
 		Status string `json:"status"`
 	}
@@ -67,7 +73,7 @@ func (h *UserHandler) UpdateUserStatus(c *gin.Context) {
 		return
 	}
 	status := strings.ToLower(payload.Status)
-	updated, err := h.userUseCase.UpdateStatus(c.Request.Context(), userID, status)
+	updated, err := h.userUseCase.UpdateStatus(c.Request.Context(), id, status)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			JSONError(c, http.StatusNotFound, "User not found", err)

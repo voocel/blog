@@ -21,7 +21,7 @@ func (r *categoryRepo) Create(ctx context.Context, category *entity.Category) er
 	return r.db.WithContext(ctx).Create(category).Error
 }
 
-func (r *categoryRepo) GetByID(ctx context.Context, id string) (*entity.Category, error) {
+func (r *categoryRepo) GetByID(ctx context.Context, id int64) (*entity.Category, error) {
 	var category entity.Category
 	err := r.db.WithContext(ctx).Where("id = ?", id).First(&category).Error
 	if err != nil {
@@ -33,7 +33,7 @@ func (r *categoryRepo) GetByID(ctx context.Context, id string) (*entity.Category
 	return &category, nil
 }
 
-func (r *categoryRepo) GetByIDs(ctx context.Context, ids []string) ([]entity.Category, error) {
+func (r *categoryRepo) GetByIDs(ctx context.Context, ids []int64) ([]entity.Category, error) {
 	if len(ids) == 0 {
 		return []entity.Category{}, nil
 	}
@@ -66,17 +66,17 @@ func (r *categoryRepo) Update(ctx context.Context, category *entity.Category) er
 	return r.db.WithContext(ctx).Save(category).Error
 }
 
-func (r *categoryRepo) Delete(ctx context.Context, id string) error {
+func (r *categoryRepo) Delete(ctx context.Context, id int64) error {
 	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Category{}).Error
 }
 
-func (r *categoryRepo) IncrementCount(ctx context.Context, id string) error {
+func (r *categoryRepo) IncrementCount(ctx context.Context, id int64) error {
 	return r.db.WithContext(ctx).Model(&entity.Category{}).
 		Where("id = ?", id).
 		UpdateColumn("count", gorm.Expr("count + 1")).Error
 }
 
-func (r *categoryRepo) DecrementCount(ctx context.Context, id string) error {
+func (r *categoryRepo) DecrementCount(ctx context.Context, id int64) error {
 	return r.db.WithContext(ctx).Model(&entity.Category{}).
 		Where("id = ?", id).
 		UpdateColumn("count", gorm.Expr("CASE WHEN count > 0 THEN count - 1 ELSE 0 END")).Error

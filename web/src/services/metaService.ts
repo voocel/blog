@@ -11,7 +11,7 @@ export const metaService = {
         const response = await apiClient.post('/admin/categories', category);
         return response.data;
     },
-    deleteCategory: async (id: string): Promise<void> => {
+    deleteCategory: async (id: number): Promise<void> => {
         await apiClient.delete(`/admin/categories/${id}`);
     },
 
@@ -24,7 +24,7 @@ export const metaService = {
         const response = await apiClient.post('/admin/tags', tag);
         return response.data;
     },
-    deleteTag: async (id: string): Promise<void> => {
+    deleteTag: async (id: number): Promise<void> => {
         await apiClient.delete(`/admin/tags/${id}`);
     },
 
@@ -39,12 +39,12 @@ export const metaService = {
         // We just return the file as is, assuming the server already has it.
         return Promise.resolve(file);
     },
-    deleteFile: async (id: string): Promise<void> => {
+    deleteFile: async (id: number): Promise<void> => {
         await apiClient.delete(`/admin/files/${id}`);
     },
 
     // Analytics
-    logVisit: async (pagePath: string, postId?: string, postTitle?: string): Promise<void> => {
+    logVisit: async (pagePath: string, postId?: number, postTitle?: string): Promise<void> => {
         await apiClient.post('/analytics/visit', { pagePath, postId, postTitle });
     },
 

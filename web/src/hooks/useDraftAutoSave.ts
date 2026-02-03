@@ -17,9 +17,9 @@ interface UseDraftAutoSaveReturn {
     recoveryDraft: Partial<BlogPost> | null;
     setRecoveryDraft: (draft: Partial<BlogPost> | null) => void;
     saveDraft: (post: Partial<BlogPost>) => void;
-    loadDraft: (postId?: string) => Partial<BlogPost> | null;
-    clearDraft: (postId?: string) => void;
-    checkForDraft: (postId?: string) => Partial<BlogPost> | null;
+    loadDraft: (postId?: number) => Partial<BlogPost> | null;
+    clearDraft: (postId?: number) => void;
+    checkForDraft: (postId?: number) => Partial<BlogPost> | null;
     hasUnsavedChanges: (post: Partial<BlogPost> | null) => boolean;
 }
 
@@ -34,19 +34,19 @@ export function useDraftAutoSave({
     const [recoveryDraft, setRecoveryDraft] = useState<Partial<BlogPost> | null>(null);
 
     // Get draft key based on post ID
-    const getDraftKey = useCallback((postId?: string) => {
-        return `${DRAFT_KEY_PREFIX}${postId || 'new'}`;
+    const getDraftKey = useCallback((postId?: number) => {
+        return `${DRAFT_KEY_PREFIX}${postId ?? 'new'}`;
     }, []);
 
     // Clear draft from localStorage
-    const clearDraft = useCallback((postId?: string) => {
+    const clearDraft = useCallback((postId?: number) => {
         const key = getDraftKey(postId);
         localStorage.removeItem(key);
         lastSavedContentRef.current = '';
     }, [getDraftKey]);
 
     // Load draft from localStorage
-    const loadDraft = useCallback((postId?: string): Partial<BlogPost> | null => {
+    const loadDraft = useCallback((postId?: number): Partial<BlogPost> | null => {
         const key = getDraftKey(postId);
         const saved = localStorage.getItem(key);
         if (saved) {
@@ -71,7 +71,7 @@ export function useDraftAutoSave({
     }, [getDraftKey, onSave]);
 
     // Check if a draft exists for a post
-    const checkForDraft = useCallback((postId?: string): Partial<BlogPost> | null => {
+    const checkForDraft = useCallback((postId?: number): Partial<BlogPost> | null => {
         return loadDraft(postId);
     }, [loadDraft]);
 

@@ -5,7 +5,7 @@ import type { Tag } from '../../types';
 interface AdminTagsProps {
     tags: Tag[];
     onAddTag: (name: string) => void;
-    onDeleteTag: (id: string) => void;
+    onDeleteTag: (id: number) => void;
     requestConfirm: (title: string, message: string, onConfirm: () => void) => void;
 }
 

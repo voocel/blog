@@ -107,16 +107,16 @@ func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
 		return
 	}
 
-	userIDStr, ok := userID.(string)
+	userIDInt, ok := userID.(int64)
 	if !ok {
-		log.Errorw("GetCurrentUser: user_id is not a string",
+		log.Errorw("GetCurrentUser: user_id is not an int64",
 			log.Pair("ip", c.ClientIP()),
 		)
 		JSONError(c, http.StatusInternalServerError, "Invalid user ID type", nil)
 		return
 	}
 
-	user, err := h.authUseCase.GetCurrentUser(c.Request.Context(), userIDStr)
+	user, err := h.authUseCase.GetCurrentUser(c.Request.Context(), userIDInt)
 	if err != nil {
 		log.Errorw("GetCurrentUser failed",
 			log.Pair("user_id", userID),

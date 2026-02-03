@@ -4,6 +4,7 @@ import (
 	"blog/internal/entity"
 	"blog/internal/usecase"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -45,7 +46,12 @@ func (h *TagHandler) CreateTag(c *gin.Context) {
 
 // DeleteTag - DELETE /tags/:id
 func (h *TagHandler) DeleteTag(c *gin.Context) {
-	id := c.Param("id")
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		JSONError(c, http.StatusBadRequest, "Invalid tag id", nil)
+		return
+	}
 
 	if err := h.tagUseCase.Delete(c.Request.Context(), id); err != nil {
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)

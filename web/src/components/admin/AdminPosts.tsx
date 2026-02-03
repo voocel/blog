@@ -5,8 +5,8 @@ import type { BlogPost } from '../../types';
 interface AdminPostsProps {
     posts: BlogPost[];
     onEditPost: (post?: BlogPost) => void;
-    onDeletePost: (id: string) => void;
-    onPublishPost: (id: string) => void;
+    onDeletePost: (id: number) => void;
+    onPublishPost: (id: number) => void;
     onViewPost: (slug: string) => void;
     requestConfirm: (title: string, message: string, onConfirm: () => void, options?: { confirmText?: string; isDestructive?: boolean }) => void;
 }

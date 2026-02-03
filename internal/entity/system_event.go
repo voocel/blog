@@ -46,16 +46,16 @@ const (
 
 // SystemEvent records all important system events for monitoring and auditing
 type SystemEvent struct {
-	ID            string        `json:"id" gorm:"type:varchar(36);primaryKey"`
+	ID            int64         `json:"id" gorm:"primaryKey;autoIncrement"`
 	RequestID     string        `json:"request_id" gorm:"type:varchar(36);index"`      // Trace request across services
 	EventType     EventType     `json:"event_type" gorm:"type:varchar(20);index"`      // audit, operation, security, system, business
 	EventCategory EventCategory `json:"event_category" gorm:"type:varchar(50);index"`  // admin_operation, user_action, etc.
 	Severity      Severity      `json:"severity" gorm:"type:varchar(20);index"`        // info, warning, error, critical
-	UserID        string        `json:"user_id" gorm:"type:varchar(36);index"`         // User ID (if applicable)
+	UserID        int64         `json:"user_id" gorm:"index"`                          // User ID (if applicable)
 	Username      string        `json:"username" gorm:"type:varchar(50)"`              // Username (if applicable)
 	Action        string        `json:"action" gorm:"type:varchar(50);index"`          // e.g., "CREATE_POST", "DELETE_USER", "LOGIN_FAILED"
 	Resource      string        `json:"resource" gorm:"type:varchar(50)"`              // e.g., "posts", "users", "system"
-	ResourceID    string        `json:"resource_id" gorm:"type:varchar(36)"`           // ID of affected resource
+	ResourceID    int64         `json:"resource_id"`                                   // ID of affected resource
 	Method        string        `json:"method" gorm:"type:varchar(10)"`                // HTTP method: POST, PUT, DELETE (for API operations)
 	Path          string        `json:"path" gorm:"type:varchar(255)"`                 // Request path (for API operations)
 	IP            string        `json:"ip" gorm:"type:varchar(45)"`                    // Client IP address
@@ -79,11 +79,11 @@ type CreateEventRequest struct {
 	EventType     EventType
 	EventCategory EventCategory
 	Severity      Severity
-	UserID        string
+	UserID        int64
 	Username      string
 	Action        string
 	Resource      string
-	ResourceID    string
+	ResourceID    int64
 	Method        string
 	Path          string
 	IP            string

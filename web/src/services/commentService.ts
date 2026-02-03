@@ -37,7 +37,7 @@ export const commentService = {
         }
     },
 
-    createComment: async (postSlug: string, content: string, parentId?: string): Promise<Comment> => {
+    createComment: async (postSlug: string, content: string, parentId?: number): Promise<Comment> => {
         const payload: any = { content };
         if (parentId) {
             payload.parentId = parentId;
@@ -52,7 +52,7 @@ export const commentService = {
         return response.data;
     },
 
-    deleteComment: async (id: string): Promise<void> => {
+    deleteComment: async (id: number): Promise<void> => {
         await apiClient.delete(`/admin/comments/${id}`);
     }
 };

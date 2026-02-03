@@ -3,14 +3,10 @@ package log
 import (
 	"context"
 	"net/http"
-	"net/http/pprof"
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"time"
-
-	"blog/config"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -52,35 +48,35 @@ func Init(level string, logPaths ...string) {
 		logPath = logPaths[0]
 	}
 
-	// Only start debug server in non-release mode or bind to localhost
-	addr := config.Conf.LogLevelAddr
-	if config.Conf.Mode == "release" {
-		// In release mode, bind to localhost only for security
-		if !strings.HasPrefix(addr, "127.0.0.1:") && !strings.HasPrefix(addr, "localhost:") {
-			addr = "127.0.0.1" + addr
-		}
-	}
-
-	mux := http.NewServeMux()
-	// Only expose pprof in non-release mode
-	if config.Conf.Mode != "release" {
-		mux.HandleFunc("/debug/pprof/", pprof.Index)
-		mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
-		mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
-		mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
-		mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
-	}
-	mux.HandleFunc(config.Conf.LogLevelPattern, atomicLevel.ServeHTTP)
-	srv = &http.Server{
-		Addr:    addr,
-		Handler: mux,
-	}
-
-	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			panic(err)
-		}
-	}()
+	//// Only start debug server in non-release mode or bind to localhost
+	//addr := config.Conf.LogLevelAddr
+	//if config.Conf.Mode == "release" {
+	//	// In release mode, bind to localhost only for security
+	//	if !strings.HasPrefix(addr, "127.0.0.1:") && !strings.HasPrefix(addr, "localhost:") {
+	//		addr = "127.0.0.1" + addr
+	//	}
+	//}
+	//
+	//mux := http.NewServeMux()
+	//// Only expose pprof in non-release mode
+	//if config.Conf.Mode != "release" {
+	//	mux.HandleFunc("/debug/pprof/", pprof.Index)
+	//	mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+	//	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	//	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+	//	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+	//}
+	//mux.HandleFunc(config.Conf.LogLevelPattern, atomicLevel.ServeHTTP)
+	//srv = &http.Server{
+	//	Addr:    addr,
+	//	Handler: mux,
+	//}
+	//
+	//go func() {
+	//	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	//		panic(err)
+	//	}
+	//}()
 
 	//// error, fatal, panic
 	//highLevel := zap.LevelEnablerFunc(func(l zapcore.Level) bool {

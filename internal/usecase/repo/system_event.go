@@ -34,7 +34,7 @@ func (r *systemEventRepo) List(ctx context.Context, filters map[string]interface
 	query := r.db.WithContext(ctx).Model(&entity.SystemEvent{})
 
 	// Apply filters
-	if userID, ok := filters["user_id"].(string); ok && userID != "" {
+	if userID, ok := filters["user_id"].(int64); ok && userID != 0 {
 		query = query.Where("user_id = ?", userID)
 	}
 	if action, ok := filters["action"].(string); ok && action != "" {
@@ -79,7 +79,7 @@ func (r *systemEventRepo) GetByRequestID(ctx context.Context, requestID string) 
 	return events, err
 }
 
-func (r *systemEventRepo) GetByUserID(ctx context.Context, userID string, limit int) ([]entity.SystemEvent, error) {
+func (r *systemEventRepo) GetByUserID(ctx context.Context, userID int64, limit int) ([]entity.SystemEvent, error) {
 	if limit <= 0 {
 		limit = 50
 	}

@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	ID           string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	ID           int64     `gorm:"primaryKey;autoIncrement" json:"id"`
 	Username     string    `gorm:"type:varchar(50);not null" json:"username"`                // Nickname, non-unique
 	Email        string    `gorm:"type:varchar(100);uniqueIndex;not null" json:"email"`      // Unique identifier
 	Password     string    `gorm:"type:varchar(255)" json:"-"`                               // Optional, can be empty for OAuth users
@@ -43,7 +43,7 @@ type UserResponse struct {
 
 // AdminUserResponse is returned in admin user listing/status endpoints.
 type AdminUserResponse struct {
-	ID       string `json:"id"`
+	ID       int64  `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Role     string `json:"role"`

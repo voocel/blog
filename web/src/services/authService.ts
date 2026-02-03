@@ -64,7 +64,7 @@ export const authService = {
         return response.data;
     },
 
-    updateUserStatus: async (userId: string, status: 'active' | 'banned'): Promise<void> => {
+    updateUserStatus: async (userId: number, status: 'active' | 'banned'): Promise<void> => {
         await apiClient.patch(`/admin/users/${userId}/status`, { status });
     }
 };

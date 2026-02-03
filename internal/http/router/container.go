@@ -45,6 +45,7 @@ type Container struct {
 	SystemEventHandler *handler.SystemEventHandler
 	CommentHandler     *handler.CommentHandler
 	LikeHandler        *handler.LikeHandler
+	SitemapHandler     *handler.SitemapHandler
 }
 
 // NewContainer creates and initializes all application dependencies
@@ -86,6 +87,7 @@ func NewContainer(db *gorm.DB) *Container {
 	c.SystemEventHandler = handler.NewSystemEventHandler(c.SystemEventUseCase)
 	c.CommentHandler = handler.NewCommentHandler(c.CommentUseCase, c.PostUseCase)
 	c.LikeHandler = handler.NewLikeHandler(c.LikeUseCase)
+	c.SitemapHandler = handler.NewSitemapHandler(c.PostRepo)
 
 	return c
 }

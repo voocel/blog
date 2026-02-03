@@ -15,7 +15,7 @@ func NewUserUseCase(userRepo UserRepo) *UserUseCase {
 	return &UserUseCase{userRepo: userRepo}
 }
 
-func (uc *UserUseCase) GetByID(ctx context.Context, id string) (*entity.UserResponse, error) {
+func (uc *UserUseCase) GetByID(ctx context.Context, id int64) (*entity.UserResponse, error) {
 	user, err := uc.userRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (uc *UserUseCase) GetByID(ctx context.Context, id string) (*entity.UserResp
 	}, nil
 }
 
-func (uc *UserUseCase) UpdateProfile(ctx context.Context, id string, req entity.UpdateProfileRequest) error {
+func (uc *UserUseCase) UpdateProfile(ctx context.Context, id int64, req entity.UpdateProfileRequest) error {
 	user, err := uc.userRepo.GetByID(ctx, id)
 	if err != nil {
 		return err
@@ -72,7 +72,7 @@ func (uc *UserUseCase) ListAll(ctx context.Context) ([]entity.AdminUserResponse,
 }
 
 // UpdateStatus updates user's status to active/banned.
-func (uc *UserUseCase) UpdateStatus(ctx context.Context, id, status string) (*entity.AdminUserResponse, error) {
+func (uc *UserUseCase) UpdateStatus(ctx context.Context, id int64, status string) (*entity.AdminUserResponse, error) {
 	if status != "active" && status != "banned" {
 		return nil, errors.New("invalid status")
 	}

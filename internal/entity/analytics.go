@@ -5,9 +5,9 @@ import (
 )
 
 type Analytics struct {
-	ID        string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	ID        int64     `gorm:"primaryKey;autoIncrement" json:"id"`
 	PagePath  string    `gorm:"type:varchar(500);not null;index" json:"pagePath"`
-	PostID    *string   `gorm:"type:uuid;index" json:"postId,omitempty"` // Allow NULL to prevent empty string UUID parsing error
+	PostID    *int64    `gorm:"index" json:"postId,omitempty"`
 	PostTitle string    `gorm:"type:varchar(255)" json:"postTitle,omitempty"`
 	IP        string    `gorm:"type:varchar(45);index" json:"ip"`
 	Location  string    `gorm:"type:varchar(200)" json:"location"`
@@ -17,19 +17,19 @@ type Analytics struct {
 }
 
 type AnalyticsResponse struct {
-	ID        string  `json:"id"`
-	PagePath  string  `json:"pagePath"`
-	PostID    *string `json:"postId,omitempty"`
-	PostTitle string  `json:"postTitle,omitempty"`
-	IP        string  `json:"ip"`
-	Location  string  `json:"location"`
-	Timestamp int64   `json:"timestamp"`
-	UserAgent string  `json:"userAgent"`
+	ID        int64  `json:"id"`
+	PagePath  string `json:"pagePath"`
+	PostID    *int64 `json:"postId,omitempty"`
+	PostTitle string `json:"postTitle,omitempty"`
+	IP        string `json:"ip"`
+	Location  string `json:"location"`
+	Timestamp int64  `json:"timestamp"`
+	UserAgent string `json:"userAgent"`
 }
 
 type LogVisitRequest struct {
 	PagePath  string `json:"pagePath" binding:"required"`
-	PostID    string `json:"postId,omitempty"`
+	PostID    int64  `json:"postId,omitempty"`
 	PostTitle string `json:"postTitle,omitempty"`
 }
 

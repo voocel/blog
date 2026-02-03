@@ -35,7 +35,9 @@ func (h *PostHandler) ListPublishedPosts(c *gin.Context) {
 		"beforePublishAt": time.Now(),
 	}
 	if category != "" {
-		filters["categoryId"] = category
+		if categoryID, err := strconv.ParseInt(category, 10, 64); err == nil && categoryID != 0 {
+			filters["categoryId"] = categoryID
+		}
 	}
 	if search != "" {
 		filters["search"] = search
@@ -66,7 +68,9 @@ func (h *PostHandler) ListAllPosts(c *gin.Context) {
 
 	filters := make(map[string]interface{})
 	if category != "" {
-		filters["categoryId"] = category
+		if categoryID, err := strconv.ParseInt(category, 10, 64); err == nil && categoryID != 0 {
+			filters["categoryId"] = categoryID
+		}
 	}
 
 	if status != "" && status != "all" {
@@ -117,8 +121,9 @@ func (h *PostHandler) GetPost(c *gin.Context) {
 
 // GetPostAdmin - GET /admin/posts/:id (Admin API)
 func (h *PostHandler) GetPostAdmin(c *gin.Context) {
-	id := c.Param("id")
-	if !util.IsValidUUID(id) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
 		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
 		return
 	}
@@ -160,8 +165,9 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 
 // UpdatePost - PUT /posts/:id
 func (h *PostHandler) UpdatePost(c *gin.Context) {
-	id := c.Param("id")
-	if !util.IsValidUUID(id) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
 		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
 		return
 	}
@@ -191,8 +197,9 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 
 // DeletePost - DELETE /posts/:id
 func (h *PostHandler) DeletePost(c *gin.Context) {
-	id := c.Param("id")
-	if !util.IsValidUUID(id) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
 		JSONError(c, http.StatusBadRequest, "Invalid post id", nil)
 		return
 	}

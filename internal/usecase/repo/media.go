@@ -21,7 +21,7 @@ func (r *mediaRepo) Create(ctx context.Context, media *entity.Media) error {
 	return r.db.WithContext(ctx).Create(media).Error
 }
 
-func (r *mediaRepo) GetByID(ctx context.Context, id string) (*entity.Media, error) {
+func (r *mediaRepo) GetByID(ctx context.Context, id int64) (*entity.Media, error) {
 	var media entity.Media
 	err := r.db.WithContext(ctx).Where("id = ?", id).First(&media).Error
 	if err != nil {
@@ -39,7 +39,7 @@ func (r *mediaRepo) List(ctx context.Context) ([]entity.Media, error) {
 	return media, err
 }
 
-func (r *mediaRepo) Delete(ctx context.Context, id string) error {
+func (r *mediaRepo) Delete(ctx context.Context, id int64) error {
 	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Media{}).Error
 }
 

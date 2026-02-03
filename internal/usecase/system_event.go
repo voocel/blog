@@ -42,7 +42,7 @@ func (uc *SystemEventUseCase) GetByRequestID(ctx context.Context, requestID stri
 }
 
 // GetByUserID retrieves recent events for a specific user
-func (uc *SystemEventUseCase) GetByUserID(ctx context.Context, userID string, limit int) ([]entity.SystemEvent, error) {
+func (uc *SystemEventUseCase) GetByUserID(ctx context.Context, userID int64, limit int) ([]entity.SystemEvent, error) {
 	return uc.eventRepo.GetByUserID(ctx, userID, limit)
 }
 

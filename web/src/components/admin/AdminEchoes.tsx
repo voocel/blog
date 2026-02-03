@@ -33,13 +33,13 @@ const AdminEchoes: React.FC<AdminEchoesProps> = ({ visitLogs, posts }) => {
             const id = log.postId!;
             acc[id] = (acc[id] || 0) + 1;
             return acc;
-        }, {} as Record<string, number>);
+        }, {} as Record<number, number>);
 
     const sortedTopPosts = Object.entries(topPosts)
         .sort(([, a], [, b]) => b - a)
         .slice(0, 5)
         .map(([id, count]) => {
-            const post = posts.find(p => p.id === id);
+            const post = posts.find(p => p.id === Number(id));
             return { ...post, visitCount: count };
         });
 

@@ -37,6 +37,6 @@ func (uc *TagUseCase) List(ctx context.Context) ([]entity.TagResponse, error) {
 	return responses, nil
 }
 
-func (uc *TagUseCase) Delete(ctx context.Context, id string) error {
+func (uc *TagUseCase) Delete(ctx context.Context, id int64) error {
 	return uc.tagRepo.Delete(ctx, id)
 }

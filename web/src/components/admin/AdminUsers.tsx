@@ -17,7 +17,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ users, requestConfirm }) => {
     const { refreshAdminUsers } = useAdmin();
     const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
-    const [processingId, setProcessingId] = useState<string | null>(null);
+    const [processingId, setProcessingId] = useState<number | null>(null);
 
     const filteredUsers = users.filter(user =>
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||

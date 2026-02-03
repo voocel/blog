@@ -6,11 +6,11 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // EventLogger logs important system events (admin operations, auth attempts, etc.)
@@ -65,16 +65,15 @@ func EventLogger(eventRepo usecase.SystemEventRepo) gin.HandlerFunc {
 
 		// Create system event
 		event := &entity.SystemEvent{
-			ID:            uuid.New().String(),
 			RequestID:     getStringValue(requestID),
 			EventType:     eventType,
 			EventCategory: eventCategory,
 			Severity:      severity,
-			UserID:        getStringValue(userID),
+			UserID:        getInt64Value(userID),
 			Username:      getStringValue(username),
 			Action:        action,
 			Resource:      resource,
-			ResourceID:    resourceID,
+			ResourceID:    parseResourceID(resourceID),
 			Method:        c.Request.Method,
 			Path:          c.Request.URL.Path,
 			IP:            c.ClientIP(),
@@ -260,6 +259,26 @@ func getStringValue(v interface{}) string {
 		return s
 	}
 	return ""
+}
+
+// getInt64Value safely converts interface{} to int64
+func getInt64Value(v interface{}) int64 {
+	if v == nil {
+		return 0
+	}
+	if i, ok := v.(int64); ok {
+		return i
+	}
+	return 0
+}
+
+// parseResourceID converts string resource ID to int64
+func parseResourceID(s string) int64 {
+	if s == "" {
+		return 0
+	}
+	id, _ := strconv.ParseInt(s, 10, 64)
+	return id
 }
 
 // isNumeric checks if string is numeric

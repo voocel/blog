@@ -6,7 +6,7 @@ import { uploadImage } from '../../services/uploadService';
 interface AdminFilesProps {
     files: MediaFile[];
     onAddFile: (file: MediaFile) => void;
-    onDeleteFile: (id: string) => void;
+    onDeleteFile: (id: number) => void;
     requestConfirm: (title: string, message: string, onConfirm: () => void) => void;
 }
 
@@ -21,7 +21,7 @@ const AdminFiles: React.FC<AdminFilesProps> = ({ files, onAddFile, onDeleteFile,
             try {
                 const result = await uploadImage(file);
                 onAddFile({
-                    id: `f-${Date.now()}`,
+                    id: Date.now(),
                     url: result.url,
                     name: result.filename,
                     type: 'image', // In real app, use result.type
@@ -36,7 +36,7 @@ const AdminFiles: React.FC<AdminFilesProps> = ({ files, onAddFile, onDeleteFile,
     const handleAddUrl = () => {
         if (!newFileUrl) return;
         onAddFile({
-            id: `f-${Date.now()}`,
+            id: Date.now(),
             url: newFileUrl,
             name: 'New Upload',
             type: 'image',

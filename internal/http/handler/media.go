@@ -2,9 +2,9 @@ package handler
 
 import (
 	"blog/internal/usecase"
-	"blog/pkg/util"
 	"errors"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -87,8 +87,9 @@ func (h *MediaHandler) ListFiles(c *gin.Context) {
 
 // DeleteFile - DELETE /files/:id
 func (h *MediaHandler) DeleteFile(c *gin.Context) {
-	id := c.Param("id")
-	if !util.IsValidUUID(id) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
 		JSONError(c, http.StatusBadRequest, "Invalid file id", nil)
 		return
 	}

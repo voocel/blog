@@ -42,7 +42,7 @@ export const postService = {
         return [];
     },
 
-    getAdminPost: async (id: string): Promise<BlogPost | undefined> => {
+    getAdminPost: async (id: number): Promise<BlogPost | undefined> => {
         try {
             // Admin API: /admin/posts/:id (can view drafts)
             const response = await apiClient.get(`/admin/posts/${id}`);
@@ -58,12 +58,12 @@ export const postService = {
         return response.data;
     },
 
-    updatePost: async (id: string, updatedFields: any): Promise<BlogPost> => {
+    updatePost: async (id: number, updatedFields: any): Promise<BlogPost> => {
         const response = await apiClient.put(`/admin/posts/${id}`, updatedFields);
         return response.data;
     },
 
-    deletePost: async (id: string): Promise<void> => {
+    deletePost: async (id: number): Promise<void> => {
         await apiClient.delete(`/admin/posts/${id}`);
     },
 

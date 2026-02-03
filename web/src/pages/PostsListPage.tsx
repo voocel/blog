@@ -73,28 +73,28 @@ const PostsListPage: React.FC = () => {
 
             switch (activeFilter) {
                 case 'day':
-                    // Group by specific date: "2026年01月09日"
-                    key = `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, '0')}月${String(date.getDate()).padStart(2, '0')}日`;
+                    // Group by specific date: "Jan 09, 2026"
+                    key = `${date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}`;
                     break;
                 case 'week':
                     // Group by week number
                     const weekNum = Math.ceil((date.getDate()) / 7);
-                    key = `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, '0')}月 第${weekNum}周`;
+                    key = `${date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} Week ${weekNum}`;
                     break;
                 case 'month':
-                    // Group by month: "2026年01月"
-                    key = `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, '0')}月`;
+                    // Group by month: "Jan 2026"
+                    key = `${date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
                     break;
                 case 'year':
-                    // Group by year: "2026年"
-                    key = `${date.getFullYear()}年`;
+                    // Group by year: "2026"
+                    key = `${date.getFullYear()}`;
                     break;
                 case 'category':
-                    // Group by first tag or 'Uncategorized'
-                    key = post.category || post.tags?.[0] || '未分类';
+                    // Group by category
+                    key = post.category || 'Uncategorized';
                     break;
                 default:
-                    key = `${date.getFullYear()}年`;
+                    key = `${date.getFullYear()}`;
             }
 
             if (!groups[key]) {
@@ -125,11 +125,11 @@ const PostsListPage: React.FC = () => {
     };
 
     const filters = [
-        { key: 'day', label: '日' },
-        { key: 'week', label: '周' },
-        { key: 'month', label: '月' },
-        { key: 'year', label: '年' },
-        { key: 'category', label: '分类' },
+        { key: 'day', label: 'Day' },
+        { key: 'week', label: 'Week' },
+        { key: 'month', label: 'Month' },
+        { key: 'year', label: 'Year' },
+        { key: 'category', label: 'Category' },
     ] as const;
 
     return (
@@ -197,7 +197,7 @@ const PostsListPage: React.FC = () => {
                         {/* Group Header */}
                         <div className="flex items-center gap-3 mb-6">
                             <h2 className="text-xl font-bold text-stone-800">{group.label}</h2>
-                            <span className="text-xs text-stone-400">☆ {group.count} 篇文章</span>
+                            <span className="text-xs text-stone-400">☆ {group.count} posts</span>
                         </div>
 
                         {/* Posts */}

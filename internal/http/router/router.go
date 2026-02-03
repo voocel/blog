@@ -9,6 +9,10 @@ import (
 
 // SetupRoutes configures all application routes
 func SetupRoutes(r *gin.Engine, c *Container) {
+	// SEO routes (root level)
+	r.GET("/sitemap.xml", c.SitemapHandler.GenerateSitemap)
+	r.GET("/robots.txt", c.SitemapHandler.RobotsTxt)
+
 	v1 := r.Group("/api/v1")
 	{
 		v1.GET("/health", handler.HealthCheck)

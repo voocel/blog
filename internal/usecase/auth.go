@@ -50,7 +50,7 @@ func (uc *AuthUseCase) Login(ctx context.Context, req entity.LoginRequest) (*ent
 }
 
 // GetCurrentUser retrieves current user info
-func (uc *AuthUseCase) GetCurrentUser(ctx context.Context, userID string) (*entity.UserResponse, error) {
+func (uc *AuthUseCase) GetCurrentUser(ctx context.Context, userID int64) (*entity.UserResponse, error) {
 	user, err := uc.userRepo.GetByID(ctx, userID)
 	if err != nil {
 		return nil, err

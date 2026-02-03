@@ -216,12 +216,13 @@ const PostEditor: React.FC<PostEditorProps> = ({
                             <div className="relative">
                                 <select
                                     className="w-full bg-white border border-stone-200 rounded-xl p-3 text-sm focus:outline-none focus:border-gold-500 appearance-none shadow-sm font-serif"
-                                    value={editingPost.categoryId || (categories.find(c => c.name === editingPost.category)?.id) || ''}
+                                    value={editingPost.categoryId ?? (categories.find(c => c.name === editingPost.category)?.id) ?? ''}
                                     onChange={e => {
-                                        const cat = categories.find(c => c.id === e.target.value);
+                                        const catId = Number(e.target.value);
+                                        const cat = categories.find(c => c.id === catId);
                                         setEditingPost({
                                             ...editingPost,
-                                            categoryId: e.target.value,
+                                            categoryId: catId,
                                             category: cat ? cat.name : ''
                                         });
                                     }}
@@ -240,15 +241,14 @@ const PostEditor: React.FC<PostEditorProps> = ({
                             <label className="block text-xs uppercase tracking-widest text-stone-500 mb-3 font-bold">Tags</label>
                             <div className="flex flex-wrap gap-2">
                                 {tags.map(tag => {
-                                    const isSelected = editingPost.tags?.includes(tag.id) || editingPost.tags?.includes(tag.name);
+                                    const isSelected = editingPost.tags?.includes(tag.id);
                                     return (
                                         <button
                                             key={tag.id}
                                             onClick={() => {
                                                 const currentTags = editingPost.tags || [];
-                                                const alreadySelected = currentTags.includes(tag.id) || currentTags.includes(tag.name);
-                                                const newTags = alreadySelected
-                                                    ? currentTags.filter(t => t !== tag.id && t !== tag.name)
+                                                const newTags = isSelected
+                                                    ? currentTags.filter(t => t !== tag.id)
                                                     : [...currentTags, tag.id];
                                                 setEditingPost({ ...editingPost, tags: newTags });
                                             }}

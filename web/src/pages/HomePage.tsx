@@ -167,7 +167,7 @@ const HomePage: React.FC = () => {
                   {/* Content */}
                   <div className="flex-1 min-w-0 flex flex-col gap-1">
                     <h4 className="font-bold text-stone-700 text-sm leading-snug line-clamp-2">{latestPost.title}</h4>
-                    <p className="text-xs text-stone-500 line-clamp-1">{latestPost.excerpt || "点击阅读更多内容..."}</p>
+                    <p className="text-xs text-stone-500 line-clamp-1">{latestPost.excerpt || "Click to read more..."}</p>
                     <div className="text-[10px] text-stone-400 mt-1">{new Date(latestPost.publishAt).toLocaleDateString()}</div>
                   </div>
                 </div>
@@ -257,7 +257,7 @@ const HomePage: React.FC = () => {
                   {/* Content */}
                   <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
                     <h4 className="font-bold text-stone-700 text-[13px] leading-snug line-clamp-2 group-hover:text-orange-600 transition-colors">{latestPost.title}</h4>
-                    <p className="text-[10px] text-stone-500 line-clamp-1 opacity-80">{latestPost.excerpt || "点击阅读..."}</p>
+                    <p className="text-[10px] text-stone-500 line-clamp-1 opacity-80">{latestPost.excerpt || "Click to read..."}</p>
                     <div className="text-[10px] text-stone-400 font-mono">{new Date(latestPost.publishAt).toLocaleDateString()}</div>
                   </div>
                 </div>
@@ -320,13 +320,13 @@ const HomePage: React.FC = () => {
                   {/* Content */}
                   <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
                     <h4 className="font-bold text-stone-700 text-[13px] leading-snug line-clamp-2 group-hover:text-rose-500 transition-colors">{randomPost.title}</h4>
-                    <p className="text-[10px] text-stone-500 line-clamp-1 opacity-80">{randomPost.excerpt || "点击阅读..."}</p>
+                    <p className="text-[10px] text-stone-500 line-clamp-1 opacity-80">{randomPost.excerpt || "Click to read..."}</p>
                     <div className="text-[10px] text-stone-400 font-mono">{new Date(randomPost.publishAt).toLocaleDateString()}</div>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="h-24 flex items-center justify-center text-stone-300 text-xs">暂无推荐...</div>
+              <div className="h-24 flex items-center justify-center text-stone-300 text-xs">No recommendations...</div>
             )}
           </BentoItem>
         </motion.div>

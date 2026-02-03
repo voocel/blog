@@ -4,10 +4,10 @@ import "time"
 
 // Comment represents a top-level comment or a single-level reply (no deep nesting).
 type Comment struct {
-	ID        string     `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	PostID    string     `gorm:"type:uuid;not null;index" json:"postId"`
-	UserID    string     `gorm:"type:uuid;not null;index" json:"userId"`
-	ParentID  *string    `gorm:"type:uuid;index" json:"parentId,omitempty"`
+	ID        int64      `gorm:"primaryKey;autoIncrement" json:"id"`
+	PostID    int64      `gorm:"not null;index" json:"postId"`
+	UserID    int64      `gorm:"not null;index" json:"userId"`
+	ParentID  *int64     `gorm:"index" json:"parentId,omitempty"`
 	Content   string     `gorm:"type:text;not null" json:"content"`
 	CreatedAt time.Time  `gorm:"autoCreateTime" json:"createdAt"`
 	UpdatedAt time.Time  `gorm:"autoUpdateTime" json:"updatedAt"`
@@ -15,8 +15,8 @@ type Comment struct {
 }
 
 type CreateCommentRequest struct {
-	Content  string  `json:"content" binding:"required"`
-	ParentID *string `json:"parentId"`
+	Content  string `json:"content" binding:"required"`
+	ParentID *int64 `json:"parentId"`
 }
 
 type CommentUser struct {
@@ -25,8 +25,8 @@ type CommentUser struct {
 }
 
 type CommentResponse struct {
-	ID          string            `json:"id"`
-	ParentID    *string           `json:"parentId,omitempty"`
+	ID          int64             `json:"id"`
+	ParentID    *int64            `json:"parentId,omitempty"`
 	Content     string            `json:"content"`
 	CreatedAt   time.Time         `json:"createdAt"`
 	User        CommentUser       `json:"user"`
@@ -36,10 +36,10 @@ type CommentResponse struct {
 
 // AdminCommentResponse is used by admin moderation endpoints.
 type AdminCommentResponse struct {
-	ID        string      `json:"id"`
+	ID        int64       `json:"id"`
 	Content   string      `json:"content"`
 	CreatedAt time.Time   `json:"createdAt"`
-	PostID    string      `json:"postId"`
+	PostID    int64       `json:"postId"`
 	PostTitle string      `json:"postTitle"`
 	User      CommentUser `json:"user"`
 }

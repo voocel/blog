@@ -23,7 +23,7 @@ func NewCommentUseCase(commentRepo CommentRepo, postRepo PostRepo, userRepo User
 }
 
 // Create creates a top-level comment or a single-level reply.
-func (uc *CommentUseCase) Create(ctx context.Context, postID, userID string, req entity.CreateCommentRequest) (*entity.CommentResponse, error) {
+func (uc *CommentUseCase) Create(ctx context.Context, postID, userID int64, req entity.CreateCommentRequest) (*entity.CommentResponse, error) {
 	content := strings.TrimSpace(req.Content)
 	if content == "" {
 		return nil, errors.New("content cannot be empty")
@@ -41,7 +41,7 @@ func (uc *CommentUseCase) Create(ctx context.Context, postID, userID string, req
 	}
 
 	var parentComment *entity.Comment
-	if req.ParentID != nil && *req.ParentID != "" {
+	if req.ParentID != nil && *req.ParentID != 0 {
 		pc, err := uc.commentRepo.GetByID(ctx, *req.ParentID)
 		if err != nil {
 			return nil, err
@@ -96,7 +96,7 @@ func (uc *CommentUseCase) Create(ctx context.Context, postID, userID string, req
 }
 
 // List returns paginated top-level comments with optional one-level replies.
-func (uc *CommentUseCase) List(ctx context.Context, postID string, page, limit int, order string, withReplies bool) (*entity.PaginatedCommentsResponse, error) {
+func (uc *CommentUseCase) List(ctx context.Context, postID int64, page, limit int, order string, withReplies bool) (*entity.PaginatedCommentsResponse, error) {
 	if page <= 0 {
 		page = 1
 	}
@@ -112,8 +112,8 @@ func (uc *CommentUseCase) List(ctx context.Context, postID string, page, limit i
 		return nil, err
 	}
 
-	userCache := make(map[string]entity.CommentUser)
-	getUser := func(uid string) (entity.CommentUser, error) {
+	userCache := make(map[int64]entity.CommentUser)
+	getUser := func(uid int64) (entity.CommentUser, error) {
 		if u, ok := userCache[uid]; ok {
 			return u, nil
 		}
@@ -131,7 +131,7 @@ func (uc *CommentUseCase) List(ctx context.Context, postID string, page, limit i
 
 	// Build base responses
 	responses := make([]entity.CommentResponse, 0, len(topComments))
-	parentIDs := make([]string, 0, len(topComments))
+	parentIDs := make([]int64, 0, len(topComments))
 	for _, c := range topComments {
 		parentIDs = append(parentIDs, c.ID)
 		user, err := getUser(c.UserID)
@@ -151,7 +151,7 @@ func (uc *CommentUseCase) List(ctx context.Context, postID string, page, limit i
 	if withReplies && len(parentIDs) > 0 {
 		replies, err := uc.commentRepo.ListReplies(ctx, postID, parentIDs, "asc")
 		if err == nil {
-			byParent := make(map[string][]entity.Comment)
+			byParent := make(map[int64][]entity.Comment)
 			for _, r := range replies {
 				if r.ParentID == nil {
 					continue
@@ -208,21 +208,21 @@ func (uc *CommentUseCase) ListAllAdmin(ctx context.Context) ([]entity.AdminComme
 	}
 
 	// Batch load users and posts to avoid N+1 queries.
-	userIDSet := make(map[string]struct{})
-	postIDSet := make(map[string]struct{})
+	userIDSet := make(map[int64]struct{})
+	postIDSet := make(map[int64]struct{})
 	for _, c := range comments {
-		if c.UserID != "" {
+		if c.UserID != 0 {
 			userIDSet[c.UserID] = struct{}{}
 		}
-		if c.PostID != "" {
+		if c.PostID != 0 {
 			postIDSet[c.PostID] = struct{}{}
 		}
 	}
-	userIDs := make([]string, 0, len(userIDSet))
+	userIDs := make([]int64, 0, len(userIDSet))
 	for id := range userIDSet {
 		userIDs = append(userIDs, id)
 	}
-	postIDs := make([]string, 0, len(postIDSet))
+	postIDs := make([]int64, 0, len(postIDSet))
 	for id := range postIDSet {
 		postIDs = append(postIDs, id)
 	}
@@ -231,7 +231,7 @@ func (uc *CommentUseCase) ListAllAdmin(ctx context.Context) ([]entity.AdminComme
 	if err != nil {
 		return nil, err
 	}
-	userByID := make(map[string]entity.CommentUser, len(users))
+	userByID := make(map[int64]entity.CommentUser, len(users))
 	for i := range users {
 		userByID[users[i].ID] = entity.CommentUser{Username: users[i].Username, Avatar: users[i].Avatar}
 	}
@@ -240,7 +240,7 @@ func (uc *CommentUseCase) ListAllAdmin(ctx context.Context) ([]entity.AdminComme
 	if err != nil {
 		return nil, err
 	}
-	postTitleByID := make(map[string]string, len(posts))
+	postTitleByID := make(map[int64]string, len(posts))
 	for i := range posts {
 		postTitleByID[posts[i].ID] = posts[i].Title
 	}
@@ -269,7 +269,7 @@ func (uc *CommentUseCase) ListAllAdmin(ctx context.Context) ([]entity.AdminComme
 }
 
 // DeleteAdmin deletes a comment and its direct replies.
-func (uc *CommentUseCase) DeleteAdmin(ctx context.Context, id string) error {
+func (uc *CommentUseCase) DeleteAdmin(ctx context.Context, id int64) error {
 	// Ensure exists
 	if _, err := uc.commentRepo.GetByID(ctx, id); err != nil {
 		return err

@@ -115,7 +115,7 @@ func (uc *MediaUseCase) List(ctx context.Context) ([]entity.MediaResponse, error
 	return responses, nil
 }
 
-func (uc *MediaUseCase) Delete(ctx context.Context, id string) error {
+func (uc *MediaUseCase) Delete(ctx context.Context, id int64) error {
 	media, err := uc.mediaRepo.GetByID(ctx, id)
 	if err != nil {
 		return err

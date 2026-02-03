@@ -29,8 +29,8 @@ func NewAnalyticsUseCase(analyticsRepo AnalyticsRepo, postRepo PostRepo, categor
 func (uc *AnalyticsUseCase) LogVisit(ctx context.Context, req entity.LogVisitRequest, ip, userAgent string) error {
 	location := geoip.Lookup(ip)
 
-	var postID *string
-	if req.PostID != "" {
+	var postID *int64
+	if req.PostID != 0 {
 		postID = &req.PostID
 	}
 

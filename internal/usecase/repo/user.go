@@ -21,7 +21,7 @@ func (r *userRepo) Create(ctx context.Context, user *entity.User) error {
 	return r.db.WithContext(ctx).Create(user).Error
 }
 
-func (r *userRepo) GetByID(ctx context.Context, id string) (*entity.User, error) {
+func (r *userRepo) GetByID(ctx context.Context, id int64) (*entity.User, error) {
 	var user entity.User
 	err := r.db.WithContext(ctx).Where("id = ?", id).First(&user).Error
 	if err != nil {
@@ -33,7 +33,7 @@ func (r *userRepo) GetByID(ctx context.Context, id string) (*entity.User, error)
 	return &user, nil
 }
 
-func (r *userRepo) GetByIDs(ctx context.Context, ids []string) ([]entity.User, error) {
+func (r *userRepo) GetByIDs(ctx context.Context, ids []int64) ([]entity.User, error) {
 	if len(ids) == 0 {
 		return []entity.User{}, nil
 	}
@@ -72,13 +72,13 @@ func (r *userRepo) Update(ctx context.Context, user *entity.User) error {
 	return r.db.WithContext(ctx).Save(user).Error
 }
 
-func (r *userRepo) BumpTokenVersion(ctx context.Context, id string) error {
+func (r *userRepo) BumpTokenVersion(ctx context.Context, id int64) error {
 	return r.db.WithContext(ctx).Model(&entity.User{}).
 		Where("id = ?", id).
 		UpdateColumn("token_version", gorm.Expr("token_version + 1")).Error
 }
 
-func (r *userRepo) Delete(ctx context.Context, id string) error {
+func (r *userRepo) Delete(ctx context.Context, id int64) error {
 	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.User{}).Error
 }
 

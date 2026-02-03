@@ -12,14 +12,14 @@ interface BlogContextType {
 
   // CRUD Operations
   addPost: (post: BlogPost) => Promise<void>;
-  updatePost: (id: string, post: Partial<BlogPost>) => Promise<void>;
-  deletePost: (id: string) => Promise<void>;
+  updatePost: (id: number, post: Partial<BlogPost>) => Promise<void>;
+  deletePost: (id: number) => Promise<void>;
 
   addCategory: (category: Category) => Promise<void>;
-  deleteCategory: (id: string) => Promise<void>;
+  deleteCategory: (id: number) => Promise<void>;
 
   addTag: (tag: Tag) => Promise<void>;
-  deleteTag: (id: string) => Promise<void>;
+  deleteTag: (id: number) => Promise<void>;
 
   // Refresh
   refreshPosts: () => Promise<void>;
@@ -27,7 +27,7 @@ interface BlogContextType {
   refreshTags: () => Promise<void>;
 
   // Logging
-  logVisit: (path: string, postId?: string, postTitle?: string) => void;
+  logVisit: (path: string, postId?: number, postTitle?: string) => void;
 }
 
 const BlogContext = createContext<BlogContextType | undefined>(undefined);
@@ -108,7 +108,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const updatePost = async (id: string, updatedFields: Partial<BlogPost>) => {
+  const updatePost = async (id: number, updatedFields: Partial<BlogPost>) => {
     try {
       const updatedPost = await postService.updatePost(id, updatedFields);
       setPosts(prev => prev.map(p => p.id === id ? updatedPost : p));
@@ -118,7 +118,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const deletePost = async (id: string) => {
+  const deletePost = async (id: number) => {
     try {
       await postService.deletePost(id);
       setPosts(prev => prev.filter(post => post.id !== id));
@@ -140,7 +140,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const deleteCategory = async (id: string) => {
+  const deleteCategory = async (id: number) => {
     try {
       await metaService.deleteCategory(id);
       setCategories(prev => prev.filter(c => c.id !== id));
@@ -162,7 +162,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const deleteTag = async (id: string) => {
+  const deleteTag = async (id: number) => {
     try {
       await metaService.deleteTag(id);
       setTags(prev => prev.filter(t => t.id !== id));
@@ -173,7 +173,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // --- Visit Logging Logic ---
-  const logVisit = async (pagePath: string, postId?: string, postTitle?: string) => {
+  const logVisit = async (pagePath: string, postId?: number, postTitle?: string) => {
     // Don't log visits for admins to keep analytics clean
     if (user?.role?.toLowerCase() === 'admin') return;
 

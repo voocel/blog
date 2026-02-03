@@ -21,7 +21,7 @@ func (r *tagRepo) Create(ctx context.Context, tag *entity.Tag) error {
 	return r.db.WithContext(ctx).Create(tag).Error
 }
 
-func (r *tagRepo) GetByID(ctx context.Context, id string) (*entity.Tag, error) {
+func (r *tagRepo) GetByID(ctx context.Context, id int64) (*entity.Tag, error) {
 	var tag entity.Tag
 	err := r.db.WithContext(ctx).Where("id = ?", id).First(&tag).Error
 	if err != nil {
@@ -45,7 +45,7 @@ func (r *tagRepo) GetByName(ctx context.Context, name string) (*entity.Tag, erro
 	return &tag, nil
 }
 
-func (r *tagRepo) GetByIDs(ctx context.Context, ids []string) ([]entity.Tag, error) {
+func (r *tagRepo) GetByIDs(ctx context.Context, ids []int64) ([]entity.Tag, error) {
 	var tags []entity.Tag
 	err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&tags).Error
 	return tags, err
@@ -61,7 +61,7 @@ func (r *tagRepo) Update(ctx context.Context, tag *entity.Tag) error {
 	return r.db.WithContext(ctx).Save(tag).Error
 }
 
-func (r *tagRepo) Delete(ctx context.Context, id string) error {
+func (r *tagRepo) Delete(ctx context.Context, id int64) error {
 	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Tag{}).Error
 }
 

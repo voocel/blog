@@ -4,6 +4,7 @@ import (
 	"blog/internal/entity"
 	"blog/internal/usecase"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -45,7 +46,12 @@ func (h *CategoryHandler) CreateCategory(c *gin.Context) {
 
 // DeleteCategory - DELETE /categories/:id
 func (h *CategoryHandler) DeleteCategory(c *gin.Context) {
-	id := c.Param("id")
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		JSONError(c, http.StatusBadRequest, "Invalid category id", nil)
+		return
+	}
 
 	if err := h.categoryUseCase.Delete(c.Request.Context(), id); err != nil {
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)

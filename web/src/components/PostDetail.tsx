@@ -196,7 +196,7 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
 
                     {/* Summary Sidebar Card */}
                     <div className="bg-white/60 backdrop-blur-md rounded-[1.2rem] p-5 shadow-sm border border-white/50">
-                        <h4 className="text-[10px] font-bold text-stone-400 mb-3 tracking-wider uppercase">摘要</h4>
+                        <h4 className="text-[10px] font-bold text-stone-400 mb-3 tracking-wider uppercase">Summary</h4>
                         <div className="text-xs text-stone-600 leading-relaxed font-sans">
                             {post.excerpt || "No summary available for this article."}
                         </div>
@@ -205,7 +205,7 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
                     {/* TOC Sidebar Card */}
                     {tocItems.length > 0 && (
                         <div className="bg-white/60 backdrop-blur-md rounded-[1.2rem] p-5 shadow-sm border border-white/50">
-                            <h4 className="text-[10px] font-bold text-stone-400 mb-3 tracking-wider uppercase">目录</h4>
+                            <h4 className="text-[10px] font-bold text-stone-400 mb-3 tracking-wider uppercase">Contents</h4>
                             <nav className="space-y-2">
                                 {tocItems.map((item, index) => (
                                     <a

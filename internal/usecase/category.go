@@ -49,7 +49,7 @@ func (uc *CategoryUseCase) List(ctx context.Context) ([]entity.CategoryResponse,
 	return responses, nil
 }
 
-func (uc *CategoryUseCase) Delete(ctx context.Context, id string) error {
+func (uc *CategoryUseCase) Delete(ctx context.Context, id int64) error {
 	return uc.categoryRepo.Delete(ctx, id)
 }
 

@@ -49,7 +49,7 @@ func (uc *PostUseCase) Create(ctx context.Context, req entity.CreatePostRequest,
 		slug = util.GenerateSlug(req.Title)
 	}
 	// Ensure slug uniqueness
-	slug, err = uc.ensureUniqueSlug(ctx, slug, "")
+	slug, err = uc.ensureUniqueSlug(ctx, slug, 0)
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func deriveExcerpt(content string, maxRunes int) string {
 	return strings.TrimSpace(string(r[:maxRunes])) + "…"
 }
 
-func (uc *PostUseCase) GetByID(ctx context.Context, id string) (*entity.PostResponse, error) {
+func (uc *PostUseCase) GetByID(ctx context.Context, id int64) (*entity.PostResponse, error) {
 	post, err := uc.postRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -146,7 +146,7 @@ func (uc *PostUseCase) GetBySlugWithAnalytics(ctx context.Context, slug, ip, use
 }
 
 // GetByIDWithAnalytics retrieves a post by ID and logs the visit
-func (uc *PostUseCase) GetByIDWithAnalytics(ctx context.Context, id, ip, userAgent string) (*entity.PostResponse, error) {
+func (uc *PostUseCase) GetByIDWithAnalytics(ctx context.Context, id int64, ip, userAgent string) (*entity.PostResponse, error) {
 	post, err := uc.postRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -173,7 +173,7 @@ func (uc *PostUseCase) GetByIDWithAnalytics(ctx context.Context, id, ip, userAge
 }
 
 // logVisit records a page visit to analytics
-func (uc *PostUseCase) logVisit(postID, postSlug, postTitle, ip, userAgent string) {
+func (uc *PostUseCase) logVisit(postID int64, postSlug, postTitle, ip, userAgent string) {
 	if uc.analyticsRepo == nil {
 		return
 	}
@@ -202,7 +202,7 @@ func (uc *PostUseCase) logVisit(postID, postSlug, postTitle, ip, userAgent strin
 }
 
 // ensureUniqueSlug ensures the slug is unique by appending a number suffix if needed
-func (uc *PostUseCase) ensureUniqueSlug(ctx context.Context, baseSlug, excludeID string) (string, error) {
+func (uc *PostUseCase) ensureUniqueSlug(ctx context.Context, baseSlug string, excludeID int64) (string, error) {
 	slug := baseSlug
 	for i := 2; i <= 100; i++ {
 		exists, err := uc.postRepo.SlugExists(ctx, slug, excludeID)
@@ -276,17 +276,17 @@ func (uc *PostUseCase) assemblePostResponsesBatch(ctx context.Context, posts []e
 		return []entity.PostResponse{}, nil
 	}
 
-	postIDs := make([]string, 0, len(posts))
-	categoryIDSet := make(map[string]struct{}, len(posts))
+	postIDs := make([]int64, 0, len(posts))
+	categoryIDSet := make(map[int64]struct{}, len(posts))
 	for i := range posts {
 		postIDs = append(postIDs, posts[i].ID)
-		if posts[i].CategoryID != "" {
+		if posts[i].CategoryID != 0 {
 			categoryIDSet[posts[i].CategoryID] = struct{}{}
 		}
 	}
 
 	// Batch load categories
-	categoryIDs := make([]string, 0, len(categoryIDSet))
+	categoryIDs := make([]int64, 0, len(categoryIDSet))
 	for id := range categoryIDSet {
 		categoryIDs = append(categoryIDs, id)
 	}
@@ -294,7 +294,7 @@ func (uc *PostUseCase) assemblePostResponsesBatch(ctx context.Context, posts []e
 	if err != nil {
 		return nil, err
 	}
-	categoryNameByID := make(map[string]string, len(categories))
+	categoryNameByID := make(map[int64]string, len(categories))
 	for i := range categories {
 		categoryNameByID[categories[i].ID] = categories[i].Name
 	}
@@ -304,27 +304,27 @@ func (uc *PostUseCase) assemblePostResponsesBatch(ctx context.Context, posts []e
 	if err != nil {
 		return nil, err
 	}
-	tagIDSet := make(map[string]struct{})
+	tagIDSet := make(map[int64]struct{})
 	for _, ids := range tagIDsByPostID {
 		for _, id := range ids {
-			if id != "" {
+			if id != 0 {
 				tagIDSet[id] = struct{}{}
 			}
 		}
 	}
-	allTagIDs := make([]string, 0, len(tagIDSet))
+	allTagIDs := make([]int64, 0, len(tagIDSet))
 	for id := range tagIDSet {
 		allTagIDs = append(allTagIDs, id)
 	}
 
 	// Batch load tags
-	tagNameByID := make(map[string]string)
+	tagNameByID := make(map[int64]string)
 	if len(allTagIDs) > 0 {
 		tags, err := uc.tagRepo.GetByIDs(ctx, allTagIDs)
 		if err != nil {
 			return nil, err
 		}
-		tagNameByID = make(map[string]string, len(tags))
+		tagNameByID = make(map[int64]string, len(tags))
 		for i := range tags {
 			tagNameByID[tags[i].ID] = tags[i].Name
 		}
@@ -360,7 +360,7 @@ func (uc *PostUseCase) assemblePostResponsesBatch(ctx context.Context, posts []e
 	return responses, nil
 }
 
-func (uc *PostUseCase) Update(ctx context.Context, id string, req entity.UpdatePostRequest) error {
+func (uc *PostUseCase) Update(ctx context.Context, id int64, req entity.UpdatePostRequest) error {
 	post, err := uc.postRepo.GetByID(ctx, id)
 	if err != nil {
 		return err
@@ -406,7 +406,7 @@ func (uc *PostUseCase) Update(ctx context.Context, id string, req entity.UpdateP
 	}
 
 	// Handle category change
-	if req.CategoryID != "" && req.CategoryID != post.CategoryID {
+	if req.CategoryID != 0 && req.CategoryID != post.CategoryID {
 		if err := uc.categoryRepo.DecrementCount(ctx, post.CategoryID); err != nil {
 			log.Warnw("Decrement category count failed",
 				log.Pair("category_id", post.CategoryID),
@@ -436,7 +436,7 @@ func (uc *PostUseCase) Update(ctx context.Context, id string, req entity.UpdateP
 	return nil
 }
 
-func (uc *PostUseCase) Delete(ctx context.Context, id string) error {
+func (uc *PostUseCase) Delete(ctx context.Context, id int64) error {
 	post, err := uc.postRepo.GetByID(ctx, id)
 	if err != nil {
 		return err
