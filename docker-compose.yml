@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # PostgreSQL Database
   postgres:
-    image: docker.m.daocloud.io/postgres:18-alpine
+    image: docker.1ms.run/postgres:18-alpine
     container_name: blog-postgres
     restart: unless-stopped
     ports:
@@ -87,7 +87,7 @@ services:
 
   # Nginx Reverse Proxy (HTTPS)
   nginx:
-    image: docker.m.daocloud.io/nginx:alpine
+    image: docker.1ms.run/nginx:alpine
     container_name: blog-nginx
     restart: unless-stopped
     depends_on:

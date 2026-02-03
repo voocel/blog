@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM docker.m.daocloud.io/node:20-alpine AS builder
+FROM docker.1ms.run/node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production with Nginx
-FROM docker.m.daocloud.io/nginx:alpine
+FROM docker.1ms.run/nginx:alpine
 
 # Copy built files from builder
 COPY --from=builder /app/dist /usr/share/nginx/html

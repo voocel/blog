@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM docker.m.daocloud.io/golang:1.25-alpine AS builder
+FROM docker.1ms.run/golang:1.25-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache git
@@ -28,7 +28,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     -o /app/bin/blog ./cmd/blog
 
 # Stage 2: Runtime
-FROM docker.m.daocloud.io/alpine:latest
+FROM docker.1ms.run/alpine:latest
 
 # Install ca-certificates for HTTPS
 RUN apk --no-cache add ca-certificates tzdata
