@@ -3,7 +3,7 @@ import MDEditor from '@uiw/react-md-editor';
 import { IconX, IconGrid, IconClock } from '@/components/Icons';
 import { useDraftAutoSave } from '@/hooks/useDraftAutoSave';
 import ConfirmModal from '@/components/ConfirmModal';
-import type { BlogPost, EditingPost, Category, Tag } from '@/types';
+import type { EditingPost, Category, Tag } from '@/types';
 
 interface PostEditorProps {
     post: EditingPost;
