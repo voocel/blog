@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import type { BlogPost, Category, Tag } from '@/types';
+import type { BlogPost, EditingPost, Category, Tag } from '@/types';
 import { postService } from '@/services/postService';
 import { metaService } from '@/services/metaService';
 import { useAuth } from '@/context/AuthContext';
@@ -11,14 +11,14 @@ interface BlogContextType {
   error: string | null;
 
   // CRUD Operations
-  addPost: (post: BlogPost) => Promise<void>;
-  updatePost: (id: number, post: Partial<BlogPost>) => Promise<void>;
+  addPost: (post: EditingPost) => Promise<void>;
+  updatePost: (id: number, post: EditingPost) => Promise<void>;
   deletePost: (id: number) => Promise<void>;
 
-  addCategory: (category: Category) => Promise<void>;
+  addCategory: (category: { name: string; slug?: string }) => Promise<void>;
   deleteCategory: (id: number) => Promise<void>;
 
-  addTag: (tag: Tag) => Promise<void>;
+  addTag: (tag: { name: string }) => Promise<void>;
   deleteTag: (id: number) => Promise<void>;
 
   // Refresh
@@ -98,7 +98,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // --- Post Logic ---
-  const addPost = async (post: BlogPost) => {
+  const addPost = async (post: EditingPost) => {
     try {
       await postService.createPost(post);
       await refreshPosts();
@@ -108,7 +108,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const updatePost = async (id: number, updatedFields: Partial<BlogPost>) => {
+  const updatePost = async (id: number, updatedFields: EditingPost) => {
     try {
       const updatedPost = await postService.updatePost(id, updatedFields);
       setPosts(prev => prev.map(p => p.id === id ? updatedPost : p));
@@ -129,7 +129,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // --- Category Logic ---
-  const addCategory = async (category: Category) => {
+  const addCategory = async (category: { name: string; slug?: string }) => {
     try {
       await metaService.addCategory(category);
       const updatedCategories = await metaService.getCategories();
@@ -151,7 +151,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // --- Tag Logic ---
-  const addTag = async (tag: Tag) => {
+  const addTag = async (tag: { name: string }) => {
     try {
       await metaService.addTag(tag);
       const updatedTags = await metaService.getTags();

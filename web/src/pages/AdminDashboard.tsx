@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useBlog } from '@/context/BlogContext';
 import { useAdmin } from '@/context/AdminContext';
-import type { AdminSection, BlogPost, MediaFile } from '@/types';
+import type { AdminSection, BlogPost, EditingPost, MediaFile } from '@/types';
 import { useToast } from '@/components/Toast';
 import { AUTHOR_NAME } from '@/constants';
 import ConfirmModal from '@/components/ConfirmModal';
@@ -76,7 +76,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section }) => {
 
     // --- Editor State ---
     const [isEditorOpen, setIsEditorOpen] = useState(false);
-    const [editingPost, setEditingPost] = useState<Partial<BlogPost> | null>(null);
+    const [editingPost, setEditingPost] = useState<EditingPost | null>(null);
 
     // --- Confirmation Modal State ---
     const [confirmModal, setConfirmModal] = useState<{
@@ -114,7 +114,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section }) => {
     // --- Post Handlers ---
     const handleEditPost = (post?: BlogPost) => {
         if (post) {
-            setEditingPost({ ...post });
+            // Convert tag names to IDs for editing
+            const tagIds = post.tags
+                .map(name => tags.find(t => t.name === name)?.id)
+                .filter((id): id is number => id !== undefined);
+            setEditingPost({ ...post, tags: tagIds });
         } else {
             setEditingPost({
                 title: '',
@@ -135,10 +139,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section }) => {
         setIsEditorOpen(true);
     };
 
-    const handleSavePost = async (post: Partial<BlogPost>) => {
+    const handleSavePost = async (post: EditingPost) => {
         if (!post.title) return;
 
-        const payload: Partial<BlogPost> & { categoryId?: number } = {
+        const payload = {
             ...post,
             categoryId: post.categoryId,
             tags: post.tags || []
@@ -154,7 +158,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section }) => {
             await updatePost(post.id, payload);
             showToast("Entry updated successfully", "success");
         } else {
-            await addPost(payload as BlogPost);
+            await addPost(payload);
             showToast("New entry created", "success");
         }
     };
@@ -179,10 +183,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section }) => {
     const handleAddCategory = async (name: string) => {
         try {
             await addCategory({
-                id: Date.now(),
                 name: name,
                 slug: name.toLowerCase().replace(/ /g, '-'),
-                count: 0
             });
             showToast("Category created successfully", "success");
         } catch (error) {
@@ -204,7 +206,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section }) => {
     const handleAddTag = async (name: string) => {
         try {
             await addTag({
-                id: Date.now(),
                 name: name
             });
             showToast("Tag created successfully", "success");

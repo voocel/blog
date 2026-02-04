@@ -37,6 +37,7 @@ type CommentResponse struct {
 // AdminCommentResponse is used by admin moderation endpoints.
 type AdminCommentResponse struct {
 	ID        int64       `json:"id"`
+	ParentID  *int64      `json:"parentId"`
 	Content   string      `json:"content"`
 	CreatedAt time.Time   `json:"createdAt"`
 	PostID    int64       `json:"postId"`

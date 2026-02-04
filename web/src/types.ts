@@ -12,10 +12,13 @@ export interface BlogPost {
   category: string;
   readTime: string;
   cover: string;
-  tags: number[]; // Tag IDs for editing; API response returns string[] names (JS handles automatically)
+  tags: string[]; // Tag names from API response
   views: number;
   status: 'published' | 'draft';
 }
+
+// Editing state: tags stored as IDs for API submission
+export type EditingPost = Partial<Omit<BlogPost, 'tags'> & { tags: number[] }>;
 
 export interface Category {
   id: number;

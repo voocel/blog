@@ -1,5 +1,5 @@
 import apiClient from '@/services/apiClient';
-import type { BlogPost } from '@/types';
+import type { BlogPost, EditingPost } from '@/types';
 
 export const postService = {
     // Public Endpoints
@@ -53,12 +53,12 @@ export const postService = {
         }
     },
 
-    createPost: async (postData: Partial<BlogPost>): Promise<BlogPost> => {
+    createPost: async (postData: EditingPost): Promise<BlogPost> => {
         const response = await apiClient.post('/admin/posts', postData);
         return response.data;
     },
 
-    updatePost: async (id: number, updatedFields: Partial<BlogPost>): Promise<BlogPost> => {
+    updatePost: async (id: number, updatedFields: EditingPost): Promise<BlogPost> => {
         const response = await apiClient.put(`/admin/posts/${id}`, updatedFields);
         return response.data;
     },

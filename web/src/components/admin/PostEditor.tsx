@@ -3,13 +3,13 @@ import MDEditor from '@uiw/react-md-editor';
 import { IconX, IconGrid, IconClock } from '@/components/Icons';
 import { useDraftAutoSave } from '@/hooks/useDraftAutoSave';
 import ConfirmModal from '@/components/ConfirmModal';
-import type { BlogPost, Category, Tag } from '@/types';
+import type { BlogPost, EditingPost, Category, Tag } from '@/types';
 
 interface PostEditorProps {
-    post: Partial<BlogPost>;
+    post: EditingPost;
     categories: Category[];
     tags: Tag[];
-    onSave: (post: Partial<BlogPost>) => Promise<void>;
+    onSave: (post: EditingPost) => Promise<void>;
     onClose: () => void;
     onDraftSaved?: () => void;
 }
@@ -22,7 +22,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
     onClose,
     onDraftSaved
 }) => {
-    const [editingPost, setEditingPost] = useState<Partial<BlogPost>>(initialPost);
+    const [editingPost, setEditingPost] = useState<EditingPost>(initialPost);
     const [isSaving, setIsSaving] = useState(false);
     const [showCloseConfirm, setShowCloseConfirm] = useState(false);
 

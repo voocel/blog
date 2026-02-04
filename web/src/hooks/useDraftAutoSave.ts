@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import type { BlogPost } from '@/types';
+import type { EditingPost } from '@/types';
 
 const DRAFT_KEY_PREFIX = 'blog_draft_';
 
 interface UseDraftAutoSaveOptions {
-    post: Partial<BlogPost> | null;
+    post: EditingPost | null;
     isEnabled: boolean;
     intervalMs?: number;
     onSave?: () => void;
@@ -14,13 +14,13 @@ interface UseDraftAutoSaveReturn {
     lastSavedContentRef: React.MutableRefObject<string>;
     showDraftRecovery: boolean;
     setShowDraftRecovery: (show: boolean) => void;
-    recoveryDraft: Partial<BlogPost> | null;
-    setRecoveryDraft: (draft: Partial<BlogPost> | null) => void;
-    saveDraft: (post: Partial<BlogPost>) => void;
-    loadDraft: (postId?: number) => Partial<BlogPost> | null;
+    recoveryDraft: EditingPost | null;
+    setRecoveryDraft: (draft: EditingPost | null) => void;
+    saveDraft: (post: EditingPost) => void;
+    loadDraft: (postId?: number) => EditingPost | null;
     clearDraft: (postId?: number) => void;
-    checkForDraft: (postId?: number) => Partial<BlogPost> | null;
-    hasUnsavedChanges: (post: Partial<BlogPost> | null) => boolean;
+    checkForDraft: (postId?: number) => EditingPost | null;
+    hasUnsavedChanges: (post: EditingPost | null) => boolean;
 }
 
 export function useDraftAutoSave({
@@ -31,7 +31,7 @@ export function useDraftAutoSave({
 }: UseDraftAutoSaveOptions): UseDraftAutoSaveReturn {
     const lastSavedContentRef = useRef<string>('');
     const [showDraftRecovery, setShowDraftRecovery] = useState(false);
-    const [recoveryDraft, setRecoveryDraft] = useState<Partial<BlogPost> | null>(null);
+    const [recoveryDraft, setRecoveryDraft] = useState<EditingPost | null>(null);
 
     // Get draft key based on post ID
     const getDraftKey = useCallback((postId?: number) => {
@@ -46,7 +46,7 @@ export function useDraftAutoSave({
     }, [getDraftKey]);
 
     // Load draft from localStorage
-    const loadDraft = useCallback((postId?: number): Partial<BlogPost> | null => {
+    const loadDraft = useCallback((postId?: number): EditingPost | null => {
         const key = getDraftKey(postId);
         const saved = localStorage.getItem(key);
         if (saved) {
@@ -60,7 +60,7 @@ export function useDraftAutoSave({
     }, [getDraftKey]);
 
     // Save draft to localStorage
-    const saveDraft = useCallback((postToSave: Partial<BlogPost>) => {
+    const saveDraft = useCallback((postToSave: EditingPost) => {
         const key = getDraftKey(postToSave.id);
         const content = JSON.stringify(postToSave);
         if (content !== lastSavedContentRef.current) {
@@ -71,12 +71,12 @@ export function useDraftAutoSave({
     }, [getDraftKey, onSave]);
 
     // Check if a draft exists for a post
-    const checkForDraft = useCallback((postId?: number): Partial<BlogPost> | null => {
+    const checkForDraft = useCallback((postId?: number): EditingPost | null => {
         return loadDraft(postId);
     }, [loadDraft]);
 
     // Check if there are unsaved changes
-    const hasUnsavedChanges = useCallback((currentPost: Partial<BlogPost> | null): boolean => {
+    const hasUnsavedChanges = useCallback((currentPost: EditingPost | null): boolean => {
         if (!currentPost) return false;
         const currentContent = JSON.stringify(currentPost);
         return currentContent !== lastSavedContentRef.current &&

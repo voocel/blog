@@ -257,6 +257,7 @@ func (uc *CommentUseCase) ListAllAdmin(ctx context.Context) ([]entity.AdminComme
 		}
 		resp = append(resp, entity.AdminCommentResponse{
 			ID:        c.ID,
+			ParentID:  c.ParentID,
 			Content:   c.Content,
 			CreatedAt: c.CreatedAt,
 			PostID:    c.PostID,

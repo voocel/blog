@@ -7,7 +7,7 @@ export const metaService = {
         const response = await apiClient.get('/categories');
         return response.data;
     },
-    addCategory: async (category: Category): Promise<Category> => {
+    addCategory: async (category: { name: string; slug?: string }): Promise<Category> => {
         const response = await apiClient.post('/admin/categories', category);
         return response.data;
     },
@@ -20,7 +20,7 @@ export const metaService = {
         const response = await apiClient.get('/tags');
         return response.data;
     },
-    addTag: async (tag: Tag): Promise<Tag> => {
+    addTag: async (tag: { name: string }): Promise<Tag> => {
         const response = await apiClient.post('/admin/tags', tag);
         return response.data;
     },
