@@ -8,6 +8,11 @@ interface FloatingHeart {
     color: string;
     scale: number;
     rotation: number;
+    // Pre-computed random values for animation
+    yOffset: number;
+    xOffset: number;
+    rotationOffset: number;
+    durationOffset: number;
 }
 
 interface LikeButtonProps {
@@ -47,6 +52,11 @@ const LikeButton: React.FC<LikeButtonProps> = ({ initialCount = 0, onLike }) => 
                 color: heartColors[Math.floor(Math.random() * heartColors.length)],
                 scale: 0.6 + Math.random() * 0.6, // Random size 0.6-1.2
                 rotation: (Math.random() - 0.5) * 40, // Random rotation
+                // Pre-compute random values for animation
+                yOffset: Math.random() * 40,
+                xOffset: (Math.random() - 0.5) * 30,
+                rotationOffset: (Math.random() - 0.5) * 20,
+                durationOffset: Math.random() * 0.5,
             });
         }
 
@@ -97,13 +107,13 @@ const LikeButton: React.FC<LikeButtonProps> = ({ initialCount = 0, onLike }) => 
                             animate={{
                                 opacity: [1, 1, 0],
                                 scale: [0, heart.scale, heart.scale * 0.5],
-                                y: -120 - Math.random() * 40,
-                                x: heart.x + (Math.random() - 0.5) * 30,
-                                rotate: heart.rotation + (Math.random() - 0.5) * 20,
+                                y: -120 - heart.yOffset,
+                                x: heart.x + heart.xOffset,
+                                rotate: heart.rotation + heart.rotationOffset,
                             }}
                             exit={{ opacity: 0 }}
                             transition={{
-                                duration: 1.5 + Math.random() * 0.5,
+                                duration: 1.5 + heart.durationOffset,
                                 ease: 'easeOut',
                             }}
                         >

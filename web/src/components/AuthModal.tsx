@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { IconX, IconLock, IconUser } from './Icons';
+import { useAuth } from '@/context/AuthContext';
+import { IconX, IconLock, IconUser } from '@/components/Icons';
 
 const AuthModal: React.FC = () => {
     const { isAuthModalOpen, setAuthModalOpen, login, register, user } = useAuth();
@@ -46,10 +46,11 @@ const AuthModal: React.FC = () => {
                 setPassword('');
                 setAuthModalOpen(false);
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Auth error:", err);
             // Extract error message from backend response if available
-            const backendError = err.response?.data?.error || err.message || 'Authentication failed';
+            const axiosError = err as { response?: { data?: { error?: string } }; message?: string };
+            const backendError = axiosError.response?.data?.error || axiosError.message || 'Authentication failed';
             setError(backendError);
         }
     };

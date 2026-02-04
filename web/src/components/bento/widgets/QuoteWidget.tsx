@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconSparkles } from '../../Icons';
+import { IconSparkles } from '@/components/Icons';
 
 const QUOTES = [
     { text: "Code is poetry, and design is the silent language of connection.", author: "Digital Soul" },

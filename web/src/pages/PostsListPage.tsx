@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import AnimatedNavWidget from '../components/AnimatedNavWidget';
-import SEO from '../components/SEO';
-import { postService } from '../services/postService';
-import type { BlogPost } from '../types';
+import AnimatedNavWidget from '@/components/AnimatedNavWidget';
+import SEO from '@/components/SEO';
+import { postService } from '@/services/postService';
+import type { BlogPost } from '@/types';
 
 interface PostGroup {
     label: string;
@@ -76,11 +76,12 @@ const PostsListPage: React.FC = () => {
                     // Group by specific date: "Jan 09, 2026"
                     key = `${date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}`;
                     break;
-                case 'week':
+                case 'week': {
                     // Group by week number
                     const weekNum = Math.ceil((date.getDate()) / 7);
                     key = `${date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} Week ${weekNum}`;
                     break;
+                }
                 case 'month':
                     // Group by month: "Jan 2026"
                     key = `${date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;

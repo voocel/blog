@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AuthResponse } from '../types';
+import type { AuthResponse } from '@/types';
 
 // Token Management Helpers
 export const getAccessToken = () => localStorage.getItem('access_token');
@@ -65,7 +65,7 @@ apiClient.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
         const status = error.response?.status as number | undefined;
-        const data = error.response?.data as any;
+        const data = error.response?.data as { error?: string; message?: string } | string | undefined;
         const msg: string = (() => {
             if (!data) return '';
             if (typeof data === 'string') return data;

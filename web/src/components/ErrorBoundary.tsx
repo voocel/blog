@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { IconSparkles } from './Icons';
+import { IconSparkles } from '@/components/Icons';
 
 interface Props {
     children: ReactNode;

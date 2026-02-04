@@ -1,5 +1,5 @@
-import apiClient from './apiClient';
-import type { Category, Tag, MediaFile, DashboardOverview } from '../types';
+import apiClient from '@/services/apiClient';
+import type { Category, Tag, MediaFile, DashboardOverview, VisitLog } from '@/types';
 
 export const metaService = {
     // Categories
@@ -48,7 +48,7 @@ export const metaService = {
         await apiClient.post('/analytics/visit', { pagePath, postId, postTitle });
     },
 
-    getVisitLogs: async (): Promise<any[]> => {
+    getVisitLogs: async (): Promise<VisitLog[]> => {
         const response = await apiClient.get('/admin/analytics/logs');
         return response.data;
     },

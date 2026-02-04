@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { IconTrash } from '../Icons';
-import type { Category } from '../../types';
+import { IconTrash } from '@/components/Icons';
+import type { Category } from '@/types';
 
 interface AdminCategoriesProps {
     categories: Category[];

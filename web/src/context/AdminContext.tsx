@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, type ReactNode } from 'react';
-import type { MediaFile, VisitLog, DashboardOverview, User, Comment } from '../types';
-import { metaService } from '../services/metaService';
-import { authService } from '../services/authService';
+import type { MediaFile, VisitLog, DashboardOverview, User, Comment } from '@/types';
+import { metaService } from '@/services/metaService';
+import { authService } from '@/services/authService';
 
 interface AdminContextType {
     files: MediaFile[];
@@ -83,7 +83,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     const refreshAllComments = async () => {
         try {
-            const comments = await import('../services/commentService').then(m => m.commentService.getAllComments());
+            const comments = await import('@/services/commentService').then(m => m.commentService.getAllComments());
             setAllComments(comments);
         } catch (err) {
             console.error("Failed to refresh all comments", err);
@@ -131,6 +131,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAdmin = () => {
     const context = useContext(AdminContext);
     if (!context) {

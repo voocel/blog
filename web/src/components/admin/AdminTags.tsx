@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { IconX } from '../Icons';
-import type { Tag } from '../../types';
+import { IconX } from '@/components/Icons';
+import type { Tag } from '@/types';
 
 interface AdminTagsProps {
     tags: Tag[];

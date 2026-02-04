@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { IconUser, IconMail, IconCamera, IconArrowLeft, IconCheck, IconSparkles, IconMoon, IconGlobe } from '../components/Icons';
-import { uploadImage } from '../services/uploadService';
+import { useAuth } from '@/context/AuthContext';
+import { IconUser, IconMail, IconCamera, IconArrowLeft, IconCheck, IconSparkles, IconMoon, IconGlobe } from '@/components/Icons';
+import { uploadImage } from '@/services/uploadService';
 
 interface SettingsPageProps {
     onExit: () => void;

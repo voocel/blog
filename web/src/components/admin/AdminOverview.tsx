@@ -1,6 +1,6 @@
 import React from 'react';
-import { IconGrid, IconLayers, IconTag, IconImage, IconClock, IconEye } from '../Icons';
-import type { BlogPost, DashboardOverview, User } from '../../types';
+import { IconGrid, IconLayers, IconTag, IconImage, IconClock, IconEye } from '@/components/Icons';
+import type { BlogPost, DashboardOverview, User } from '@/types';
 
 interface AdminOverviewProps {
     user: User | null;

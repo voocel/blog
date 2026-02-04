@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { IconGithub } from '../../Icons';
+import { IconGithub } from '@/components/Icons';
 
 const SocialWidget: React.FC = () => {
     return (

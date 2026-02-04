@@ -1,5 +1,5 @@
-import apiClient, { setTokens, clearTokens, getRefreshToken, getAccessToken } from './apiClient';
-import type { User, AuthResponse } from '../types';
+import apiClient, { setTokens, clearTokens, getRefreshToken, getAccessToken } from '@/services/apiClient';
+import type { User, AuthResponse } from '@/types';
 
 export const authService = {
     login: async (email: string, password?: string): Promise<User> => {

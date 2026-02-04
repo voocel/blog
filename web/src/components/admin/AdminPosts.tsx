@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { IconPlus, IconX, IconClock, IconEye, IconEdit, IconTrash, IconArrowLeft, IconArrowDown } from '../Icons';
-import type { BlogPost } from '../../types';
+import { IconPlus, IconX, IconClock, IconEye, IconEdit, IconTrash, IconArrowLeft, IconArrowDown } from '@/components/Icons';
+import type { BlogPost } from '@/types';
 
 interface AdminPostsProps {
     posts: BlogPost[];

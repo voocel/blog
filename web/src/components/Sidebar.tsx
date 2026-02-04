@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { IconHome, IconGrid, IconLayers, IconTag, IconImage, IconLogOut, IconArrowLeft, IconSparkles, IconUserCircle, IconActivity, IconUser, IconMessageSquare } from './Icons';
-import type { AdminSection } from '../types';
-import { useAuth } from '../context/AuthContext';
+import { IconHome, IconGrid, IconLayers, IconTag, IconImage, IconLogOut, IconArrowLeft, IconSparkles, IconUserCircle, IconActivity, IconUser, IconMessageSquare } from '@/components/Icons';
+import type { AdminSection } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 
 interface SidebarProps {
     currentSection: AdminSection;
@@ -13,7 +13,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ currentSection, setSection, onExit }) => {
     const { logout, user } = useAuth();
 
-    const menuItems: { id: AdminSection; label: string; icon: React.FC<any> }[] = [
+    const menuItems: { id: AdminSection; label: string; icon: React.FC<{ className?: string }> }[] = [
         { id: 'overview', label: 'Command Center', icon: IconHome },
         { id: 'posts', label: 'Journal Entries', icon: IconGrid },
         { id: 'categories', label: 'Categories', icon: IconLayers },

@@ -1,4 +1,4 @@
-import type { Comment } from '../types';
+import type { Comment } from '@/types';
 
 interface CommentResponse {
     data: Comment[];
@@ -10,7 +10,7 @@ interface CommentResponse {
     };
 }
 
-import apiClient from './apiClient';
+import apiClient from '@/services/apiClient';
 
 // ... interface CommentResponse remains the same ...
 
@@ -38,7 +38,7 @@ export const commentService = {
     },
 
     createComment: async (postSlug: string, content: string, parentId?: number): Promise<Comment> => {
-        const payload: any = { content };
+        const payload: { content: string; parentId?: number } = { content };
         if (parentId) {
             payload.parentId = parentId;
         }

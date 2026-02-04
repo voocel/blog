@@ -1,10 +1,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import MDEditor from '@uiw/react-md-editor';
-import { streamChatResponse } from '../services/geminiService';
-import type { ChatMessage } from '../types';
-import { IconX, IconSend, IconSparkles } from './Icons';
-import { useBlog } from '../context/BlogContext';
+import { streamChatResponse } from '@/services/geminiService';
+import type { ChatMessage } from '@/types';
+import { IconX, IconSend, IconSparkles } from '@/components/Icons';
+import { useBlog } from '@/context/BlogContext';
 
 const AIChat: React.FC = () => {
   const { posts } = useBlog();

@@ -1,15 +1,15 @@
 
-import React, { useState, useEffect, type PropsWithChildren } from 'react';
+import React, { useState, useEffect, useMemo, type PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MDEditor from '@uiw/react-md-editor';
-import type { BlogPost } from '../types';
-import { getAssetUrl } from '../utils/urlUtils';
-import { IconSparkles, IconBrain } from './Icons';
-import { generateSummary, generateInsight } from '../services/geminiService';
-import { postService } from '../services/postService';
-import SEO from './SEO';
-import AnimatedNavWidget from './AnimatedNavWidget';
-import LikeButton from './LikeButton';
+import type { BlogPost } from '@/types';
+import { getAssetUrl } from '@/utils/urlUtils';
+import { IconSparkles, IconBrain } from '@/components/Icons';
+import { generateSummary, generateInsight } from '@/services/geminiService';
+import { postService } from '@/services/postService';
+import SEO from '@/components/SEO';
+import AnimatedNavWidget from '@/components/AnimatedNavWidget';
+import LikeButton from '@/components/LikeButton';
 
 interface PostDetailProps {
     post: BlogPost;
@@ -22,7 +22,16 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
     const [loadingSummary, setLoadingSummary] = useState(false);
     const [loadingInsight, setLoadingInsight] = useState(false);
     const [articleLikes, setArticleLikes] = useState(0);
-    const [tocItems, setTocItems] = useState<{ id: string; text: string; level: number }[]>([]);
+
+    const tocItems = useMemo(() => {
+        const headingRegex = /^(#{1,3})\s+(.+)$/gm;
+        const matches = [...post.content.matchAll(headingRegex)];
+        return matches.map((match, index) => ({
+            id: `heading-${index}`,
+            text: match[2],
+            level: match[1].length,
+        }));
+    }, [post.content]);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -31,17 +40,7 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
         postService.getLikes(`post-${post.slug}`)
             .then(count => setArticleLikes(count))
             .catch(err => console.error('Failed to fetch article likes:', err));
-
-        // Generate TOC from content
-        const headingRegex = /^(#{1,3})\s+(.+)$/gm;
-        const matches = [...post.content.matchAll(headingRegex)];
-        const items = matches.map((match, index) => ({
-            id: `heading-${index}`,
-            text: match[2],
-            level: match[1].length,
-        }));
-        setTocItems(items);
-    }, [post.slug, post.content]);
+    }, [post.slug]);
 
     const handleGenerateSummary = async () => {
         setLoadingSummary(true);

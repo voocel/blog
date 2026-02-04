@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import AnimatedNavWidget from '../components/AnimatedNavWidget';
+import AnimatedNavWidget from '@/components/AnimatedNavWidget';
 
 
 type Mode = 'stopwatch' | 'timer';
@@ -35,6 +35,7 @@ const ClockPage: React.FC = () => {
             if (swRef.current) clearInterval(swRef.current);
         }
         return () => { if (swRef.current) clearInterval(swRef.current); };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [swRunning]);
 
     const handleSwToggle = () => setSwRunning(!swRunning);
@@ -68,6 +69,7 @@ const ClockPage: React.FC = () => {
             if (timerRef.current) clearInterval(timerRef.current);
         }
         return () => { if (timerRef.current) clearInterval(timerRef.current); };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [timerRunning]);
 
     const handleTimerToggle = () => {

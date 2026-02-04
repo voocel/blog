@@ -1,5 +1,5 @@
 
-import type { BlogPost, Category, Tag, MediaFile } from './types';
+import type { BlogPost, Category, Tag, MediaFile } from '@/types';
 
 export const BLOG_TITLE = "Voocel.";
 export const BLOG_SUBTITLE = "Notes from the Aether";

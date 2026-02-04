@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { commentService } from '../services/commentService';
-import type { Comment } from '../types';
-import { IconUserCircle, IconSparkles } from './Icons';
+import { useAuth } from '@/context/AuthContext';
+import { commentService } from '@/services/commentService';
+import type { Comment } from '@/types';
+import { IconUserCircle, IconSparkles } from '@/components/Icons';
 
 interface CommentSectionProps {
     postSlug: string;

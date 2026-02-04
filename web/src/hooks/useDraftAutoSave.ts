@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import type { BlogPost } from '../types';
+import type { BlogPost } from '@/types';
 
 const DRAFT_KEY_PREFIX = 'blog_draft_';
 

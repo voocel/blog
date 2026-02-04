@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useBlog } from '../context/BlogContext';
-import { useAdmin } from '../context/AdminContext';
-import type { AdminSection, BlogPost } from '../types';
-import { useToast } from '../components/Toast';
-import { AUTHOR_NAME } from '../constants';
-import ConfirmModal from '../components/ConfirmModal';
-import PostEditor from '../components/admin/PostEditor';
+import { useAuth } from '@/context/AuthContext';
+import { useBlog } from '@/context/BlogContext';
+import { useAdmin } from '@/context/AdminContext';
+import type { AdminSection, BlogPost, MediaFile } from '@/types';
+import { useToast } from '@/components/Toast';
+import { AUTHOR_NAME } from '@/constants';
+import ConfirmModal from '@/components/ConfirmModal';
+import PostEditor from '@/components/admin/PostEditor';
 
-import AdminOverview from '../components/admin/AdminOverview';
-import AdminPosts from '../components/admin/AdminPosts';
-import AdminCategories from '../components/admin/AdminCategories';
-import AdminTags from '../components/admin/AdminTags';
-import AdminFiles from '../components/admin/AdminFiles';
-import AdminEchoes from '../components/admin/AdminEchoes';
-import AdminUsers from '../components/admin/AdminUsers';
-import AdminComments from '../components/admin/AdminComments';
+import AdminOverview from '@/components/admin/AdminOverview';
+import AdminPosts from '@/components/admin/AdminPosts';
+import AdminCategories from '@/components/admin/AdminCategories';
+import AdminTags from '@/components/admin/AdminTags';
+import AdminFiles from '@/components/admin/AdminFiles';
+import AdminEchoes from '@/components/admin/AdminEchoes';
+import AdminUsers from '@/components/admin/AdminUsers';
+import AdminComments from '@/components/admin/AdminComments';
 
 interface AdminDashboardProps {
     section: AdminSection;
     onExit: () => void;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExit }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ section }) => {
     const navigate = useNavigate();
 
     // Auth Context - user info
@@ -71,6 +71,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
         } else if (section === 'comments') {
             refreshAllComments();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [section]);
 
     // --- Editor State ---
@@ -137,7 +138,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
     const handleSavePost = async (post: Partial<BlogPost>) => {
         if (!post.title) return;
 
-        const payload: any = {
+        const payload: Partial<BlogPost> & { categoryId?: number } = {
             ...post,
             categoryId: post.categoryId,
             tags: post.tags || []
@@ -224,7 +225,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
     };
 
     // --- File Handlers ---
-    const handleAddFile = async (file: any) => {
+    const handleAddFile = async (file: MediaFile) => {
         try {
             await addFile(file);
             showToast("File uploaded successfully", "success");
@@ -304,7 +305,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section, onExit: _onExi
                         'Are you sure you want to remove this comment? This action cannot be undone.',
                         async () => {
                             try {
-                                const { commentService } = await import('../services/commentService');
+                                const { commentService } = await import('@/services/commentService');
                                 await commentService.deleteComment(id);
                                 await refreshAllComments();
                                 showToast("Comment deleted", "success");

@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import type { BlogPost, Category, Tag } from '../types';
-import { postService } from '../services/postService';
-import { metaService } from '../services/metaService';
-import { useAuth } from './AuthContext';
+import type { BlogPost, Category, Tag } from '@/types';
+import { postService } from '@/services/postService';
+import { metaService } from '@/services/metaService';
+import { useAuth } from '@/context/AuthContext';
 
 interface BlogContextType {
   posts: BlogPost[];
@@ -198,6 +198,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useBlog = () => {
   const context = useContext(BlogContext);
   if (!context) {

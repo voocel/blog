@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-
-import { IconSearch, IconTrash, IconMessageSquare } from '../Icons';
+import type { Comment } from '@/types';
+import { IconSearch, IconTrash, IconMessageSquare } from '@/components/Icons';
 
 interface AdminCommentsProps {
-    comments: any[];
+    comments: Comment[];
     onDeleteComment: (id: number) => void;
 }
 

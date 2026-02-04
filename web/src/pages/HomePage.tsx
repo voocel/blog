@@ -2,21 +2,21 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import BentoItem from '../components/bento/BentoItem';
-import QuoteWidget from '../components/bento/widgets/QuoteWidget';
-import AnimatedNavWidget from '../components/AnimatedNavWidget';
-import ClockWidget from '../components/bento/widgets/ClockWidget';
-import CalendarWidget from '../components/bento/widgets/CalendarWidget';
-import MediaWidget from '../components/bento/widgets/MediaWidget';
-import SocialWidget from '../components/bento/widgets/SocialWidget';
-import LikeButton from '../components/LikeButton';
-import SettingsModal from '../components/SettingsModal';
-import SEO from '../components/SEO';
-import { postService } from '../services/postService';
-import type { BlogPost } from '../types';
-import { useAuth } from '../context/AuthContext';
-import { useSettings } from '../context/SettingsContext';
-import { useTranslation } from '../hooks/useTranslation';
+import BentoItem from '@/components/bento/BentoItem';
+import QuoteWidget from '@/components/bento/widgets/QuoteWidget';
+import AnimatedNavWidget from '@/components/AnimatedNavWidget';
+import ClockWidget from '@/components/bento/widgets/ClockWidget';
+import CalendarWidget from '@/components/bento/widgets/CalendarWidget';
+import MediaWidget from '@/components/bento/widgets/MediaWidget';
+import SocialWidget from '@/components/bento/widgets/SocialWidget';
+import LikeButton from '@/components/LikeButton';
+import SettingsModal from '@/components/SettingsModal';
+import SEO from '@/components/SEO';
+import { postService } from '@/services/postService';
+import type { BlogPost } from '@/types';
+import { useAuth } from '@/context/AuthContext';
+import { useSettings } from '@/context/SettingsContext';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // Staggered animation variants
 const containerVariants = {

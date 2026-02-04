@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { IconActivity, IconGlobe, IconMapPin } from '../Icons';
-import type { VisitLog, BlogPost } from '../../types';
+import { IconActivity, IconGlobe, IconMapPin } from '@/components/Icons';
+import type { VisitLog, BlogPost } from '@/types';
 
 interface AdminEchoesProps {
     visitLogs: VisitLog[];

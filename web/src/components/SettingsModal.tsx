@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useSettings } from '../context/SettingsContext';
-import { useTranslation } from '../hooks/useTranslation';
-import type { ThemeMode } from '../config/settings';
-import { type Locale, localeNames } from '../locales';
+import { useSettings } from '@/context/SettingsContext';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { ThemeMode } from '@/config/settings';
+import { type Locale, localeNames } from '@/locales';
 
 interface SettingsModalProps {
     isOpen: boolean;
@@ -10,12 +10,12 @@ interface SettingsModalProps {
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-    if (!isOpen) return null;
-
     const { settings, updateTheme, updateAnimations, updateMusicSettings, updateLocale, resetSettings } = useSettings();
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState<'appearance' | 'music' | 'language'>('appearance');
     const [showSaveToast, setShowSaveToast] = useState(false);
+
+    if (!isOpen) return null;
 
     const handleSave = () => {
         setShowSaveToast(true);

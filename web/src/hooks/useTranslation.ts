@@ -1,5 +1,5 @@
-import { useSettings } from '../context/SettingsContext';
-import { translations } from '../locales';
+import { useSettings } from '@/context/SettingsContext';
+import { translations } from '@/locales';
 
 export const useTranslation = () => {
   const { settings } = useSettings();

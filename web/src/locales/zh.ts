@@ -1,5 +1,5 @@
 // Chinese translations
-import type { TranslationKeys } from './en';
+import type { TranslationKeys } from '@/locales/en';
 
 export const zh: TranslationKeys = {
   // Settings modal

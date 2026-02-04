@@ -1,5 +1,5 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
-import type { ChatMessage } from "../types";
+import type { ChatMessage } from "@/types";
 
 const apiKey = import.meta.env.VITE_API_KEY;
 let ai: GoogleGenAI | null = null;

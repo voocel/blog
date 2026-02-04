@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { IconCheck, IconX, IconSparkles } from './Icons';
+import { IconCheck, IconX, IconSparkles } from '@/components/Icons';
 
 export type ToastType = 'success' | 'error' | 'info';
 
@@ -16,6 +16,7 @@ interface ToastContextType {
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useToast = () => {
     const context = useContext(ToastContext);
     if (!context) {
@@ -27,6 +28,10 @@ export const useToast = () => {
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [toasts, setToasts] = useState<Toast[]>([]);
 
+    const removeToast = useCallback((id: string) => {
+        setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, []);
+
     const showToast = useCallback((message: string, type: ToastType = 'info', details?: string) => {
         const id = Math.random().toString(36).substr(2, 9);
         setToasts((prev) => [...prev, { id, message, type, details }]);
@@ -36,11 +41,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setTimeout(() => {
             removeToast(id);
         }, duration);
-    }, []);
-
-    const removeToast = useCallback((id: string) => {
-        setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    }, []);
+    }, [removeToast]);
 
     return (
         <ToastContext.Provider value={{ showToast }}>

@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import MDEditor from '@uiw/react-md-editor';
-import { IconX, IconGrid, IconClock } from '../Icons';
-import { useDraftAutoSave } from '../../hooks/useDraftAutoSave';
-import ConfirmModal from '../ConfirmModal';
-import type { BlogPost, Category, Tag } from '../../types';
+import { IconX, IconGrid, IconClock } from '@/components/Icons';
+import { useDraftAutoSave } from '@/hooks/useDraftAutoSave';
+import ConfirmModal from '@/components/ConfirmModal';
+import type { BlogPost, Category, Tag } from '@/types';
 
 interface PostEditorProps {
     post: Partial<BlogPost>;
@@ -53,6 +53,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
         }
         // Initialize lastSavedContentRef
         lastSavedContentRef.current = JSON.stringify(initialPost);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Handle save
@@ -158,11 +159,13 @@ const PostEditor: React.FC<PostEditorProps> = ({
                             <div
                                 className="relative group cursor-pointer"
                                 onClick={() => {
-                                    try {
-                                        // @ts-ignore
-                                        document.getElementById('publish-date-picker')?.showPicker();
-                                    } catch (e) {
-                                        document.getElementById('publish-date-picker')?.focus();
+                                    const picker = document.getElementById('publish-date-picker');
+                                    if (picker instanceof HTMLInputElement) {
+                                        try {
+                                            picker.showPicker();
+                                        } catch {
+                                            picker.focus();
+                                        }
                                     }
                                 }}
                             >

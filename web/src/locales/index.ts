@@ -1,5 +1,5 @@
-import { en } from './en';
-import { zh } from './zh';
+import { en } from '@/locales/en';
+import { zh } from '@/locales/zh';
 
 export type Locale = 'en' | 'zh';
 

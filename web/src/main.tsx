@@ -1,14 +1,14 @@
 import React, { useState, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { BlogProvider } from './context/BlogContext';
-import { AdminProvider } from './context/AdminContext';
-import { SettingsProvider } from './context/SettingsContext';
-import type { AdminSection } from './types';
-import Sidebar from './components/Sidebar';
-import AuthModal from './components/AuthModal';
-import ErrorBoundary from './components/ErrorBoundary';
-import { ToastProvider } from './components/Toast';
+import { AuthProvider } from '@/context/AuthContext';
+import { BlogProvider } from '@/context/BlogContext';
+import { AdminProvider } from '@/context/AdminContext';
+import { SettingsProvider } from '@/context/SettingsContext';
+import type { AdminSection } from '@/types';
+import Sidebar from '@/components/Sidebar';
+import AuthModal from '@/components/AuthModal';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { ToastProvider } from '@/components/Toast';
 
 // Lazy Load AIChat (large deps: @uiw/react-md-editor, @google/genai)
 const AIChat = React.lazy(() => import('./components/AIChat'));

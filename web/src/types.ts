@@ -48,6 +48,7 @@ export interface Comment {
   parentId: number | null;
   content: string;
   createdAt: string;
+  postTitle?: string;  // Available in admin list
   user: {
     username: string;
     avatar?: string;

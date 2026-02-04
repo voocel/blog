@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IconSparkles, IconBrain, IconMessage, IconSend } from '../components/Icons';
-import AnimatedNavWidget from '../components/AnimatedNavWidget';
+import { IconSparkles, IconBrain, IconMessage, IconSend } from '@/components/Icons';
+import AnimatedNavWidget from '@/components/AnimatedNavWidget';
 
 
 // --- Reusable Reveal Component (Same as HomePage) ---

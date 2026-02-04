@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useSettings } from '../context/SettingsContext';
+import { useSettings } from '@/context/SettingsContext';
 
 export interface Song {
   id: string;
@@ -59,6 +59,7 @@ export const useAudioPlayer = (playlist: Song[] = []): UseAudioPlayerReturn => {
       audio.pause();
       audio.src = '';
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update audio source when song changes
@@ -78,6 +79,7 @@ export const useAudioPlayer = (playlist: Song[] = []): UseAudioPlayerReturn => {
         });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSongIndex, playlist]);
 
   // Setup event listeners
@@ -146,6 +148,7 @@ export const useAudioPlayer = (playlist: Song[] = []): UseAudioPlayerReturn => {
       audio.removeEventListener('error', handleError);
       audio.removeEventListener('canplay', handleCanPlay);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playlist.length, currentSongIndex]);
 
   const play = useCallback(() => {

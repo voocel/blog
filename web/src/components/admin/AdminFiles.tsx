@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { IconUpload, IconCopy, IconTrash, IconX, IconChevronLeft, IconChevronRight } from '../Icons';
-import type { MediaFile } from '../../types';
-import { uploadImage } from '../../services/uploadService';
+import { IconUpload, IconCopy, IconTrash, IconX, IconChevronLeft, IconChevronRight } from '@/components/Icons';
+import type { MediaFile } from '@/types';
+import { uploadImage } from '@/services/uploadService';
 
 interface AdminFilesProps {
     files: MediaFile[];

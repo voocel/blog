@@ -1,6 +1,6 @@
 import React from 'react';
-import { useAudioPlayer } from '../../../hooks/useAudioPlayer';
-import { MUSIC_PLAYLIST } from '../../../config/musicConfig';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { MUSIC_PLAYLIST } from '@/config/musicConfig';
 
 const MediaWidget: React.FC = () => {
     const {

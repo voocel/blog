@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { useAdmin } from '../../context/AdminContext';
-import { IconUserCircle, IconSearch, IconShield, IconLock, IconCheck, IconGoogle, IconGithub, IconMail } from '../Icons';
-import { authService } from '../../services/authService';
-import type { User } from '../../types';
+import { useAdmin } from '@/context/AdminContext';
+import { IconUserCircle, IconSearch, IconShield, IconLock, IconCheck, IconGoogle, IconGithub, IconMail } from '@/components/Icons';
+import { authService } from '@/services/authService';
+import type { User } from '@/types';
 
 interface AdminUsersProps {
     users: User[];
     requestConfirm: (title: string, message: string, onConfirm: () => void, options?: { confirmText?: string; isDestructive?: boolean }) => void;
 }
 
-import { useToast } from '../../components/Toast';
+import { useToast } from '@/components/Toast';
 
 // ...
 
