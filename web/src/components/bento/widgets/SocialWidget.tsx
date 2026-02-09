@@ -28,7 +28,7 @@ const SocialWidget: React.FC = () => {
             </a>
 
             {/* Email - Square/Rounded */}
-            <div className="bg-orange-100 text-orange-500 rounded-2xl flex items-center justify-center text-xl shadow-sm cursor-pointer hover:scale-105 transition-transform hover:bg-orange-200 px-4 py-3">
+            <div className="bg-orange-100 dark:bg-orange-900/40 text-orange-500 rounded-2xl flex items-center justify-center text-xl shadow-sm cursor-pointer hover:scale-105 transition-transform hover:bg-orange-200 dark:hover:bg-orange-800/40 px-4 py-3">
                 ✉️
             </div>
         </div>

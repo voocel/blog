@@ -90,11 +90,11 @@ const ClockPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#fdfaf6] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-orange-50 via-stone-50 to-stone-100 flex flex-col items-center justify-center relative overflow-hidden text-stone-700 font-sans selection:bg-orange-200">
+        <div className="min-h-screen bg-[var(--color-base)] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-orange-50 via-stone-50 to-stone-100 dark:from-orange-950 dark:via-stone-900 dark:to-stone-950 flex flex-col items-center justify-center relative overflow-hidden text-stone-700 dark:text-stone-300 font-sans selection:bg-orange-200">
 
             {/* Background Blobs */}
-            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-200/30 rounded-full mix-blend-multiply blur-3xl animate-blob pointer-events-none" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-orange-200/30 rounded-full mix-blend-multiply blur-3xl animate-blob animation-delay-2000 pointer-events-none" />
+            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-200/30 dark:bg-purple-900/30 rounded-full mix-blend-multiply dark:mix-blend-screen blur-3xl animate-blob pointer-events-none" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-orange-200/30 dark:bg-orange-900/30 rounded-full mix-blend-multiply dark:mix-blend-screen blur-3xl animate-blob animation-delay-2000 pointer-events-none" />
 
             {/* Nav */}
             <div className="fixed top-8 left-8 z-50">
@@ -108,16 +108,16 @@ const ClockPage: React.FC = () => {
             >
 
                 {/* Toggle Switch */}
-                <div className="flex bg-stone-200/50 p-1.5 rounded-full backdrop-blur-sm shadow-inner">
+                <div className="flex bg-stone-200/50 dark:bg-stone-700/50 p-1.5 rounded-full backdrop-blur-sm shadow-inner">
                     <button
                         onClick={() => setMode('stopwatch')}
-                        className={`px-8 py-2 rounded-full text-sm font-bold transition-all duration-300 ${mode === 'stopwatch' ? 'bg-white shadow-sm text-orange-500' : 'text-stone-500 hover:text-stone-700'}`}
+                        className={`px-8 py-2 rounded-full text-sm font-bold transition-all duration-300 ${mode === 'stopwatch' ? 'bg-[var(--color-surface)] shadow-sm text-orange-500' : 'text-[var(--color-text-secondary)] hover:text-stone-700 dark:hover:text-stone-300'}`}
                     >
                         Stopwatch
                     </button>
                     <button
                         onClick={() => setMode('timer')}
-                        className={`px-8 py-2 rounded-full text-sm font-bold transition-all duration-300 ${mode === 'timer' ? 'bg-white shadow-sm text-orange-500' : 'text-stone-500 hover:text-stone-700'}`}
+                        className={`px-8 py-2 rounded-full text-sm font-bold transition-all duration-300 ${mode === 'timer' ? 'bg-[var(--color-surface)] shadow-sm text-orange-500' : 'text-[var(--color-text-secondary)] hover:text-stone-700 dark:hover:text-stone-300'}`}
                     >
                         Timer
                     </button>
@@ -126,7 +126,7 @@ const ClockPage: React.FC = () => {
                 {/* Display Container */}
                 <motion.div
                     layout
-                    className="w-full bg-white/40 backdrop-blur-xl border border-white/60 shadow-xl rounded-[2.5rem] p-6 md:p-10 flex flex-col items-center justify-center gap-6 relative overflow-hidden"
+                    className="w-full bg-[var(--color-elevated)] backdrop-blur-xl border border-[var(--color-elevated-border)] shadow-xl rounded-[2.5rem] p-6 md:p-10 flex flex-col items-center justify-center gap-6 relative overflow-hidden"
                 >
                     <AnimatePresence mode="wait">
                         <motion.div
@@ -138,7 +138,7 @@ const ClockPage: React.FC = () => {
                             className="flex flex-col items-center gap-8 w-full"
                         >
                             {/* Time Display */}
-                            <div className="text-5xl md:text-7xl font-sans font-light tracking-tight tabular-nums text-stone-800 drop-shadow-sm">
+                            <div className="text-5xl md:text-7xl font-sans font-light tracking-tight tabular-nums text-ink drop-shadow-sm">
                                 {mode === 'stopwatch' ? formatMs(swTime) : formatMs(timerTimeLeft)}
                             </div>
 
@@ -149,7 +149,7 @@ const ClockPage: React.FC = () => {
                                         <button
                                             onClick={handleSwLap}
                                             disabled={!swRunning}
-                                            className="w-14 h-14 rounded-full bg-stone-100 hover:bg-white text-stone-500 font-bold text-sm shadow-sm hover:shadow-md transition-all flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="w-14 h-14 rounded-full bg-stone-100 dark:bg-stone-800 hover:bg-[var(--color-surface)] text-[var(--color-text-secondary)] font-bold text-sm shadow-sm hover:shadow-md transition-all flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             LAP
                                         </button>
@@ -161,7 +161,7 @@ const ClockPage: React.FC = () => {
                                         </button>
                                         <button
                                             onClick={handleSwReset}
-                                            className="w-14 h-14 rounded-full bg-stone-100 hover:bg-white text-stone-500 font-bold text-sm shadow-sm hover:shadow-md transition-all flex items-center justify-center"
+                                            className="w-14 h-14 rounded-full bg-stone-100 dark:bg-stone-800 hover:bg-[var(--color-surface)] text-[var(--color-text-secondary)] font-bold text-sm shadow-sm hover:shadow-md transition-all flex items-center justify-center"
                                         >
                                             CLR
                                         </button>
@@ -179,7 +179,7 @@ const ClockPage: React.FC = () => {
                                         </button>
                                         <button
                                             onClick={handleTimerReset}
-                                            className="w-14 h-14 rounded-full bg-stone-100 hover:bg-white text-stone-500 font-bold text-sm shadow-sm hover:shadow-md transition-all flex items-center justify-center"
+                                            className="w-14 h-14 rounded-full bg-stone-100 dark:bg-stone-800 hover:bg-[var(--color-surface)] text-[var(--color-text-secondary)] font-bold text-sm shadow-sm hover:shadow-md transition-all flex items-center justify-center"
                                         >
                                             RST
                                         </button>
@@ -198,7 +198,7 @@ const ClockPage: React.FC = () => {
                         >
                             <div className="flex flex-col gap-2 w-full">
                                 {laps.map((lap, i) => (
-                                    <div key={i} className="flex justify-between text-stone-500 text-sm font-mono border-b border-stone-100 pb-1">
+                                    <div key={i} className="flex justify-between text-[var(--color-text-secondary)] text-sm font-mono border-b border-[var(--color-border-subtle)] pb-1">
                                         <span>Lap {laps.length - i}</span>
                                         <span>{formatMs(lap)}</span>
                                     </div>
@@ -214,7 +214,7 @@ const ClockPage: React.FC = () => {
                                 <button
                                     key={min}
                                     onClick={() => { setTimerDuration(min * 60 * 1000); setTimerTimeLeft(min * 60 * 1000); }}
-                                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${timerDuration === min * 60 * 1000 ? 'bg-orange-100 text-orange-600' : 'bg-stone-100 text-stone-500 hover:bg-stone-200'}`}
+                                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${timerDuration === min * 60 * 1000 ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-600' : 'bg-stone-100 dark:bg-stone-800 text-[var(--color-text-secondary)] hover:bg-stone-200 dark:hover:bg-stone-700'}`}
                                 >
                                     {min}m
                                 </button>

@@ -33,10 +33,10 @@ const MediaWidget: React.FC = () => {
 
                     {/* Placeholder Info */}
                     <div className="flex flex-col flex-1 min-w-0 ml-1">
-                        <span className="text-stone-500 font-bold text-xs">No Music</span>
-                        <span className="text-stone-400 text-[10px]">Add songs to play</span>
+                        <span className="text-[var(--color-text-secondary)] font-bold text-xs">No Music</span>
+                        <span className="text-[var(--color-text-muted)] text-[10px]">Add songs to play</span>
                         {/* Empty Progress Bar */}
-                        <div className="w-full max-w-[120px] h-1 bg-stone-200 rounded-full mt-1 overflow-hidden">
+                        <div className="w-full max-w-[120px] h-1 bg-[var(--color-muted)] rounded-full mt-1 overflow-hidden">
                             <div className="h-full bg-orange-300 rounded-full w-0"></div>
                         </div>
                     </div>
@@ -94,16 +94,16 @@ const MediaWidget: React.FC = () => {
 
                 {/* Song Info - Flexible width */}
                 <div className="flex flex-col flex-1 min-w-0 ml-1">
-                    <span className="text-stone-700 font-bold text-xs truncate" title={displayTitle}>
+                    <span className="text-ink font-bold text-xs truncate" title={displayTitle}>
                         {displayTitle}
                     </span>
                     {displayArtist && (
-                        <span className="text-stone-500 text-[10px] truncate" title={displayArtist}>
+                        <span className="text-[var(--color-text-secondary)] text-[10px] truncate" title={displayArtist}>
                             {displayArtist}
                         </span>
                     )}
                     {/* Real-time Progress Bar */}
-                    <div className="w-full max-w-[120px] h-1 bg-stone-200 rounded-full mt-1 overflow-hidden">
+                    <div className="w-full max-w-[120px] h-1 bg-[var(--color-muted)] rounded-full mt-1 overflow-hidden">
                         <div
                             className="h-full bg-orange-400 rounded-full transition-all duration-300"
                             style={{ width: `${progress}%` }}

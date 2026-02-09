@@ -38,11 +38,11 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
                 <div>
                     <h2 className="text-4xl font-serif font-bold text-ink mb-2">Journal Entries</h2>
-                    <p className="text-stone-500">Curate and manage your published works.</p>
+                    <p className="text-[var(--color-text-secondary)]">Curate and manage your published works.</p>
                 </div>
                 <button
                     onClick={() => onEditPost()}
-                    className="bg-ink text-white px-6 py-3 rounded-xl hover:bg-gold-600 transition-colors shadow-lg shadow-stone-200 flex items-center gap-2 group cursor-pointer"
+                    className="bg-ink text-white px-6 py-3 rounded-xl hover:bg-gold-600 transition-colors shadow-lg shadow-stone-200 dark:shadow-none flex items-center gap-2 group cursor-pointer"
                 >
                     <IconPlus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
                     <span className="font-medium tracking-wide">Create New Entry</span>
@@ -50,7 +50,7 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
             </div>
 
             {/* Toolbar */}
-            <div className="bg-white p-4 rounded-xl border border-stone-200 shadow-sm mb-6 flex flex-col md:flex-row gap-4 justify-between items-center">
+            <div className="bg-[var(--color-surface)] p-4 rounded-xl border border-[var(--color-border)] shadow-sm mb-6 flex flex-col md:flex-row gap-4 justify-between items-center">
                 {/* Search */}
                 <div className="relative w-full md:w-96">
                     <input
@@ -58,24 +58,24 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
                         placeholder="Search by title or content..."
                         value={postSearch}
                         onChange={(e) => setPostSearch(e.target.value)}
-                        className="w-full pl-4 pr-10 py-2.5 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500 transition-all"
+                        className="w-full pl-4 pr-10 py-2.5 bg-[var(--color-surface-alt)] border border-[var(--color-border)] rounded-lg text-sm focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500 transition-all"
                     />
                     {postSearch && (
-                        <button onClick={() => setPostSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-ink cursor-pointer">
+                        <button onClick={() => setPostSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-ink cursor-pointer">
                             <IconX className="w-4 h-4" />
                         </button>
                     )}
                 </div>
 
                 {/* Filter Tabs */}
-                <div className="flex bg-stone-100 p-1 rounded-lg">
+                <div className="flex bg-[var(--color-surface-alt)] p-1 rounded-lg">
                     {(['all', 'published', 'draft'] as const).map(status => (
                         <button
                             key={status}
                             onClick={() => setPostFilter(status)}
                             className={`px-4 py-1.5 rounded-md text-xs uppercase tracking-wider font-bold transition-all cursor-pointer ${postFilter === status
-                                ? 'bg-white text-ink shadow-sm'
-                                : 'text-stone-500 hover:text-stone-700'
+                                ? 'bg-[var(--color-surface)] text-ink shadow-sm'
+                                : 'text-[var(--color-text-secondary)] hover:text-ink'
                                 }`}
                         >
                             {status}
@@ -88,12 +88,12 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
             <div className="space-y-4 pb-20">
                 {paginatedPosts.length > 0 ? (
                     paginatedPosts.map(post => (
-                        <div key={post.id} className="group bg-white rounded-xl border border-stone-200 p-5 flex items-center gap-6 hover:shadow-md hover:border-gold-300 transition-all">
+                        <div key={post.id} className="group bg-[var(--color-surface)] rounded-xl border border-[var(--color-border)] p-5 flex items-center gap-6 hover:shadow-md hover:border-gold-300 transition-all">
                             {/* Status Indicator */}
-                            <div className={`w-1.5 h-full min-h-[4rem] rounded-full ${post.status === 'published' ? 'bg-emerald-400' : 'bg-stone-300'}`} />
+                            <div className={`w-1.5 h-full min-h-[4rem] rounded-full ${post.status === 'published' ? 'bg-emerald-400' : 'bg-[var(--color-text-muted)]'}`} />
 
                             {/* Image */}
-                            <div className="w-28 h-20 rounded-lg bg-stone-100 overflow-hidden shrink-0 relative border border-stone-100 cursor-pointer" onClick={() => onViewPost(post.slug)}>
+                            <div className="w-28 h-20 rounded-lg bg-[var(--color-surface-alt)] overflow-hidden shrink-0 relative border border-[var(--color-border-subtle)] cursor-pointer" onClick={() => onViewPost(post.slug)}>
                                 <img src={post.cover} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="" />
                             </div>
 
@@ -107,17 +107,17 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
                                         </span>
                                     )}
                                     {post.status === 'published' && (
-                                        <span className="text-[10px] uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                        <span className="text-[10px] uppercase tracking-wider text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
                                             Published
                                         </span>
                                     )}
-                                    <span className="text-[10px] uppercase tracking-wider text-stone-500 bg-stone-100 px-2 py-0.5 rounded border border-stone-200">{post.category}</span>
+                                    <span className="text-[10px] uppercase tracking-wider text-[var(--color-text-secondary)] bg-[var(--color-surface-alt)] px-2 py-0.5 rounded border border-[var(--color-border)]">{post.category}</span>
                                 </div>
-                                <div className="flex items-center gap-6 text-xs text-stone-400 font-medium">
+                                <div className="flex items-center gap-6 text-xs text-[var(--color-text-muted)] font-medium">
                                     <span className="flex items-center gap-1.5"><IconClock className="w-3.5 h-3.5" /> {new Date(post.publishAt).toLocaleString()}</span>
                                     <span className="flex items-center gap-1.5"><IconEye className="w-3.5 h-3.5" /> {post.views.toLocaleString()} reads</span>
                                     <div className="flex gap-2">
-                                        {post.tags.slice(0, 3).map(t => <span key={t} className="text-stone-300">#{t}</span>)}
+                                        {post.tags.slice(0, 3).map(t => <span key={t} className="text-[var(--color-text-muted)]">#{t}</span>)}
                                     </div>
                                 </div>
                             </div>
@@ -135,25 +135,25 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
                                                 { confirmText: 'Publish', isDestructive: false }
                                             );
                                         }}
-                                        className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100 rounded-lg transition-colors border border-emerald-200 cursor-pointer"
+                                        className="flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 rounded-lg transition-colors border border-emerald-200 dark:border-emerald-800 cursor-pointer"
                                         title="Publish"
                                     >
                                         <span className="text-xs font-bold uppercase tracking-wider">Publish</span>
                                     </button>
                                 )}
-                                <button onClick={(e) => { e.stopPropagation(); onEditPost(post); }} className="flex items-center gap-2 px-4 py-2 bg-stone-50 text-stone-600 hover:text-gold-600 hover:bg-gold-50 rounded-lg transition-colors border border-stone-200 cursor-pointer" title="Edit">
+                                <button onClick={(e) => { e.stopPropagation(); onEditPost(post); }} className="flex items-center gap-2 px-4 py-2 bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)] hover:text-gold-600 hover:bg-gold-50 rounded-lg transition-colors border border-[var(--color-border)] cursor-pointer" title="Edit">
                                     <IconEdit className="w-4 h-4" />
                                     <span className="text-xs font-bold uppercase tracking-wider">Edit</span>
                                 </button>
-                                <button onClick={(e) => { e.stopPropagation(); requestConfirm('Delete Entry', 'Are you sure you want to delete this entry? This action cannot be undone.', () => onDeletePost(post.id)); }} className="p-2.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100 cursor-pointer" title="Delete">
+                                <button onClick={(e) => { e.stopPropagation(); requestConfirm('Delete Entry', 'Are you sure you want to delete this entry? This action cannot be undone.', () => onDeletePost(post.id)); }} className="p-2.5 text-[var(--color-text-muted)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-800 cursor-pointer" title="Delete">
                                     <IconTrash className="w-4 h-4" />
                                 </button>
                             </div>
                         </div>
                     ))
                 ) : (
-                    <div className="text-center py-20 bg-stone-50 rounded-xl border border-dashed border-stone-300">
-                        <p className="text-stone-400 font-serif italic text-lg">No entries match your search criteria.</p>
+                    <div className="text-center py-20 bg-[var(--color-surface-alt)] rounded-xl border border-dashed border-[var(--color-border)]">
+                        <p className="text-[var(--color-text-muted)] font-serif italic text-lg">No entries match your search criteria.</p>
                         <button onClick={() => { setPostSearch(''); setPostFilter('all'); }} className="mt-4 text-sm text-gold-600 hover:underline cursor-pointer">Clear Filters</button>
                     </div>
                 )}
@@ -165,7 +165,7 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
                     <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="flex items-center gap-2 text-stone-400 hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors uppercase tracking-widest text-xs"
+                        className="flex items-center gap-2 text-[var(--color-text-muted)] hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors uppercase tracking-widest text-xs"
                     >
                         <IconArrowLeft className="w-4 h-4" />
                         Previous
@@ -178,7 +178,7 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
                                 onClick={() => handlePageChange(page)}
                                 className={`w-8 h-8 flex items-center justify-center rounded-full transition-all leading-none cursor-pointer ${currentPage === page
                                     ? 'bg-gold-600 text-white shadow-sm'
-                                    : 'text-stone-500 hover:bg-stone-100'
+                                    : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-alt)]'
                                     }`}
                             >
                                 {page}
@@ -189,7 +189,7 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
                     <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="flex items-center gap-2 text-stone-400 hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors uppercase tracking-widest text-xs"
+                        className="flex items-center gap-2 text-[var(--color-text-muted)] hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors uppercase tracking-widest text-xs"
                     >
                         Next
                         <IconArrowDown className="w-4 h-4 -rotate-90" />

@@ -25,20 +25,20 @@ const CalendarWidget: React.FC = () => {
 
     return (
         <div className="h-full flex flex-col p-2">
-            <div className="mb-4 text-stone-500 text-sm font-medium pl-1">
+            <div className="mb-4 text-[var(--color-text-secondary)] text-sm font-medium pl-1">
                 {currentYear}/{currentMonth}/{currentDay} {weekDay}
             </div>
 
-            <div className="grid grid-cols-7 gap-1 text-center text-xs text-stone-400 mb-2">
+            <div className="grid grid-cols-7 gap-1 text-center text-xs text-[var(--color-text-muted)] mb-2">
                 {weekHeaders.map(d => <div key={d}>{d}</div>)}
             </div>
 
-            <div className="grid grid-cols-7 gap-1 text-center text-sm font-medium text-stone-600">
+            <div className="grid grid-cols-7 gap-1 text-center text-sm font-medium text-[var(--color-text-secondary)]">
                 {blanks.map((_, i) => <div key={`blank-${i}`} />)}
                 {days.map(d => (
                     <div
                         key={d}
-                        className={`aspect-square flex items-center justify-center rounded-lg cursor-pointer hover:bg-white/50 transition-colors ${d === currentDay ? 'bg-orange-500 text-white shadow-md' : ''
+                        className={`aspect-square flex items-center justify-center rounded-lg cursor-pointer hover:bg-[var(--color-elevated)] transition-colors ${d === currentDay ? 'bg-orange-500 text-white shadow-md' : ''
                             }`}
                     >
                         {d}

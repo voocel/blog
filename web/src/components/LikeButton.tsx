@@ -134,7 +134,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({ initialCount = 0, onLike }) => 
             {/* Like Button */}
             <motion.button
                 onClick={handleClick}
-                className="relative w-14 h-14 rounded-full bg-white/60 backdrop-blur-xl border border-white/50 shadow-lg flex items-center justify-center cursor-pointer hover:bg-white/80 transition-colors"
+                className="relative w-14 h-14 rounded-full bg-[var(--color-elevated)] backdrop-blur-xl border border-[var(--color-elevated-border)] shadow-lg flex items-center justify-center cursor-pointer hover:bg-[var(--color-surface)]/80 transition-colors"
                 animate={isAnimating ? { scale: 1.2 } : { scale: 1 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

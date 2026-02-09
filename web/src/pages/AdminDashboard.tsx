@@ -247,7 +247,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ section }) => {
     };
 
     return (
-        <div className="min-h-full bg-[#FDFBF7]">
+        <div className="min-h-full bg-[var(--color-base)]">
             {section === 'overview' && (
                 <AdminOverview
                     user={user}

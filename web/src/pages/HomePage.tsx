@@ -97,14 +97,14 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#fdfaf6] bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-orange-100/40 via-rose-100/20 to-transparent overflow-hidden relative">
+    <div className="min-h-screen w-full bg-[var(--color-base)] bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-orange-100/40 via-rose-100/20 to-transparent dark:from-orange-900/20 dark:via-rose-900/10 overflow-hidden relative">
       <SEO title="Home - Voocel Dashboard" />
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 
       {/* Background Decorations - Animated blobs */}
-      <div className="fixed top-20 left-10 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob pointer-events-none" aria-hidden="true"></div>
-      <div className="fixed top-20 right-10 w-64 h-64 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000 pointer-events-none" aria-hidden="true"></div>
-      <div className="fixed -bottom-8 left-20 w-64 h-64 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000 pointer-events-none" aria-hidden="true"></div>
+      <div className="fixed top-20 left-10 w-64 h-64 bg-purple-200 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 animate-blob pointer-events-none" aria-hidden="true"></div>
+      <div className="fixed top-20 right-10 w-64 h-64 bg-orange-200 dark:bg-orange-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-2000 pointer-events-none" aria-hidden="true"></div>
+      <div className="fixed -bottom-8 left-20 w-64 h-64 bg-pink-200 dark:bg-pink-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-4000 pointer-events-none" aria-hidden="true"></div>
 
 
       {/* Mobile Navigation - Fixed at top, outside animation container */}
@@ -126,7 +126,7 @@ const HomePage: React.FC = () => {
             <div className="absolute inset-0">
               <img src={catImage} alt="Decorative cat" className="w-full h-full object-cover object-[center_35%]" />
             </div>
-            <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[9px] font-bold text-stone-500 shadow-sm">
+            <div className="absolute top-3 right-3 bg-[var(--color-surface)]/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[9px] font-bold text-[var(--color-text-secondary)] shadow-sm">
               Do not disturb
             </div>
           </BentoItem>
@@ -134,7 +134,7 @@ const HomePage: React.FC = () => {
 
         {/* Profile */}
         <motion.div variants={itemVariants}>
-          <BentoItem className="py-8 flex items-center justify-center bg-gradient-to-b from-white/80 to-orange-50/50 shadow-xl border-white/60">
+          <BentoItem className="py-8 flex items-center justify-center bg-gradient-to-b from-[var(--color-surface)]/80 to-orange-50/50 dark:to-orange-950/30 shadow-xl border-[var(--color-elevated-border)]">
             <QuoteWidget />
           </BentoItem>
         </motion.div>
@@ -146,7 +146,7 @@ const HomePage: React.FC = () => {
 
         {/* Latest Post - Mobile Redesigned */}
         <motion.div variants={itemVariants}>
-          <BentoItem className="h-auto !bg-[#FFFBF0] hover:!bg-[#FFFBF0] cursor-pointer relative group !p-4 overflow-hidden shadow-sm border border-orange-100/30">
+          <BentoItem className="h-auto !bg-[var(--color-surface)] hover:!bg-[var(--color-surface)] cursor-pointer relative group !p-4 overflow-hidden shadow-sm border border-orange-100/30">
             {latestPost ? (
               <div
                 onClick={() => navigate(`/post/${latestPost.slug}`)}
@@ -156,19 +156,19 @@ const HomePage: React.FC = () => {
                 onKeyDown={(e) => e.key === 'Enter' && navigate(`/post/${latestPost.slug}`)}
               >
                 {/* Header */}
-                <div className="text-sm font-bold text-stone-500 tracking-wide">{t.home.latestPost}</div>
+                <div className="text-sm font-bold text-[var(--color-text-secondary)] tracking-wide">{t.home.latestPost}</div>
 
                 <div className="flex gap-4 items-start">
                   {/* Small Image */}
-                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 shadow-sm border border-white/50">
+                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 shadow-sm border border-[var(--color-elevated-border)]">
                     <img src={latestPost.cover} className="w-full h-full object-cover" alt={latestPost.title} />
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0 flex flex-col gap-1">
-                    <h4 className="font-bold text-stone-700 text-sm leading-snug line-clamp-2">{latestPost.title}</h4>
-                    <p className="text-xs text-stone-500 line-clamp-1">{latestPost.excerpt || "Click to read more..."}</p>
-                    <div className="text-[10px] text-stone-400 mt-1">{new Date(latestPost.publishAt).toLocaleDateString()}</div>
+                    <h4 className="font-bold text-ink text-sm leading-snug line-clamp-2">{latestPost.title}</h4>
+                    <p className="text-xs text-[var(--color-text-secondary)] line-clamp-1">{latestPost.excerpt || "Click to read more..."}</p>
+                    <div className="text-[10px] text-[var(--color-text-muted)] mt-1">{new Date(latestPost.publishAt).toLocaleDateString()}</div>
                   </div>
                 </div>
               </div>
@@ -204,14 +204,14 @@ const HomePage: React.FC = () => {
           {!user && (
             <button
               onClick={handleLoginClick}
-              className="bg-white/70 text-stone-500 px-4 py-2 rounded-xl shadow-sm font-bold text-sm cursor-pointer"
+              className="bg-[var(--color-elevated)] text-[var(--color-text-secondary)] px-4 py-2 rounded-xl shadow-sm font-bold text-sm cursor-pointer"
             >
               {t.home.signIn}
             </button>
           )}
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center text-stone-400"
+            className="w-10 h-10 rounded-xl bg-[var(--color-elevated)] flex items-center justify-center text-[var(--color-text-muted)]"
           >
             ⚙️
           </button>
@@ -235,7 +235,7 @@ const HomePage: React.FC = () => {
 
         {/* Recent Post Widget - Redesigned */}
         <motion.div className="absolute left-[12%] top-[62%] w-[220px]" variants={itemVariants}>
-          <BentoItem className="h-auto !bg-[#FFFBF0] hover:!bg-[#FFFBF0] cursor-pointer relative group !p-5 overflow-hidden shadow-sm border border-orange-100/30 !rounded-[1.5rem]">
+          <BentoItem className="h-auto !bg-[var(--color-surface)] hover:!bg-[var(--color-surface)] cursor-pointer relative group !p-5 overflow-hidden shadow-sm border border-orange-100/30 !rounded-[1.5rem]">
             {latestPost ? (
               <div
                 onClick={() => navigate(`/post/${latestPost.slug}`)}
@@ -246,19 +246,19 @@ const HomePage: React.FC = () => {
                 aria-label={`Read article: ${latestPost.title}`}
               >
                 {/* Header */}
-                <div className="text-sm font-bold text-stone-500 tracking-wide">{t.home.latestPost}</div>
+                <div className="text-sm font-bold text-[var(--color-text-secondary)] tracking-wide">{t.home.latestPost}</div>
 
                 <div className="flex gap-4">
                   {/* Image */}
-                  <div className="w-14 h-14 rounded-[0.8rem] overflow-hidden shrink-0 shadow-sm border border-white/50 bg-stone-100">
+                  <div className="w-14 h-14 rounded-[0.8rem] overflow-hidden shrink-0 shadow-sm border border-[var(--color-elevated-border)] bg-stone-100 dark:bg-stone-800">
                     <img src={latestPost.cover} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={latestPost.title} />
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                    <h4 className="font-bold text-stone-700 text-[13px] leading-snug line-clamp-2 group-hover:text-orange-600 transition-colors">{latestPost.title}</h4>
-                    <p className="text-[10px] text-stone-500 line-clamp-1 opacity-80">{latestPost.excerpt || "Click to read..."}</p>
-                    <div className="text-[10px] text-stone-400 font-mono">{new Date(latestPost.publishAt).toLocaleDateString()}</div>
+                    <h4 className="font-bold text-ink text-[13px] leading-snug line-clamp-2 group-hover:text-orange-600 transition-colors">{latestPost.title}</h4>
+                    <p className="text-[10px] text-[var(--color-text-secondary)] line-clamp-1 opacity-80">{latestPost.excerpt || "Click to read..."}</p>
+                    <div className="text-[10px] text-[var(--color-text-muted)] font-mono">{new Date(latestPost.publishAt).toLocaleDateString()}</div>
                   </div>
                 </div>
               </div>
@@ -276,7 +276,7 @@ const HomePage: React.FC = () => {
             <div className="absolute inset-0">
               <img src={catImage} alt="Decorative cat" className="w-full h-full object-cover object-[center_35%] transition-transform duration-700 group-hover:scale-105" />
             </div>
-            <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[9px] font-bold text-stone-500 shadow-sm">
+            <div className="absolute top-3 right-3 bg-[var(--color-surface)]/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[9px] font-bold text-[var(--color-text-secondary)] shadow-sm">
               Do not disturb
             </div>
           </BentoItem>
@@ -284,7 +284,7 @@ const HomePage: React.FC = () => {
 
         {/* Profile Widget */}
         <motion.div className="absolute left-[50%] -translate-x-1/2 top-[26%] w-[280px]" variants={itemVariants}>
-          <BentoItem className="h-[220px] flex items-center justify-center bg-gradient-to-b from-white/80 to-orange-50/50 shadow-xl border-white/60">
+          <BentoItem className="h-[220px] flex items-center justify-center bg-gradient-to-b from-[var(--color-surface)]/80 to-orange-50/50 dark:to-orange-950/30 shadow-xl border-[var(--color-elevated-border)]">
             <QuoteWidget />
           </BentoItem>
         </motion.div>
@@ -298,7 +298,7 @@ const HomePage: React.FC = () => {
 
         {/* Random Pick Widget - Same design as Latest Post */}
         <motion.div className="absolute left-[34%] top-[70%] w-[220px]" variants={itemVariants}>
-          <BentoItem className="h-auto !bg-[#FFF5F0] hover:!bg-[#FFF5F0] cursor-pointer relative group !p-5 overflow-hidden shadow-sm border border-rose-100/30 !rounded-[1.5rem]">
+          <BentoItem className="h-auto !bg-[var(--color-surface)] hover:!bg-[var(--color-surface)] cursor-pointer relative group !p-5 overflow-hidden shadow-sm border border-rose-100/30 !rounded-[1.5rem]">
             {randomPost ? (
               <div
                 onClick={() => navigate(`/post/${randomPost.slug}`)}
@@ -313,15 +313,15 @@ const HomePage: React.FC = () => {
 
                 <div className="flex gap-4">
                   {/* Image */}
-                  <div className="w-14 h-14 rounded-[0.8rem] overflow-hidden shrink-0 shadow-sm border border-white/50 bg-stone-100">
+                  <div className="w-14 h-14 rounded-[0.8rem] overflow-hidden shrink-0 shadow-sm border border-[var(--color-elevated-border)] bg-stone-100 dark:bg-stone-800">
                     <img src={randomPost.cover} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={randomPost.title} />
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                    <h4 className="font-bold text-stone-700 text-[13px] leading-snug line-clamp-2 group-hover:text-rose-500 transition-colors">{randomPost.title}</h4>
-                    <p className="text-[10px] text-stone-500 line-clamp-1 opacity-80">{randomPost.excerpt || "Click to read..."}</p>
-                    <div className="text-[10px] text-stone-400 font-mono">{new Date(randomPost.publishAt).toLocaleDateString()}</div>
+                    <h4 className="font-bold text-ink text-[13px] leading-snug line-clamp-2 group-hover:text-rose-500 transition-colors">{randomPost.title}</h4>
+                    <p className="text-[10px] text-[var(--color-text-secondary)] line-clamp-1 opacity-80">{randomPost.excerpt || "Click to read..."}</p>
+                    <div className="text-[10px] text-[var(--color-text-muted)] font-mono">{new Date(randomPost.publishAt).toLocaleDateString()}</div>
                   </div>
                 </div>
               </div>
@@ -362,11 +362,11 @@ const HomePage: React.FC = () => {
             </button>
           )}
 
-          <div className="flex items-center gap-1.5 bg-white/50 backdrop-blur-md rounded-xl px-2 shadow-sm">
+          <div className="flex items-center gap-1.5 bg-[var(--color-elevated)] backdrop-blur-md rounded-xl px-2 shadow-sm">
             {!user && (
               <button
                 onClick={handleLoginClick}
-                className="text-[10px] text-stone-400 font-bold px-1.5 hover:text-stone-600 transition-colors cursor-pointer"
+                className="text-[10px] text-[var(--color-text-muted)] font-bold px-1.5 hover:text-[var(--color-text-secondary)] transition-colors cursor-pointer"
                 aria-label="Sign in to your account"
               >
                 {t.home.signIn.toUpperCase()}
@@ -374,7 +374,7 @@ const HomePage: React.FC = () => {
             )}
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="w-7 h-7 rounded-lg hover:bg-stone-200/50 flex items-center justify-center text-stone-400 transition-colors cursor-pointer"
+              className="w-7 h-7 rounded-lg hover:bg-stone-200/50 dark:hover:bg-stone-700/50 flex items-center justify-center text-[var(--color-text-muted)] transition-colors cursor-pointer"
               aria-label="Open settings menu"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -394,7 +394,7 @@ const HomePage: React.FC = () => {
 
         {/* Clock Widget */}
         <motion.div className="absolute right-[10%] top-[14%] w-[170px]" variants={itemVariants}>
-          <BentoItem className="h-[100px] !p-0 !bg-stone-100/70 !border-white/30 shadow-inner">
+          <BentoItem className="h-[100px] !p-0 !bg-[var(--color-surface-alt)]/70 !border-[var(--color-elevated-border)] shadow-inner">
             <ClockWidget />
           </BentoItem>
         </motion.div>

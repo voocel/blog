@@ -9,6 +9,13 @@
   <meta property="og:description" content="Exploring technology, design, and life. Thoughts on coding, AI, and creative development." />
   <meta property="og:type" content="website" />
   <title>Voocel | Tech & Design Journal</title>
+  <script>
+    (function(){try{var s=JSON.parse(localStorage.getItem('blog-user-settings'));
+    var t=s&&s.appearance&&s.appearance.theme;
+    if(t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme:dark)').matches))
+    document.documentElement.classList.add('dark');
+    }catch(e){}})();
+  </script>
 
   <!-- Preconnect to font servers -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

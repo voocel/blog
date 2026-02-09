@@ -108,9 +108,9 @@ const AdminFiles: React.FC<AdminFilesProps> = ({ files, onAddFile, onDeleteFile,
             <div className="flex justify-between items-end mb-10">
                 <div>
                     <h2 className="text-4xl font-serif font-bold text-ink mb-2">Media Assets</h2>
-                    <p className="text-stone-500">Library of uploaded images and documents.</p>
+                    <p className="text-[var(--color-text-secondary)]">Library of uploaded images and documents.</p>
                 </div>
-                <div className="flex gap-3 bg-white p-2 rounded-xl border border-stone-200 shadow-sm">
+                <div className="flex gap-3 bg-[var(--color-surface)] p-2 rounded-xl border border-[var(--color-border)] shadow-sm">
                     <input
                         type="file"
                         ref={fileInputRef}
@@ -120,17 +120,17 @@ const AdminFiles: React.FC<AdminFilesProps> = ({ files, onAddFile, onDeleteFile,
                     />
                     <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="p-2 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-lg border border-stone-200 transition-colors cursor-pointer"
+                        className="p-2 bg-[var(--color-surface-alt)] hover:bg-[var(--color-muted)] text-[var(--color-text-secondary)] rounded-lg border border-[var(--color-border)] transition-colors cursor-pointer"
                         title="Upload Local File"
                     >
                         <IconUpload className="w-5 h-5" />
                     </button>
-                    <div className="w-px bg-stone-200 my-1"></div>
+                    <div className="w-px bg-[var(--color-border)] my-1"></div>
                     <input
                         value={newFileUrl}
                         onChange={e => setNewFileUrl(e.target.value)}
                         placeholder="Paste Image URL..."
-                        className="w-64 bg-stone-50 rounded-lg px-4 py-2 text-sm focus:outline-none border border-transparent focus:border-stone-300 transition-colors"
+                        className="w-64 bg-[var(--color-surface-alt)] rounded-lg px-4 py-2 text-sm focus:outline-none border border-transparent focus:border-[var(--color-border)] transition-colors"
                     />
                     <button onClick={handleAddUrl} className="bg-ink text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-stone-800 transition-colors cursor-pointer">Import</button>
                 </div>
@@ -138,8 +138,8 @@ const AdminFiles: React.FC<AdminFilesProps> = ({ files, onAddFile, onDeleteFile,
 
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 overflow-y-auto pb-10">
                 {files.map((file, index) => (
-                    <div key={file.id} className="group relative aspect-square bg-white border border-stone-200 p-3 rounded-2xl shadow-sm hover:shadow-lg transition-all hover:-translate-y-1">
-                        <div className="w-full h-full rounded-xl overflow-hidden relative bg-stone-100 cursor-pointer" onClick={() => setLightboxIndex(index)}>
+                    <div key={file.id} className="group relative aspect-square bg-[var(--color-surface)] border border-[var(--color-border)] p-3 rounded-2xl shadow-sm hover:shadow-lg transition-all hover:-translate-y-1">
+                        <div className="w-full h-full rounded-xl overflow-hidden relative bg-[var(--color-surface-alt)] cursor-pointer" onClick={() => setLightboxIndex(index)}>
                             <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
 
                             {/* Overlay Actions */}

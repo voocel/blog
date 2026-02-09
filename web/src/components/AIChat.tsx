@@ -86,27 +86,27 @@ const AIChat: React.FC = () => {
       {isOpen && (
         <div
           ref={chatContainerRef}
-          className="mb-6 w-80 sm:w-96 bg-white/90 backdrop-blur-2xl rounded-3xl border border-white/60 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col h-[600px] animate-slide-up origin-bottom-right ring-1 ring-white/50"
+          className="mb-6 w-80 sm:w-96 bg-[var(--color-surface)]/90 backdrop-blur-2xl rounded-3xl border border-[var(--color-elevated-border)] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col h-[600px] animate-slide-up origin-bottom-right ring-1 ring-[var(--color-elevated-border)]"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-stone-50/80 to-white/80 p-4 flex justify-between items-center border-b border-stone-100/50 backdrop-blur-md">
+          <div className="bg-gradient-to-r from-[var(--color-surface-alt)]/80 to-[var(--color-surface)]/80 p-4 flex justify-between items-center border-b border-[var(--color-border-subtle)]/50 backdrop-blur-md">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <img
                   src={AETHER_AVATAR_URL}
                   alt="Aether"
-                  className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md"
+                  className="w-10 h-10 rounded-full object-cover border-2 border-[var(--color-surface)] shadow-md"
                 />
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-teal-400 border-2 border-white rounded-full animate-pulse"></span>
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-teal-400 border-2 border-[var(--color-surface)] rounded-full animate-pulse"></span>
               </div>
               <div className="flex flex-col">
-                <span className="font-serif italic tracking-wide font-medium text-stone-800">Aether AI</span>
+                <span className="font-serif italic tracking-wide font-medium text-ink">Aether AI</span>
                 <span className="text-[10px] uppercase tracking-widest text-teal-600/80 font-semibold">Online</span>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-600 transition-colors cursor-pointer"
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--color-surface-alt)] text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors cursor-pointer"
             >
               <IconX className="w-4 h-4" />
             </button>
@@ -125,7 +125,7 @@ const AIChat: React.FC = () => {
                     <img
                       src={AETHER_AVATAR_URL}
                       alt="AI"
-                      className="w-8 h-8 rounded-full object-cover border border-white/50 shadow-sm"
+                      className="w-8 h-8 rounded-full object-cover border border-[var(--color-elevated-border)] shadow-sm"
                     />
                   </div>
                 )}
@@ -133,12 +133,12 @@ const AIChat: React.FC = () => {
                 <div
                   className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm ${msg.role === 'user'
                     ? 'bg-stone-800 text-stone-50 rounded-br-sm shadow-stone-200'
-                    : 'bg-white border border-white/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-stone-700 rounded-bl-sm'
+                    : 'bg-[var(--color-surface)] border border-[var(--color-elevated-border)] shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-[var(--color-text)] rounded-bl-sm'
                     }`}
                 >
                   {/* Text Content */}
                   {msg.text && (
-                    <div className={`markdown-content ${msg.role === 'user' ? 'text-stone-50' : 'text-stone-700'}`}>
+                    <div className={`markdown-content ${msg.role === 'user' ? 'text-stone-50' : 'text-[var(--color-text)]'}`}>
                       <MDEditor.Markdown
                         source={msg.text}
                         style={{
@@ -171,19 +171,19 @@ const AIChat: React.FC = () => {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSubmit} className="p-4 bg-white/60 border-t border-stone-100 backdrop-blur-md">
+          <form onSubmit={handleSubmit} className="p-4 bg-[var(--color-elevated)] border-t border-[var(--color-border-subtle)] backdrop-blur-md">
             <div className="relative group">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask Aether about the journal..."
-                className="w-full pl-5 pr-12 py-3.5 bg-white/90 rounded-full border border-stone-200/80 focus:outline-none focus:border-teal-300 focus:ring-4 focus:ring-teal-50/50 text-sm text-ink placeholder-stone-400 transition-all shadow-sm group-hover:bg-white group-hover:shadow-md"
+                className="w-full pl-5 pr-12 py-3.5 bg-[var(--color-surface)]/90 rounded-full border border-[var(--color-border)]/80 focus:outline-none focus:border-teal-300 focus:ring-4 focus:ring-teal-50/50 text-sm text-ink placeholder-[var(--color-text-muted)] transition-all shadow-sm group-hover:bg-[var(--color-surface)] group-hover:shadow-md"
               />
               <button
                 type="submit"
                 disabled={!input.trim() || isTyping}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-stone-100 rounded-full text-stone-400 hover:text-white hover:bg-teal-500 disabled:opacity-30 disabled:hover:bg-stone-100 disabled:hover:text-stone-400 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md hover:scale-105"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[var(--color-surface-alt)] rounded-full text-[var(--color-text-muted)] hover:text-white hover:bg-teal-500 disabled:opacity-30 disabled:hover:bg-[var(--color-surface-alt)] disabled:hover:text-[var(--color-text-muted)] disabled:cursor-not-allowed transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md hover:scale-105"
               >
                 <IconSend className="w-4 h-4" />
               </button>
@@ -195,9 +195,9 @@ const AIChat: React.FC = () => {
       {/* Toggle Button with Enhanced Effects */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`group relative flex items-center justify-center w-12 h-12 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl border border-white/60 transition-all duration-500 cursor-pointer ${isOpen
+        className={`group relative flex items-center justify-center w-12 h-12 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl border border-[var(--color-elevated-border)] transition-all duration-500 cursor-pointer ${isOpen
           ? 'bg-stone-800 rotate-90 scale-90'
-          : 'bg-white/90 hover:scale-110 hover:-translate-y-1'
+          : 'bg-[var(--color-surface)]/90 hover:scale-110 hover:-translate-y-1'
           }`}
       >
         {/* Outer Glow Ring - Spreads Outwards */}

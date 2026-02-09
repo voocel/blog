@@ -33,9 +33,9 @@ const PostPage: React.FC = () => {
 
     if (loading || isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
+            <div className="min-h-screen flex items-center justify-center bg-[var(--color-base)]">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-stone-200 border-t-gold-600 rounded-full animate-spin"></div>
+                    <div className="w-12 h-12 border-4 border-[var(--color-border)] border-t-gold-600 rounded-full animate-spin"></div>
                 </div>
             </div>
         );
@@ -43,7 +43,7 @@ const PostPage: React.FC = () => {
 
     if (!post) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
+            <div className="min-h-screen flex items-center justify-center bg-[var(--color-base)]">
                 <div className="text-center">
                     <h2 className="text-2xl font-serif text-ink mb-4">Entry Not Found</h2>
                     <button

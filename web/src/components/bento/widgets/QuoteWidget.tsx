@@ -38,12 +38,12 @@ const QuoteWidget: React.FC = () => {
             </div>
 
             <div className="relative z-10 animate-fade-in">
-                <div className="text-3xl font-serif text-stone-300 mb-2 leading-none">“</div>
-                <p className="text-lg font-serif text-stone-700 italic leading-relaxed mb-3 line-clamp-3">
+                <div className="text-3xl font-serif text-[var(--color-text-muted)] mb-2 leading-none">"</div>
+                <p className="text-lg font-serif text-ink italic leading-relaxed mb-3 line-clamp-3">
                     {dailyQuote.text}
                 </p>
                 <div className="h-px w-12 bg-orange-200 mx-auto mb-3"></div>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-stone-400 font-bold">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)] font-bold">
                     {dailyQuote.author}
                 </p>
             </div>

@@ -40,11 +40,8 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
         navigate(path);
     };
 
-    // Get label based on current locale
     const getLabel = (item: NavItem) => locale === 'zh' ? item.labelCn : item.label;
 
-    // Get the indicator position (hover takes priority, then active, then last hovered)
-    // On homepage (activeIndex = -1), use lastHoveredIndex instead of defaulting to 0
     const indicatorIndex = hoveredIndex !== null
         ? hoveredIndex
         : (activeIndex >= 0 ? activeIndex : lastHoveredIndex);
@@ -58,15 +55,14 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
         return (
             <motion.div
                 layoutId="nav-container"
-                className={`${positionClasses} z-50 flex items-center gap-1 bg-white/60 backdrop-blur-xl rounded-2xl p-1.5 shadow-lg border border-white/50`}
+                className={`${positionClasses} z-50 flex items-center gap-1 bg-[var(--color-elevated)] backdrop-blur-xl rounded-2xl p-1.5 shadow-lg border border-[var(--color-elevated-border)]`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
             >
-                {/* Back Button (Optional) */}
                 {showBackButton && (
-                    <div className="flex items-center gap-1 mr-1 pr-2 border-r border-stone-200/60">
+                    <div className="flex items-center gap-1 mr-1 pr-2 border-r border-[var(--color-border)]/60">
                         <motion.button
                             whileHover={{ scale: 1.05, x: -2 }}
                             whileTap={{ scale: 0.95 }}
@@ -74,7 +70,7 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                                 if (onBackClick) onBackClick();
                                 else navigate(-1);
                             }}
-                            className="w-10 h-10 rounded-xl flex items-center justify-center text-stone-500 hover:text-orange-500 hover:bg-stone-500/10 cursor-pointer transition-all"
+                            className="w-10 h-10 rounded-xl flex items-center justify-center text-[var(--color-text-secondary)] hover:text-orange-500 hover:bg-[var(--color-muted)]/30 cursor-pointer transition-all"
                             title="Go Back"
                         >
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -88,7 +84,7 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                 <motion.button
                     layoutId="nav-avatar"
                     onClick={() => navigate('/')}
-                    className="w-10 h-10 rounded-full overflow-hidden border border-stone-200/50 relative z-10"
+                    className="w-10 h-10 rounded-full overflow-hidden border border-[var(--color-border)]/50 relative z-10"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     aria-label="Go to homepage"
@@ -98,18 +94,11 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
 
                 {/* Navigation Icons with Sliding Indicator */}
                 <div className="relative flex items-center gap-1">
-                    {/* Sliding White Background Indicator */}
                     <motion.div
-                        className="absolute w-10 h-10 bg-white rounded-xl shadow-sm"
+                        className="absolute w-10 h-10 bg-[var(--color-surface)] rounded-xl shadow-sm"
                         initial={false}
-                        animate={{
-                            x: indicatorIndex * 44, // 40px width + 4px gap
-                        }}
-                        transition={{
-                            type: 'spring',
-                            stiffness: 400,
-                            damping: 30,
-                        }}
+                        animate={{ x: indicatorIndex * 44 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     />
 
                     {navItems.map((item, index) => (
@@ -124,7 +113,7 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                             onMouseLeave={() => setHoveredIndex(null)}
                             className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg cursor-pointer transition-colors duration-200 relative z-10 ${isActive(item.path)
                                 ? 'text-orange-500'
-                                : 'text-stone-500 hover:text-orange-500'
+                                : 'text-[var(--color-text-secondary)] hover:text-orange-500'
                                 }`}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -143,17 +132,16 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
     return (
         <motion.div
             layoutId="nav-container"
-            className="h-auto shadow-sm hover:shadow-md transition-shadow bg-white/40 backdrop-blur-xl border border-white/50 rounded-3xl p-7"
+            className="h-auto shadow-sm hover:shadow-md transition-shadow bg-[var(--color-elevated)] backdrop-blur-xl border border-[var(--color-elevated-border)] rounded-3xl p-7"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
         >
-            {/* Header with Avatar */}
             <motion.div layoutId="nav-header" className="flex items-center gap-3 mb-4">
                 <motion.div
                     layoutId="nav-avatar"
-                    className="w-12 h-12 rounded-full overflow-hidden border border-stone-200 cursor-pointer shadow-sm group-hover:shadow-md transition-all"
+                    className="w-12 h-12 rounded-full overflow-hidden border border-[var(--color-border)] cursor-pointer shadow-sm group-hover:shadow-md transition-all"
                     onClick={() => navigate('/')}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -161,14 +149,13 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                     <img src="/images/avatar.jpg" alt="Home" className="w-full h-full object-cover" />
                 </motion.div>
                 <div>
-                    <h3 className="font-bold text-stone-800 text-base">Voocel</h3>
-                    <span className="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">LAB</span>
+                    <h3 className="font-bold text-ink text-base">Voocel</h3>
+                    <span className="text-[10px] bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">LAB</span>
                 </div>
             </motion.div>
 
-            {/* Section Label */}
             <motion.div
-                className="text-[10px] text-stone-400 font-bold mb-3 uppercase tracking-wider"
+                className="text-[10px] text-[var(--color-text-muted)] font-bold mb-3 uppercase tracking-wider"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -176,21 +163,13 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                 General
             </motion.div>
 
-            {/* Navigation Items with Sliding Indicator */}
             <div className="relative flex flex-col gap-1.5">
-                {/* Sliding White Background Indicator */}
                 <motion.div
-                    className="absolute left-0 right-0 bg-white rounded-xl shadow-sm pointer-events-none"
+                    className="absolute left-0 right-0 bg-[var(--color-surface)] rounded-xl shadow-sm pointer-events-none"
                     style={{ height: 48 }}
                     initial={false}
-                    animate={{
-                        y: indicatorIndex * 54, // 48px button height + 6px gap
-                    }}
-                    transition={{
-                        type: 'spring',
-                        stiffness: 400,
-                        damping: 30,
-                    }}
+                    animate={{ y: indicatorIndex * 54 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
 
                 {navItems.map((item, index) => (
@@ -209,15 +188,15 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                         <div
                             className={`p-2 rounded-lg transition-all duration-200 ${isActive(item.path) || hoveredIndex === index
                                 ? 'bg-orange-400 text-white'
-                                : 'bg-stone-100 text-stone-500'
+                                : 'bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)]'
                                 }`}
                         >
                             <span className="text-base">{item.icon}</span>
                         </div>
                         <span
                             className={`text-base font-medium transition-colors duration-200 ${isActive(item.path) || hoveredIndex === index
-                                ? 'text-stone-800'
-                                : 'text-stone-500'
+                                ? 'text-ink'
+                                : 'text-[var(--color-text-secondary)]'
                                 }`}
                         >
                             {getLabel(item)}

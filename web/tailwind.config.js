@@ -5,10 +5,11 @@ export default {
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
     ],
+    darkMode: 'selector',
     theme: {
         extend: {
             colors: {
-                ink: '#1c1917', // stone-900
+                ink: 'var(--color-text)',
                 gold: {
                     50: '#fefce8',
                     100: '#fef9c3',

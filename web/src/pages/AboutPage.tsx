@@ -52,7 +52,7 @@ const AboutPage: React.FC = () => {
     }, []);
 
     return (
-        <div className="min-h-screen pt-20 pb-32 bg-[#FDFBF7] text-ink">
+        <div className="min-h-screen pt-20 pb-32 bg-[var(--color-base)] text-ink">
             <div className="fixed top-8 left-8 z-50">
                 <AnimatedNavWidget
                     isCompact={true}
@@ -73,7 +73,7 @@ const AboutPage: React.FC = () => {
                         </h1>
                     </Reveal>
                     <Reveal delay={400}>
-                        <p className="text-xl md:text-2xl text-stone-500 font-serif italic max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-xl md:text-2xl text-[var(--color-text-secondary)] font-serif italic max-w-2xl mx-auto leading-relaxed">
                             "We believe that code is poetry, and design is the silent language of connection. Voocel is a sanctuary for those who seek beauty in the binary."
                         </p>
                     </Reveal>
@@ -106,10 +106,10 @@ const AboutPage: React.FC = () => {
                         </Reveal>
 
                         <Reveal delay={400}>
-                            <p className="text-stone-600 leading-relaxed mb-6">
+                            <p className="text-[var(--color-text-secondary)] leading-relaxed mb-6">
                                 With over a decade of experience in both software engineering and visual arts, Alex founded Voocel to bridge the gap between technical precision and aesthetic emotion.
                             </p>
-                            <p className="text-stone-600 leading-relaxed">
+                            <p className="text-[var(--color-text-secondary)] leading-relaxed">
                                 "I wanted to create a space where technology doesn't feel cold. Every line of code should serve a human purpose, and every pixel should tell a story. This journal is my exploration of that intersection."
                             </p>
                         </Reveal>
@@ -118,15 +118,15 @@ const AboutPage: React.FC = () => {
                             <div className="flex gap-8 pt-4">
                                 <div>
                                     <div className="text-3xl font-serif font-bold text-ink">12+</div>
-                                    <div className="text-xs uppercase tracking-wider text-stone-400 mt-1">Years Exp.</div>
+                                    <div className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] mt-1">Years Exp.</div>
                                 </div>
                                 <div>
                                     <div className="text-3xl font-serif font-bold text-ink">150+</div>
-                                    <div className="text-xs uppercase tracking-wider text-stone-400 mt-1">Articles</div>
+                                    <div className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] mt-1">Articles</div>
                                 </div>
                                 <div>
                                     <div className="text-3xl font-serif font-bold text-ink">10k</div>
-                                    <div className="text-xs uppercase tracking-wider text-stone-400 mt-1">Readers</div>
+                                    <div className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] mt-1">Readers</div>
                                 </div>
                             </div>
                         </Reveal>
@@ -135,7 +135,7 @@ const AboutPage: React.FC = () => {
             </section>
 
             {/* Values Grid */}
-            <section className="bg-white py-24 border-y border-stone-100">
+            <section className="bg-[var(--color-surface)] py-24 border-y border-[var(--color-border-subtle)]">
                 <div className="max-w-6xl mx-auto px-6">
                     <Reveal className="text-center mb-16">
                         <h2 className="text-3xl font-serif font-bold">Our Core Values</h2>
@@ -143,31 +143,31 @@ const AboutPage: React.FC = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                         <Reveal delay={100} className="text-center group cursor-default">
-                            <div className="w-16 h-16 mx-auto bg-stone-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-gold-50 transition-colors duration-500">
-                                <IconSparkles className="w-8 h-8 text-stone-400 group-hover:text-gold-600 transition-colors" />
+                            <div className="w-16 h-16 mx-auto bg-[var(--color-surface-alt)] rounded-full flex items-center justify-center mb-6 group-hover:bg-gold-50 transition-colors duration-500">
+                                <IconSparkles className="w-8 h-8 text-[var(--color-text-muted)] group-hover:text-gold-600 transition-colors" />
                             </div>
                             <h3 className="text-lg font-bold mb-3 font-serif">Aesthetic First</h3>
-                            <p className="text-stone-500 text-sm leading-relaxed">
+                            <p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
                                 Beauty is not an afterthought. It is the foundation of functionality and the key to user engagement.
                             </p>
                         </Reveal>
 
                         <Reveal delay={200} className="text-center group cursor-default">
-                            <div className="w-16 h-16 mx-auto bg-stone-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-gold-50 transition-colors duration-500">
-                                <IconBrain className="w-8 h-8 text-stone-400 group-hover:text-gold-600 transition-colors" />
+                            <div className="w-16 h-16 mx-auto bg-[var(--color-surface-alt)] rounded-full flex items-center justify-center mb-6 group-hover:bg-gold-50 transition-colors duration-500">
+                                <IconBrain className="w-8 h-8 text-[var(--color-text-muted)] group-hover:text-gold-600 transition-colors" />
                             </div>
                             <h3 className="text-lg font-bold mb-3 font-serif">Intelligent Design</h3>
-                            <p className="text-stone-500 text-sm leading-relaxed">
+                            <p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
                                 Leveraging AI and modern algorithms to enhance human creativity, not replace it.
                             </p>
                         </Reveal>
 
                         <Reveal delay={300} className="text-center group cursor-default">
-                            <div className="w-16 h-16 mx-auto bg-stone-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-gold-50 transition-colors duration-500">
-                                <IconMessage className="w-8 h-8 text-stone-400 group-hover:text-gold-600 transition-colors" />
+                            <div className="w-16 h-16 mx-auto bg-[var(--color-surface-alt)] rounded-full flex items-center justify-center mb-6 group-hover:bg-gold-50 transition-colors duration-500">
+                                <IconMessage className="w-8 h-8 text-[var(--color-text-muted)] group-hover:text-gold-600 transition-colors" />
                             </div>
                             <h3 className="text-lg font-bold mb-3 font-serif">Open Dialogue</h3>
-                            <p className="text-stone-500 text-sm leading-relaxed">
+                            <p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
                                 Fostering a community where ideas flow freely and diverse perspectives are celebrated.
                             </p>
                         </Reveal>
@@ -179,7 +179,7 @@ const AboutPage: React.FC = () => {
             <section className="max-w-4xl mx-auto px-6 py-32 text-center">
                 <Reveal>
                     <h2 className="text-4xl font-serif font-bold mb-6">Let's Create Together</h2>
-                    <p className="text-stone-500 mb-10 max-w-lg mx-auto">
+                    <p className="text-[var(--color-text-secondary)] mb-10 max-w-lg mx-auto">
                         Whether you have a project in mind or just want to discuss the future of digital design, we'd love to hear from you.
                     </p>
 
@@ -188,7 +188,7 @@ const AboutPage: React.FC = () => {
                             <span>Start a Project</span>
                             <IconSend className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </button>
-                        <button className="px-8 py-4 bg-white border border-stone-200 text-ink rounded-full font-medium tracking-wide hover:border-gold-400 transition-colors flex items-center gap-3 cursor-pointer">
+                        <button className="px-8 py-4 bg-[var(--color-surface)] border border-[var(--color-border)] text-ink rounded-full font-medium tracking-wide hover:border-gold-400 transition-colors flex items-center gap-3 cursor-pointer">
                             <span>hello@voocel.com</span>
                         </button>
                     </div>

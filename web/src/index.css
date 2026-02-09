@@ -1,53 +1,73 @@
 @import "tailwindcss";
 @import "@uiw/react-md-editor/markdown-editor.css";
 @import "@uiw/react-markdown-preview/markdown.css";
-@import "prism-themes/themes/prism-coldark-cold.css";
 @config "../tailwind.config.js";
 
+/* ── Dark mode variant (class-based) ── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Theme Color Tokens ── */
+:root {
+    --color-base: #FDFBF7;
+    --color-surface: #ffffff;
+    --color-surface-alt: #f5f5f4;
+    --color-muted: #e7e5e4;
+    --color-elevated: rgba(255, 255, 255, 0.4);
+    --color-elevated-border: rgba(255, 255, 255, 0.5);
+    --color-text: #1c1917;
+    --color-text-secondary: #78716c;
+    --color-text-muted: #a8a29e;
+    --color-border: #e7e5e4;
+    --color-border-subtle: #f5f5f4;
+    --color-overlay: rgba(0, 0, 0, 0.5);
+}
+
+.dark {
+    --color-base: #0c0a09;
+    --color-surface: #1c1917;
+    --color-surface-alt: #292524;
+    --color-muted: #44403c;
+    --color-elevated: rgba(41, 37, 36, 0.6);
+    --color-elevated-border: rgba(68, 64, 60, 0.5);
+    --color-text: #f5f5f4;
+    --color-text-secondary: #a8a29e;
+    --color-text-muted: #78716c;
+    --color-border: #44403c;
+    --color-border-subtle: #292524;
+    --color-overlay: rgba(0, 0, 0, 0.7);
+}
+
+/* ── Sine animation ── */
 @layer utilities {
     @keyframes sine {
-
-        0%,
-        100% {
-            transform: translateY(3px);
-        }
-
-        50% {
-            transform: translateY(-3px);
-        }
+        0%, 100% { transform: translateY(3px); }
+        50% { transform: translateY(-3px); }
     }
-
     .animate-sine {
         animation: sine 1.2s ease-in-out infinite;
     }
 }
 
-/* Markdown Styles for Chat */
+/* ── Markdown Chat Styles ── */
 .markdown-content p {
     margin-bottom: 0.5em;
 }
-
 .markdown-content p:last-child {
     margin-bottom: 0;
 }
-
 .markdown-content a {
     text-decoration: underline;
     color: #14b8a6;
-    /* teal-500 */
 }
-
 .markdown-content ul,
 .markdown-content ol {
     padding-left: 1.2em;
     margin-bottom: 0.5em;
     list-style-type: disc;
 }
-
 .markdown-content ol {
     list-style-type: decimal;
 }
-
 .markdown-content code {
     background-color: rgba(0, 0, 0, 0.1);
     padding: 0.1em 0.3em;
@@ -55,7 +75,6 @@
     font-family: monospace;
     font-size: 0.9em;
 }
-
 .markdown-content pre {
     background-color: rgba(0, 0, 0, 0.05);
     padding: 0.5em;
@@ -63,7 +82,6 @@
     overflow-x: auto;
     margin-bottom: 0.5em;
 }
-
 .markdown-content pre code {
     background-color: transparent;
     padding: 0;
@@ -72,66 +90,112 @@
 /* Dark mode adjustments for user bubble */
 .bg-stone-800 .markdown-content a {
     color: #5eead4;
-    /* teal-300 */
 }
-
 .bg-stone-800 .markdown-content code {
     background-color: rgba(255, 255, 255, 0.2);
 }
-
 .bg-stone-800 .markdown-content pre {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
-/* Code syntax highlighting for post detail */
+/* Dark mode markdown */
+.dark .markdown-content code {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+.dark .markdown-content pre {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Code syntax highlighting for post detail ── */
 .wmde-markdown {
     background-color: transparent !important;
     font-family: inherit;
 }
-
 .wmde-markdown pre {
     border-radius: 0.5rem;
     padding: 1rem;
     margin: 1.5rem 0;
     overflow-x: auto;
 }
-
 .wmde-markdown pre code {
     font-size: 0.875rem;
     line-height: 1.7;
 }
-
 .wmde-markdown code {
     padding: 0.125rem 0.375rem;
     border-radius: 0.25rem;
     font-size: 0.875em;
 }
 
-/* MDEditor styling */
+/* Light theme: use cold prism theme */
+@import "prism-themes/themes/prism-coldark-cold.css" layer(prism-light);
+
+/* Dark mode: override code block colors */
+.dark .wmde-markdown pre {
+    background-color: #1a1a2e !important;
+}
+.dark .wmde-markdown code {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.dark .wmde-markdown pre code {
+    background-color: transparent;
+    color: #e0e0e0;
+}
+
+/* Dark prism token overrides */
+.dark .token.comment,
+.dark .token.prolog,
+.dark .token.doctype,
+.dark .token.cdata { color: #6b7280; }
+.dark .token.punctuation { color: #9ca3af; }
+.dark .token.property,
+.dark .token.tag,
+.dark .token.boolean,
+.dark .token.number,
+.dark .token.constant,
+.dark .token.symbol { color: #f59e0b; }
+.dark .token.selector,
+.dark .token.attr-name,
+.dark .token.string,
+.dark .token.char,
+.dark .token.builtin { color: #34d399; }
+.dark .token.operator,
+.dark .token.entity,
+.dark .token.url { color: #93c5fd; }
+.dark .token.atrule,
+.dark .token.attr-value,
+.dark .token.keyword { color: #c084fc; }
+.dark .token.function,
+.dark .token.class-name { color: #60a5fa; }
+.dark .token.regex,
+.dark .token.important,
+.dark .token.variable { color: #fbbf24; }
+
+/* ── MDEditor styling ── */
 .w-md-editor {
     border: none !important;
     box-shadow: none !important;
     background-color: transparent !important;
 }
-
 .w-md-editor-content,
 .w-md-editor-area {
     background-color: transparent !important;
 }
-
-/* Fix editor content height when highlightEnable=false */
 .w-md-editor-content {
     height: 100% !important;
 }
-
 .w-md-editor-area {
     height: 100% !important;
 }
-
 .w-md-editor-text {
     min-height: 100% !important;
 }
-
 .w-md-editor-text-input {
     min-height: 100% !important;
+}
+
+/* Dark mode for MDEditor */
+.dark .w-md-editor-text-input,
+.dark .w-md-editor-text-pre {
+    color: #f5f5f4 !important;
 }

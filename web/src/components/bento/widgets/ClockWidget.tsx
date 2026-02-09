@@ -21,15 +21,15 @@ const ClockWidget: React.FC = () => {
     return (
         <div
             onClick={() => navigate('/clock')}
-            className="flex flex-col items-center justify-center h-full w-full bg-stone-100/50 backdrop-blur-sm rounded-2xl cursor-pointer group hover:bg-white/60 transition-all duration-300 relative overflow-hidden"
+            className="flex flex-col items-center justify-center h-full w-full bg-[var(--color-surface-alt)]/50 backdrop-blur-sm rounded-2xl cursor-pointer group hover:bg-[var(--color-elevated)] transition-all duration-300 relative overflow-hidden"
         >
             {/* Soft decorative blob for aesthetics */}
             <div className="absolute -top-10 -right-10 w-24 h-24 bg-orange-200/20 rounded-full blur-xl group-hover:bg-orange-200/40 transition-colors" />
 
-            <h1 className="text-4xl md:text-5xl font-mono font-light text-stone-700 tracking-tighter tabular-nums selection:bg-transparent relative z-10 group-hover:scale-105 transition-transform duration-500">
+            <h1 className="text-4xl md:text-5xl font-mono font-light text-ink tracking-tighter tabular-nums selection:bg-transparent relative z-10 group-hover:scale-105 transition-transform duration-500">
                 {formatTime(time)}
             </h1>
-            <span className="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold mt-2 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0 duration-300">
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[var(--color-text-muted)] font-bold mt-2 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0 duration-300">
                 Studio
             </span>
         </div>

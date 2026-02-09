@@ -65,65 +65,65 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ users, requestConfirm }) => {
             <div className="flex justify-between items-end mb-10">
                 <div>
                     <h2 className="text-4xl font-serif font-bold text-ink mb-2">Users</h2>
-                    <p className="text-stone-500">Manage registered members of the sanctuary.</p>
+                    <p className="text-[var(--color-text-secondary)]">Manage registered members of the sanctuary.</p>
                 </div>
                 <div className="relative">
-                    <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+                    <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-text-muted)]" />
                     <input
                         type="text"
                         placeholder="Search users..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-12 pr-4 py-3 bg-white border border-stone-200 rounded-xl shadow-sm focus:outline-none focus:border-gold-400 focus:ring-1 focus:ring-gold-100 transition-all w-64"
+                        className="pl-12 pr-4 py-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl shadow-sm focus:outline-none focus:border-gold-400 focus:ring-1 focus:ring-gold-100 transition-all w-64"
                     />
                 </div>
             </div>
 
-            <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden flex-1 flex flex-col">
+            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl shadow-sm overflow-hidden flex-1 flex flex-col">
                 <div className="overflow-x-auto custom-scrollbar flex-1">
                     <table className="w-full text-left border-collapse">
-                        <thead className="bg-stone-50 border-b border-stone-100 sticky top-0 z-10">
+                        <thead className="bg-[var(--color-surface-alt)] border-b border-[var(--color-border-subtle)] sticky top-0 z-10">
                             <tr>
-                                <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-400">User</th>
-                                <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-400">Provider</th>
-                                <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-400">Role</th>
-                                <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-400">Status</th>
-                                <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-stone-400 text-right">Actions</th>
+                                <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)]">User</th>
+                                <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Provider</th>
+                                <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Role</th>
+                                <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Status</th>
+                                <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)] text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-stone-50">
+                        <tbody className="divide-y divide-[var(--color-border-subtle)]">
                             {filteredUsers.length > 0 ? (
                                 filteredUsers.map((user) => (
-                                    <tr key={user.email} className={`transition-colors group ${user.status === 'banned' ? 'bg-red-50/30' : 'hover:bg-stone-50/50'}`}>
+                                    <tr key={user.email} className={`transition-colors group ${user.status === 'banned' ? 'bg-red-50/30 dark:bg-red-950/20' : 'hover:bg-[var(--color-surface-alt)]/50'}`}>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-4">
-                                                <div className={`w-10 h-10 rounded-full border overflow-hidden shrink-0 ${user.status === 'banned' ? 'border-red-200 grayscale' : 'bg-stone-100 border-stone-200'}`}>
+                                                <div className={`w-10 h-10 rounded-full border overflow-hidden shrink-0 ${user.status === 'banned' ? 'border-red-200 dark:border-red-800 grayscale' : 'bg-[var(--color-surface-alt)] border-[var(--color-border)]'}`}>
                                                     {user.avatar ? (
                                                         <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
                                                     ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-stone-400">
+                                                        <div className="w-full h-full flex items-center justify-center text-[var(--color-text-muted)]">
                                                             <IconUserCircle className="w-6 h-6" />
                                                         </div>
                                                     )}
                                                 </div>
                                                 <div className={user.status === 'banned' ? 'opacity-50' : ''}>
                                                     <div className="font-bold text-ink">{user.username}</div>
-                                                    <div className="text-xs text-stone-400">{user.email}</div>
+                                                    <div className="text-xs text-[var(--color-text-muted)]">{user.email}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <div className="flex items-center gap-2 text-stone-500" title={`Signed up with ${user.provider || 'email'}`}>
+                                            <div className="flex items-center gap-2 text-[var(--color-text-secondary)]" title={`Signed up with ${user.provider || 'email'}`}>
                                                 {user.provider === 'google' && <IconGoogle className="w-5 h-5" />}
                                                 {user.provider === 'github' && <IconGithub className="w-5 h-5" />}
-                                                {(!user.provider || user.provider === 'email') && <IconMail className="w-5 h-5 text-stone-300" />}
-                                                <span className="text-xs capitalize hidden xl:inline-block text-stone-400">{user.provider || 'email'}</span>
+                                                {(!user.provider || user.provider === 'email') && <IconMail className="w-5 h-5 text-[var(--color-text-muted)]" />}
+                                                <span className="text-xs capitalize hidden xl:inline-block text-[var(--color-text-muted)]">{user.provider || 'email'}</span>
                                             </div>
                                         </td>
                                         <td className="py-4 px-6">
                                             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${user.role === 'admin'
-                                                ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
-                                                : 'bg-stone-100 text-stone-500 border border-stone-200'
+                                                ? 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 border border-indigo-100 dark:border-indigo-800'
+                                                : 'bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)] border border-[var(--color-border)]'
                                                 }`}>
                                                 {user.role === 'admin' && <IconShield className="w-3 h-3" />}
                                                 {user.role}
@@ -131,8 +131,8 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ users, requestConfirm }) => {
                                         </td>
                                         <td className="py-4 px-6">
                                             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${user.status === 'banned'
-                                                ? 'bg-red-100 text-red-600 border border-red-200'
-                                                : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                                                ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800'
+                                                : 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 border border-emerald-100 dark:border-emerald-800'
                                                 }`}>
                                                 {user.status === 'banned' ? (
                                                     <>
@@ -151,8 +151,8 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ users, requestConfirm }) => {
                                                     onClick={() => handleToggleStatus(user)}
                                                     disabled={processingId === user.id}
                                                     className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${user.status === 'banned'
-                                                        ? 'border-stone-200 text-stone-500 hover:border-stone-400 hover:text-stone-700 bg-white'
-                                                        : 'border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 bg-white'
+                                                        ? 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-muted)] hover:text-ink bg-[var(--color-surface)]'
+                                                        : 'border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/40 hover:border-red-300 dark:hover:border-red-700 bg-[var(--color-surface)]'
                                                         } ${processingId === user.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 >
                                                     {user.status === 'banned' ? 'Unban' : 'Ban'}
@@ -163,7 +163,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ users, requestConfirm }) => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={4} className="py-20 text-center text-stone-400 italic">
+                                    <td colSpan={4} className="py-20 text-center text-[var(--color-text-muted)] italic">
                                         No users found matching your search.
                                     </td>
                                 </tr>
@@ -171,7 +171,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ users, requestConfirm }) => {
                         </tbody>
                     </table>
                 </div>
-                <div className="p-4 border-t border-stone-100 bg-stone-50 flex justify-between items-center text-xs text-stone-400 uppercase tracking-widest font-bold">
+                <div className="p-4 border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-alt)] flex justify-between items-center text-xs text-[var(--color-text-muted)] uppercase tracking-widest font-bold">
                     <span>Total Users: {users.length}</span>
                 </div>
             </div>

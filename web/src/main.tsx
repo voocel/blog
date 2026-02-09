@@ -37,7 +37,7 @@ const AppContent: React.FC = () => {
           onExit={() => window.location.href = '/'}
         />
         <main className="flex-1 ml-72 bg-transparent overflow-auto">
-          <Suspense fallback={<div className="h-full flex items-center justify-center text-stone-400">Loading Dashboard...</div>}>
+          <Suspense fallback={<div className="h-full flex items-center justify-center text-[var(--color-text-muted)]">Loading Dashboard...</div>}>
             <AdminDashboard section={adminSection} onExit={() => window.location.href = '/'} />
           </Suspense>
         </main>
@@ -55,8 +55,8 @@ const AppContent: React.FC = () => {
       <Suspense fallback={
         <div className="min-h-screen flex items-center justify-center bg-transparent">
           <div className="animate-pulse flex flex-col items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-stone-200"></div>
-            <div className="h-4 w-32 bg-stone-200 rounded"></div>
+            <div className="w-12 h-12 rounded-full bg-stone-200 dark:bg-stone-700"></div>
+            <div className="h-4 w-32 bg-stone-200 dark:bg-stone-700 rounded"></div>
           </div>
         </div>
       }>

@@ -7,6 +7,7 @@ import { getAssetUrl } from '@/utils/urlUtils';
 import { IconSparkles, IconBrain } from '@/components/Icons';
 import { generateSummary, generateInsight } from '@/services/geminiService';
 import { postService } from '@/services/postService';
+import { useSettings } from '@/context/SettingsContext';
 import SEO from '@/components/SEO';
 import AnimatedNavWidget from '@/components/AnimatedNavWidget';
 import LikeButton from '@/components/LikeButton';
@@ -17,6 +18,7 @@ interface PostDetailProps {
 
 const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, children }) => {
     const navigate = useNavigate();
+    const { effectiveTheme } = useSettings();
     const [summary, setSummary] = useState<string | null>(null);
     const [insight, setInsight] = useState<string | null>(null);
     const [loadingSummary, setLoadingSummary] = useState(false);
@@ -65,7 +67,7 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
     };
 
     return (
-        <div className="min-h-screen bg-[#F3F0E9] bg-[radial-gradient(circle_at_top_left,_#FFD6D6_0%,_transparent_40%),radial-gradient(circle_at_bottom_right,_#FFE8AB_0%,_transparent_40%)] text-stone-700">
+        <div className="min-h-screen bg-[var(--color-base)] bg-[radial-gradient(circle_at_top_left,_#FFD6D6_0%,_transparent_40%),radial-gradient(circle_at_bottom_right,_#FFE8AB_0%,_transparent_40%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(120,50,50,0.3)_0%,_transparent_40%),radial-gradient(circle_at_bottom_right,_rgba(120,90,30,0.2)_0%,_transparent_40%)] text-[var(--color-text-secondary)]">
             <SEO
                 title={post.title}
                 description={post.excerpt}
@@ -84,23 +86,23 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
 
                 {/* Left Column: Main Content Card & Comments */}
                 <main className="flex-1 min-w-0">
-                    <div className="bg-white/90 backdrop-blur-sm rounded-[2rem] shadow-sm p-12 md:p-16">
+                    <div className="bg-[var(--color-surface)]/90 backdrop-blur-sm rounded-[2rem] shadow-sm p-12 md:p-16">
 
                         {/* Article Header */}
                         <header className="text-center mb-16">
-                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-stone-800 mb-6 leading-tight font-serif">
+                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-ink mb-6 leading-tight font-serif">
                                 {post.title}
                             </h1>
 
                             <div className="flex flex-col items-center gap-3 text-sm">
                                 <div className="flex items-center gap-2">
                                     {post.tags.map(tag => (
-                                        <span key={tag} className="text-stone-400 font-medium">
+                                        <span key={tag} className="text-[var(--color-text-muted)] font-medium">
                                             #{tag}
                                         </span>
                                     ))}
                                 </div>
-                                <time className="text-stone-400">
+                                <time className="text-[var(--color-text-muted)]">
                                     {new Date(post.publishAt).toLocaleDateString('zh-CN', {
                                         year: 'numeric',
                                         month: 'long',
@@ -113,20 +115,20 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
                         {/* AI Features (Moved to Top) */}
                         <div className="mb-16 grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Summary Block */}
-                            <div className="bg-orange-50/50 rounded-2xl p-6 border border-orange-100/50 hover:border-orange-200 transition-colors">
+                            <div className="bg-orange-50/50 dark:bg-orange-950/30 rounded-2xl p-6 border border-orange-100/50 dark:border-orange-900/30 hover:border-orange-200 dark:hover:border-orange-800 transition-colors">
                                 <div className="flex items-center gap-2 mb-3 text-orange-600">
                                     <IconBrain className="w-5 h-5" />
                                     <h3 className="font-bold uppercase tracking-widest text-xs">AI Synopsis</h3>
                                 </div>
                                 {summary ? (
-                                    <div className="text-sm text-stone-700 leading-relaxed animate-fade-in font-serif">
+                                    <div className="text-sm text-[var(--color-text-secondary)] leading-relaxed animate-fade-in font-serif">
                                         <MDEditor.Markdown source={summary} style={{ background: 'transparent', color: 'inherit' }} />
                                     </div>
                                 ) : (
                                     <button
                                         onClick={handleGenerateSummary}
                                         disabled={loadingSummary}
-                                        className="text-sm text-orange-500 hover:text-orange-700 font-medium underline decoration-orange-300 underline-offset-4 disabled:opacity-50 cursor-pointer"
+                                        className="text-sm text-orange-500 hover:text-orange-700 dark:hover:text-orange-400 font-medium underline decoration-orange-300 dark:decoration-orange-700 underline-offset-4 disabled:opacity-50 cursor-pointer"
                                     >
                                         {loadingSummary ? 'Running Analysis...' : 'Generate AI Summary'}
                                     </button>
@@ -134,20 +136,20 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
                             </div>
 
                             {/* Insight Block */}
-                            <div className="bg-teal-50/50 rounded-2xl p-6 border border-teal-100/50 hover:border-teal-200 transition-colors">
+                            <div className="bg-teal-50/50 dark:bg-teal-950/30 rounded-2xl p-6 border border-teal-100/50 dark:border-teal-900/30 hover:border-teal-200 dark:hover:border-teal-800 transition-colors">
                                 <div className="flex items-center gap-2 mb-3 text-teal-600">
                                     <IconSparkles className="w-5 h-5" />
                                     <h3 className="font-bold uppercase tracking-widest text-xs">Deep Insight</h3>
                                 </div>
                                 {insight ? (
-                                    <div className="text-sm text-stone-700 leading-relaxed animate-fade-in italic font-serif">
+                                    <div className="text-sm text-[var(--color-text-secondary)] leading-relaxed animate-fade-in italic font-serif">
                                         <MDEditor.Markdown source={insight} style={{ background: 'transparent', color: 'inherit' }} />
                                     </div>
                                 ) : (
                                     <button
                                         onClick={handleGenerateInsight}
                                         disabled={loadingInsight}
-                                        className="text-sm text-teal-600 hover:text-teal-800 font-medium underline decoration-teal-300 underline-offset-4 disabled:opacity-50 cursor-pointer"
+                                        className="text-sm text-teal-600 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-medium underline decoration-teal-300 dark:decoration-teal-700 underline-offset-4 disabled:opacity-50 cursor-pointer"
                                     >
                                         {loadingInsight ? 'Thinking...' : 'Reveal Deep Insight'}
                                     </button>
@@ -157,8 +159,8 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
 
                         {/* Article Content */}
                         <div
-                            className="prose prose-lg max-w-none prose-stone prose-headings:font-bold prose-headings:text-stone-800 prose-p:text-stone-600 prose-p:leading-relaxed prose-a:text-orange-500 hover:prose-a:text-orange-600 prose-blockquote:border-l-4 prose-blockquote:border-orange-200 prose-blockquote:bg-orange-50/30 prose-blockquote:py-2 prose-blockquote:px-6 prose-img:rounded-2xl"
-                            data-color-mode="light"
+                            className="prose prose-lg max-w-none prose-stone dark:prose-invert prose-headings:font-bold prose-headings:text-ink prose-p:text-[var(--color-text-secondary)] prose-p:leading-relaxed prose-a:text-orange-500 hover:prose-a:text-orange-600 prose-blockquote:border-l-4 prose-blockquote:border-orange-200 dark:prose-blockquote:border-orange-800 prose-blockquote:bg-orange-50/30 dark:prose-blockquote:bg-orange-950/20 prose-blockquote:py-2 prose-blockquote:px-6 prose-img:rounded-2xl"
+                            data-color-mode={effectiveTheme}
                         >
                             <MDEditor.Markdown
                                 source={post.content}
@@ -177,8 +179,8 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
                 {/* Right Column: Sidebar */}
                 <aside className="w-full lg:w-64 shrink-0 space-y-4">
                     {/* Cover Image / Monitor Illustration */}
-                    <div className="bg-white/60 backdrop-blur-md rounded-[1.2rem] p-2.5 shadow-sm border border-white/50">
-                        <div className="aspect-[4/3] rounded-xl overflow-hidden bg-stone-100 flex items-center justify-center">
+                    <div className="bg-[var(--color-elevated)] backdrop-blur-md rounded-[1.2rem] p-2.5 shadow-sm border border-[var(--color-elevated-border)]">
+                        <div className="aspect-[4/3] rounded-xl overflow-hidden bg-[var(--color-surface-alt)] flex items-center justify-center">
                             {post.cover ? (
                                 <img
                                     src={getAssetUrl(post.cover)}
@@ -186,7 +188,7 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
                                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                                 />
                             ) : (
-                                <div className="text-stone-300">
+                                <div className="text-[var(--color-text-muted)]">
                                     <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" /></svg>
                                 </div>
                             )}
@@ -194,24 +196,24 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
                     </div>
 
                     {/* Summary Sidebar Card */}
-                    <div className="bg-white/60 backdrop-blur-md rounded-[1.2rem] p-5 shadow-sm border border-white/50">
-                        <h4 className="text-[10px] font-bold text-stone-400 mb-3 tracking-wider uppercase">Summary</h4>
-                        <div className="text-xs text-stone-600 leading-relaxed font-sans">
+                    <div className="bg-[var(--color-elevated)] backdrop-blur-md rounded-[1.2rem] p-5 shadow-sm border border-[var(--color-elevated-border)]">
+                        <h4 className="text-[10px] font-bold text-[var(--color-text-muted)] mb-3 tracking-wider uppercase">Summary</h4>
+                        <div className="text-xs text-[var(--color-text-secondary)] leading-relaxed font-sans">
                             {post.excerpt || "No summary available for this article."}
                         </div>
                     </div>
 
                     {/* TOC Sidebar Card */}
                     {tocItems.length > 0 && (
-                        <div className="bg-white/60 backdrop-blur-md rounded-[1.2rem] p-5 shadow-sm border border-white/50">
-                            <h4 className="text-[10px] font-bold text-stone-400 mb-3 tracking-wider uppercase">Contents</h4>
+                        <div className="bg-[var(--color-elevated)] backdrop-blur-md rounded-[1.2rem] p-5 shadow-sm border border-[var(--color-elevated-border)]">
+                            <h4 className="text-[10px] font-bold text-[var(--color-text-muted)] mb-3 tracking-wider uppercase">Contents</h4>
                             <nav className="space-y-2">
                                 {tocItems.map((item, index) => (
                                     <a
                                         key={index}
                                         href={`#${item.id}`}
-                                        className={`block text-xs transition-colors ${item.level === 1 ? 'text-stone-800 font-medium hover:text-orange-500' :
-                                            'text-stone-500 hover:text-stone-800 pl-3 border-l-[1.5px] border-transparent hover:border-orange-300'
+                                        className={`block text-xs transition-colors ${item.level === 1 ? 'text-ink font-medium hover:text-orange-500' :
+                                            'text-[var(--color-text-secondary)] hover:text-ink pl-3 border-l-[1.5px] border-transparent hover:border-orange-300'
                                             }`}
                                     >
                                         {item.text}

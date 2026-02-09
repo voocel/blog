@@ -9,9 +9,9 @@ interface BentoItemProps {
 
 const BentoItem: React.FC<BentoItemProps> = ({ children, className = "", title }) => {
     return (
-        <div className={`bg-white/40 backdrop-blur-xl border border-white/50 shadow-sm rounded-3xl p-6 transition-all duration-300 hover:scale-[1.03] hover:-translate-y-1 hover:shadow-lg nav-no-drag ${className}`}>
+        <div className={`bg-[var(--color-elevated)] backdrop-blur-xl border border-[var(--color-elevated-border)] shadow-sm rounded-3xl p-6 transition-all duration-300 hover:scale-[1.03] hover:-translate-y-1 hover:shadow-lg nav-no-drag ${className}`}>
             {title && (
-                <h3 className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4">
+                <h3 className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-widest mb-4">
                     {title}
                 </h3>
             )}
