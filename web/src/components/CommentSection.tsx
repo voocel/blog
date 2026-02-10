@@ -88,7 +88,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postSlug }) => {
                         <p className="text-[var(--color-text-secondary)] font-serif mb-4 italic">Join the conversation</p>
                         <button
                             onClick={() => setAuthModalOpen(true)}
-                            className="bg-ink text-white px-6 py-2.5 rounded-full font-medium shadow-lg shadow-[var(--color-muted)] hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm cursor-pointer"
+                            className="bg-ink text-[var(--color-base)] px-6 py-2.5 rounded-full font-medium shadow-lg shadow-[var(--color-muted)] hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm cursor-pointer"
                         >
                             Sign in to Comment
                         </button>

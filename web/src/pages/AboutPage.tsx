@@ -184,7 +184,7 @@ const AboutPage: React.FC = () => {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                        <button className="px-8 py-4 bg-ink text-white rounded-full font-medium tracking-wide hover:bg-gold-600 transition-colors shadow-lg hover:shadow-xl flex items-center gap-3 group cursor-pointer">
+                        <button className="px-8 py-4 bg-ink text-[var(--color-base)] rounded-full font-medium tracking-wide hover:bg-gold-600 transition-colors shadow-lg hover:shadow-xl flex items-center gap-3 group cursor-pointer">
                             <span>Start a Project</span>
                             <IconSend className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </button>

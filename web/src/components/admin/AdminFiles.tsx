@@ -132,7 +132,7 @@ const AdminFiles: React.FC<AdminFilesProps> = ({ files, onAddFile, onDeleteFile,
                         placeholder="Paste Image URL..."
                         className="w-64 bg-[var(--color-surface-alt)] rounded-lg px-4 py-2 text-sm focus:outline-none border border-transparent focus:border-[var(--color-border)] transition-colors"
                     />
-                    <button onClick={handleAddUrl} className="bg-ink text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-stone-800 transition-colors cursor-pointer">Import</button>
+                    <button onClick={handleAddUrl} className="bg-ink text-[var(--color-base)] px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-gold-600 transition-colors cursor-pointer">Import</button>
                 </div>
             </div>
 

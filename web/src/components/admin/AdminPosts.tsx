@@ -42,7 +42,7 @@ const AdminPosts: React.FC<AdminPostsProps> = ({ posts, onEditPost, onDeletePost
                 </div>
                 <button
                     onClick={() => onEditPost()}
-                    className="bg-ink text-white px-6 py-3 rounded-xl hover:bg-gold-600 transition-colors shadow-lg shadow-stone-200 dark:shadow-none flex items-center gap-2 group cursor-pointer"
+                    className="bg-ink text-[var(--color-base)] px-6 py-3 rounded-xl hover:bg-gold-600 transition-colors shadow-lg shadow-stone-200 dark:shadow-none flex items-center gap-2 group cursor-pointer"
                 >
                     <IconPlus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
                     <span className="font-medium tracking-wide">Create New Entry</span>

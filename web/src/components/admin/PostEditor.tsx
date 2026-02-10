@@ -141,7 +141,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
                     <button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="bg-ink text-white px-8 py-3 rounded-xl font-bold tracking-wide hover:bg-gold-600 transition-colors shadow-lg flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                        className="bg-ink text-[var(--color-base)] px-8 py-3 rounded-xl font-bold tracking-wide hover:bg-gold-600 transition-colors shadow-lg flex items-center gap-2 cursor-pointer disabled:opacity-50"
                     >
                         {isSaving ? 'Saving...' : 'Save Changes'}
                     </button>
