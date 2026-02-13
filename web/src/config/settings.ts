@@ -3,6 +3,7 @@
 import { type Locale, defaultLocale } from '@/locales';
 
 export type ThemeMode = 'light' | 'dark' | 'auto';
+export type HomepageMode = 'brand' | 'blog';
 
 export interface MusicSettings {
   defaultVolume: number; // 0.0 to 1.0
@@ -14,6 +15,7 @@ export interface MusicSettings {
 export interface AppearanceSettings {
   theme: ThemeMode;
   enableAnimations: boolean;
+  homepage: HomepageMode;
 }
 
 export interface LanguageSettings {
@@ -26,11 +28,16 @@ export interface UserSettings {
   language: LanguageSettings;
 }
 
+// Resolve default homepage from env
+const defaultHomepage: HomepageMode =
+  import.meta.env.VITE_DEFAULT_HOMEPAGE === 'blog' ? 'blog' : 'brand';
+
 // Default settings
 export const DEFAULT_SETTINGS: UserSettings = {
   appearance: {
     theme: 'light',
     enableAnimations: true,
+    homepage: defaultHomepage,
   },
   music: {
     defaultVolume: 0.7,

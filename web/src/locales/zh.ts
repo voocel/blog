@@ -26,6 +26,11 @@ export const zh: TranslationKeys = {
     animations: '动画效果',
     enableAnimations: '启用动画',
     animationsDesc: '页面过渡和特效',
+    homepage: '首页风格',
+    homepageBrand: '品牌展示',
+    homepageBlog: '博客文章',
+    homepageBrandDesc: '创意 Bento 网格布局',
+    homepageBlogDesc: '简洁文章列表',
   },
 
   // Music settings
@@ -47,6 +52,14 @@ export const zh: TranslationKeys = {
     title: '语言',
     selectLanguage: '选择语言',
     languageDesc: '选择您偏好的语言',
+  },
+
+  // BlogHomePage
+  blogHome: {
+    title: '博客',
+    subtitle: '关于代码、设计与构建之道的思考。',
+    noPosts: '暂无已发布的文章。',
+    viewAll: '查看所有文章',
   },
 
   // Homepage

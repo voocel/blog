@@ -24,6 +24,11 @@ export const en = {
     animations: 'Animations',
     enableAnimations: 'Enable Animations',
     animationsDesc: 'Page transitions and effects',
+    homepage: 'Homepage Style',
+    homepageBrand: 'Brand Dashboard',
+    homepageBlog: 'Blog Feed',
+    homepageBrandDesc: 'Creative bento grid layout',
+    homepageBlogDesc: 'Minimalist article list',
   },
 
   // Music Settings
@@ -45,6 +50,14 @@ export const en = {
     title: 'Language',
     selectLanguage: 'Select Language',
     languageDesc: 'Choose your preferred language',
+  },
+
+  // BlogHomePage
+  blogHome: {
+    title: 'Blog',
+    subtitle: 'Thoughts on code, design, and the craft of building.',
+    noPosts: 'No posts published yet.',
+    viewAll: 'View All Posts',
   },
 
   // HomePage

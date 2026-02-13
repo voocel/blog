@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, type ReactNode }
 import {
   type UserSettings,
   type ThemeMode,
+  type HomepageMode,
   type MusicSettings,
   loadSettings,
   saveSettings,
@@ -15,6 +16,7 @@ interface SettingsContextType {
   settings: UserSettings;
   updateTheme: (theme: ThemeMode) => void;
   updateAnimations: (enabled: boolean) => void;
+  updateHomepage: (mode: HomepageMode) => void;
   updateMusicSettings: (music: Partial<MusicSettings>) => void;
   updateLocale: (locale: Locale) => void;
   resetSettings: () => void;
@@ -81,6 +83,13 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     }));
   };
 
+  const updateHomepage = (mode: HomepageMode) => {
+    setSettings((prev) => ({
+      ...prev,
+      appearance: { ...prev.appearance, homepage: mode },
+    }));
+  };
+
   const updateMusicSettings = (music: Partial<MusicSettings>) => {
     setSettings((prev) => ({
       ...prev,
@@ -106,6 +115,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         settings,
         updateTheme,
         updateAnimations,
+        updateHomepage,
         updateMusicSettings,
         updateLocale,
         resetSettings,

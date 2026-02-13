@@ -5,6 +5,7 @@ import { BlogProvider } from '@/context/BlogContext';
 import { AdminProvider } from '@/context/AdminContext';
 import { SettingsProvider } from '@/context/SettingsContext';
 import type { AdminSection } from '@/types';
+import { useSettings } from '@/context/SettingsContext';
 import Sidebar from '@/components/Sidebar';
 import AuthModal from '@/components/AuthModal';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -15,12 +16,18 @@ const AIChat = React.lazy(() => import('./components/AIChat'));
 
 // Lazy Load Pages
 const HomePage = React.lazy(() => import('./pages/HomePage'));
+const BlogHomePage = React.lazy(() => import('./pages/BlogHomePage'));
 const PostPage = React.lazy(() => import('./pages/PostPage'));
 const PostsListPage = React.lazy(() => import('./pages/PostsListPage'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 const AboutPage = React.lazy(() => import('./pages/AboutPage'));
 const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
 const ClockPage = React.lazy(() => import('./pages/ClockPage'));
+
+const HomeRouter: React.FC = () => {
+  const { settings } = useSettings();
+  return settings.appearance.homepage === 'blog' ? <BlogHomePage /> : <HomePage />;
+};
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -61,7 +68,7 @@ const AppContent: React.FC = () => {
         </div>
       }>
         <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomeRouter />} />
           <Route path="/posts" element={<PostsListPage />} />
           <Route path="/post/:slug" element={<PostPage />} />
           <Route path="/about" element={<AboutPage />} />

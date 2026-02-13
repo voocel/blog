@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSettings } from '@/context/SettingsContext';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { ThemeMode } from '@/config/settings';
+import type { ThemeMode, HomepageMode } from '@/config/settings';
 import { type Locale, localeNames } from '@/locales';
 
 interface SettingsModalProps {
@@ -10,7 +10,7 @@ interface SettingsModalProps {
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-    const { settings, updateTheme, updateAnimations, updateMusicSettings, updateLocale, resetSettings } = useSettings();
+    const { settings, updateTheme, updateAnimations, updateHomepage, updateMusicSettings, updateLocale, resetSettings } = useSettings();
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState<'appearance' | 'music' | 'language'>('appearance');
     const [showSaveToast, setShowSaveToast] = useState(false);
@@ -118,6 +118,31 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                                         className="w-5 h-5 text-red-500 rounded focus:ring-2 focus:ring-red-200"
                                     />
                                 </label>
+                            </div>
+
+                            {/* Homepage Style */}
+                            <div>
+                                <h3 className="text-sm font-bold text-ink mb-4">{t.appearance.homepage}</h3>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {(['brand', 'blog'] as HomepageMode[]).map((mode) => (
+                                        <button
+                                            key={mode}
+                                            onClick={() => updateHomepage(mode)}
+                                            className={`p-4 rounded-xl border-2 transition-all cursor-pointer text-left ${
+                                                settings.appearance.homepage === mode
+                                                    ? 'border-red-400 bg-red-50 dark:bg-red-950 dark:border-red-600'
+                                                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-stone-300'
+                                            }`}
+                                        >
+                                            <div className="text-sm font-medium text-ink">
+                                                {mode === 'brand' ? t.appearance.homepageBrand : t.appearance.homepageBlog}
+                                            </div>
+                                            <div className="text-xs text-[var(--color-text-secondary)] mt-1">
+                                                {mode === 'brand' ? t.appearance.homepageBrandDesc : t.appearance.homepageBlogDesc}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     )}
