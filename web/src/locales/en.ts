@@ -54,8 +54,9 @@ export const en = {
 
   // BlogHomePage
   blogHome: {
-    title: 'Blog',
-    subtitle: 'Thoughts on code, design, and the craft of building.',
+    greeting: 'Voocel',
+    role: 'AI Infra Engineer',
+    bio: 'Focused on Go ecosystem and AI Agent/LLM infrastructure. Building tools that make complex things simple.',
     noPosts: 'No posts published yet.',
     viewAll: 'View All Posts',
   },

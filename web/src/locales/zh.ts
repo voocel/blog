@@ -56,8 +56,9 @@ export const zh: TranslationKeys = {
 
   // BlogHomePage
   blogHome: {
-    title: '博客',
-    subtitle: '关于代码、设计与构建之道的思考。',
+    greeting: 'Voocel',
+    role: 'AI 基础设施工程师',
+    bio: '专注于 Go 生态和 AI Agent/LLM 基础设施，构建让复杂事物变简单的工具。',
     noPosts: '暂无已发布的文章。',
     viewAll: '查看所有文章',
   },

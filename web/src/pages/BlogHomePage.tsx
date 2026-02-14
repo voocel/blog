@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import AnimatedNavWidget from '@/components/AnimatedNavWidget';
 import SettingsModal from '@/components/SettingsModal';
 import SEO from '@/components/SEO';
+import { IconGithub } from '@/components/Icons';
 import { postService } from '@/services/postService';
 import type { BlogPost } from '@/types';
 import { useAuth } from '@/context/AuthContext';
@@ -86,15 +87,48 @@ const BlogHomePage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
       >
-        {/* Header */}
+        {/* Profile Header */}
         <header className="mb-16">
-          <h1 className="text-4xl font-serif font-bold text-ink tracking-tight">
-            {t.blogHome.title}
-          </h1>
-          <p className="text-[var(--color-text-secondary)] text-lg mt-3 font-serif italic">
-            {t.blogHome.subtitle}
+          <div className="flex items-start gap-5">
+            {/* Avatar */}
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-orange-400 to-rose-400 flex items-center justify-center text-white font-bold text-xl shrink-0 shadow-md">
+              V
+            </div>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl font-bold text-ink tracking-tight">
+                {t.blogHome.greeting}
+              </h1>
+              <p className="text-sm text-[var(--color-text-secondary)] mt-0.5">
+                {t.blogHome.role}
+              </p>
+            </div>
+          </div>
+          <p className="text-[var(--color-text-secondary)] mt-4 leading-relaxed">
+            {t.blogHome.bio}
           </p>
-          <div className="w-12 h-[2px] bg-orange-400 mt-6" />
+          {/* Social Links */}
+          <div className="flex items-center gap-3 mt-4">
+            <a
+              href="https://github.com/voocel"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs text-[var(--color-text-muted)] hover:text-ink transition-colors"
+            >
+              <IconGithub className="w-4 h-4" />
+              <span>GitHub</span>
+            </a>
+            <span className="text-[var(--color-border)]">|</span>
+            <a
+              href="https://twitter.com/voocel"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs text-[var(--color-text-muted)] hover:text-ink transition-colors"
+            >
+              <span className="font-bold text-sm leading-none">𝕏</span>
+              <span>Twitter</span>
+            </a>
+          </div>
+          <div className="w-full h-px bg-[var(--color-border)] mt-8" />
         </header>
 
         {/* Loading */}
