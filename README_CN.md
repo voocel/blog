@@ -46,7 +46,7 @@ cd blog
 
 # 3. 配置环境变量（必填）
 cp .env.example .env
-vim .env  # 设置 POSTGRES_PASSWORD、JWT_SECRET，可选 VITE_API_KEY / VITE_DEFAULT_HOMEPAGE
+vim .env  # 设置 POSTGRES_PASSWORD
 
 # 4. 启动服务
 docker compose up -d
@@ -68,14 +68,13 @@ docker compose up -d --build --no-deps backend frontend
 **配置说明：**
 
 根目录 `.env`（部署用）：
-- `POSTGRES_PASSWORD`（必填）数据库密码
-- `JWT_SECRET`（必填）JWT 签名密钥，推荐 `openssl rand -base64 32`
-- `VITE_API_KEY`（可选）Google Gemini API Key，前端 AI 功能（构建时注入）
-- `VITE_DEFAULT_HOMEPAGE`（可选）默认首页风格，`brand` 或 `blog`（前端构建时注入，默认 `brand`）
+- `POSTGRES_PASSWORD`（必填）PostgreSQL 容器初始化密码
+
+后端运行配置：
+- `config/config.yaml`（后端单一配置源，包含 JWT/数据库/App/HTTP）
 
 **前端构建可选项**
-- 部署：在根 `.env` 写 `VITE_API_KEY=你的_Gemini_API_Key`，再 `docker compose build frontend && docker compose up -d frontend`
-- 部署：在根 `.env` 写 `VITE_DEFAULT_HOMEPAGE=blog`，然后重建前端镜像
+- 部署：在 `web/.env` 写 `VITE_API_KEY` / `VITE_DEFAULT_HOMEPAGE`，再 `docker compose build frontend && docker compose up -d frontend`
 - 本地开发：在 `web/.env` 写 `VITE_API_KEY` / `VITE_DEFAULT_HOMEPAGE`（可选 `VITE_API_URL=http://localhost:8080/api/v1`），`npm run dev`
 
 **配置机制：**
@@ -85,7 +84,8 @@ docker compose up -d --build --no-deps backend frontend
 - `config/config.yaml`：后端配置（不提交，init.sh 自动创建）
 - `web/.env.example`：前端本地开发模板（提交）
 - `web/.env`：前端本地开发配置（不提交）
-- 优先级：`.env 环境变量` > `config.yaml` > 代码默认值
+- 后端优先级：`config.yaml` > 代码默认值（不做后端环境变量覆盖）
+- 请保持 `config/config.yaml` 中 `postgres.password` 与根 `.env` 的 `POSTGRES_PASSWORD` 一致
 
 ---
 
@@ -219,8 +219,8 @@ docker compose up -d --build
 # 检查数据库状态
 docker exec blog-postgres pg_isready -U postgres
 
-# 检查环境变量
-docker exec blog-backend env | grep BLOG_
+# 检查后端配置文件
+docker compose exec backend cat /app/config/config.yaml
 
 # 重启数据库
 docker compose restart postgres

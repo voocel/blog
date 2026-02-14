@@ -31,7 +31,7 @@ cd blog
 
 # 3. Env (required)
 cp .env.example .env
-vim .env  # set POSTGRES_PASSWORD, JWT_SECRET; optional VITE_API_KEY / VITE_DEFAULT_HOMEPAGE
+vim .env  # set POSTGRES_PASSWORD
 
 # 4. Start
 docker compose up -d
@@ -51,14 +51,13 @@ docker compose up -d --build
 
 ### Env overview
 Root `.env` (for deploy):
-- `POSTGRES_PASSWORD` (required)
-- `JWT_SECRET` (required, e.g. `openssl rand -base64 32`)
-- `VITE_API_KEY` (optional, Gemini key for AI)
-- `VITE_DEFAULT_HOMEPAGE` (optional, `brand` or `blog`, build-time injected for frontend; default `brand`)
+- `POSTGRES_PASSWORD` (required, for PostgreSQL container init)
+
+Backend runtime config:
+- `config/config.yaml` (single source for backend settings, including JWT/DB/App/HTTP)
 
 Frontend build-time options:
-- Deploy: set `VITE_API_KEY` in root `.env`, then `docker compose build frontend && docker compose up -d frontend`
-- Deploy: set `VITE_DEFAULT_HOMEPAGE=blog` in root `.env`, then rebuild frontend
+- Deploy: set `VITE_API_KEY` / `VITE_DEFAULT_HOMEPAGE` in `web/.env`, then `docker compose build frontend && docker compose up -d frontend`
 - Dev: set `VITE_API_KEY` / `VITE_DEFAULT_HOMEPAGE` in `web/.env` (optional `VITE_API_URL=http://localhost:8080/api/v1`), then `npm run dev`
 
 Config files:
@@ -69,7 +68,8 @@ Config files:
 - `web/.env.example`: frontend dev template
 - `web/.env`: frontend dev config (not committed)
 
-Priority: `.env` > `config.yaml` > code defaults.
+Backend priority: `config.yaml` > code defaults (no backend env override).
+Keep `config/config.yaml` `postgres.password` consistent with root `.env` `POSTGRES_PASSWORD`.
 
 ---
 
@@ -146,7 +146,7 @@ docker compose up -d --build
 DB connection issues:
 ```bash
 docker exec blog-postgres pg_isready -U postgres
-docker exec blog-backend env | grep BLOG_
+docker compose exec backend cat /app/config/config.yaml
 docker compose restart postgres
 ```
 
@@ -167,7 +167,7 @@ GeoIP: download GeoLite2-City.mmdb (e.g. https://github.com/P3TERX/GeoLite.mmdb)
 
 Security hygiene:
 1) Change default admin password
-2) Strong secrets in `.env`
+2) Strong secrets in `config/config.yaml` and `.env` (PostgreSQL password)
 3) Enable HTTPS
 4) Firewall (ufw allow 80/443/22; ufw enable)
 5) Regular backups

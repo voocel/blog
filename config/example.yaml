@@ -5,8 +5,8 @@ log_level_addr: :4245
 log_level_pattern: /log/level
 
 app:
-  # JWT Configuration (will be overridden by environment variables)
-  jwt_secret: change-this-in-production  # Override with BLOG_APP_JWT_SECRET
+  # JWT Configuration
+  jwt_secret: change-this-in-production
   jwt_access_duration: 15   # Access token duration in minutes
   jwt_refresh_duration: 7   # Refresh token duration in days
   upload_path: uploads
@@ -19,12 +19,12 @@ http:
   #   - https://your-frontend.example.com
 
 postgres:
-  # Docker environment (will be overridden by environment variables)
-  host: postgres           # Override with BLOG_POSTGRES_HOST
-  port: 5432              # Override with BLOG_POSTGRES_PORT
-  username: postgres      # Override with BLOG_POSTGRES_USERNAME
-  password: changeme      # Override with BLOG_POSTGRES_PASSWORD (MUST CHANGE!)
-  dbname: blog           # Override with BLOG_POSTGRES_DBNAME
+  # Docker deployment example
+  host: postgres
+  port: 5432
+  username: postgres
+  password: changeme      # MUST CHANGE and keep consistent with .env POSTGRES_PASSWORD
+  dbname: blog
   ssl_mode: disable
   migrate: true
   max_open_conns: 100

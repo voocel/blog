@@ -6,12 +6,6 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Inject build-time env for Vite (Gemini API key)
-ARG VITE_API_KEY
-ENV VITE_API_KEY=${VITE_API_KEY}
-ARG VITE_DEFAULT_HOMEPAGE=brand
-ENV VITE_DEFAULT_HOMEPAGE=${VITE_DEFAULT_HOMEPAGE}
-
 # Install dependencies
 RUN npm ci --legacy-peer-deps
 

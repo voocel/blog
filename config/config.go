@@ -2,7 +2,6 @@ package config
 
 import (
 	"log"
-	"strings"
 	"sync"
 	"time"
 
@@ -88,9 +87,6 @@ func LoadConfig(paths ...string) {
 	}
 
 	viper.SetConfigType("yaml")
-	viper.SetEnvPrefix("blog")
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.AutomaticEnv()
 
 	viper.SetDefault("mode", "debug")
 	viper.SetDefault("log_level", "info")

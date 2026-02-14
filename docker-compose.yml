@@ -33,25 +33,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    environment:
-      # Database Configuration
-      BLOG_POSTGRES_HOST: postgres
-      BLOG_POSTGRES_PORT: 5432
-      BLOG_POSTGRES_USERNAME: postgres
-      BLOG_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-your_secure_password}
-      BLOG_POSTGRES_DBNAME: blog
-      BLOG_POSTGRES_SSL_MODE: disable
-
-      # JWT Configuration
-      BLOG_APP_JWT_SECRET: ${JWT_SECRET:-PhhHBxvBLw3dofezHqVbZZKREJzzn63sXwtXLPN0DEg=}
-      BLOG_APP_JWT_ACCESS_DURATION: 15
-      BLOG_APP_JWT_REFRESH_DURATION: 7
-
-      # Server Configuration
-      BLOG_HTTP_ADDR: :8080
-      BLOG_MODE: release
-      BLOG_LOG_LEVEL: info
     volumes:
+      - ./config/config.yaml:/app/config/config.yaml:ro
       - ./logs:/app/logs
       - ./static/uploads:/app/static/uploads
       - ./static/avatar:/app/static/avatar
@@ -70,9 +53,6 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
-      args:
-        VITE_API_KEY: ${VITE_API_KEY:-}
-        VITE_DEFAULT_HOMEPAGE: ${VITE_DEFAULT_HOMEPAGE:-brand}
     container_name: blog-frontend
     restart: unless-stopped
     depends_on:

@@ -44,8 +44,8 @@ COPY --from=builder /app/bin/blog .
 # Copy config files
 COPY --from=builder /app/config ./config
 
-# Create config.yaml from example.yaml
-RUN cp config/example.yaml config/config.yaml
+# Ensure configured config.yaml exists (do not fallback to example.yaml)
+RUN test -f config/config.yaml
 
 # Copy static files
 COPY --from=builder /app/static ./static
