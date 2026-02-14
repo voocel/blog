@@ -72,6 +72,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_KEY: ${VITE_API_KEY:-}
+        VITE_DEFAULT_HOMEPAGE: ${VITE_DEFAULT_HOMEPAGE:-brand}
     container_name: blog-frontend
     restart: unless-stopped
     depends_on:

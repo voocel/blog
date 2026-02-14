@@ -31,7 +31,7 @@ cd blog
 
 # 3. Env (required)
 cp .env.example .env
-vim .env  # set POSTGRES_PASSWORD, JWT_SECRET; optional VITE_API_KEY
+vim .env  # set POSTGRES_PASSWORD, JWT_SECRET; optional VITE_API_KEY / VITE_DEFAULT_HOMEPAGE
 
 # 4. Start
 docker compose up -d
@@ -54,10 +54,12 @@ Root `.env` (for deploy):
 - `POSTGRES_PASSWORD` (required)
 - `JWT_SECRET` (required, e.g. `openssl rand -base64 32`)
 - `VITE_API_KEY` (optional, Gemini key for AI)
+- `VITE_DEFAULT_HOMEPAGE` (optional, `brand` or `blog`, build-time injected for frontend; default `brand`)
 
-AI feature:
+Frontend build-time options:
 - Deploy: set `VITE_API_KEY` in root `.env`, then `docker compose build frontend && docker compose up -d frontend`
-- Dev: set `VITE_API_KEY` in `web/.env` (optional `VITE_API_URL=http://localhost:8080/api/v1`), then `npm run dev`
+- Deploy: set `VITE_DEFAULT_HOMEPAGE=blog` in root `.env`, then rebuild frontend
+- Dev: set `VITE_API_KEY` / `VITE_DEFAULT_HOMEPAGE` in `web/.env` (optional `VITE_API_URL=http://localhost:8080/api/v1`), then `npm run dev`
 
 Config files:
 - `.env.example` (root): deploy env template
@@ -184,6 +186,7 @@ cd web
 npm install
 cp .env.example .env
 # set VITE_API_URL=http://localhost:8080/api/v1 as needed
+# optional: VITE_DEFAULT_HOMEPAGE=blog
 npm run dev
 ```
 
@@ -191,4 +194,3 @@ npm run dev
 
 ## License
 Apache-2.0
-

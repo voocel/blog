@@ -46,7 +46,7 @@ cd blog
 
 # 3. 配置环境变量（必填）
 cp .env.example .env
-vim .env  # 设置 POSTGRES_PASSWORD、JWT_SECRET，若需 AI 填 VITE_API_KEY
+vim .env  # 设置 POSTGRES_PASSWORD、JWT_SECRET，可选 VITE_API_KEY / VITE_DEFAULT_HOMEPAGE
 
 # 4. 启动服务
 docker compose up -d
@@ -71,10 +71,12 @@ docker compose up -d --build --no-deps backend frontend
 - `POSTGRES_PASSWORD`（必填）数据库密码
 - `JWT_SECRET`（必填）JWT 签名密钥，推荐 `openssl rand -base64 32`
 - `VITE_API_KEY`（可选）Google Gemini API Key，前端 AI 功能（构建时注入）
+- `VITE_DEFAULT_HOMEPAGE`（可选）默认首页风格，`brand` 或 `blog`（前端构建时注入，默认 `brand`）
 
-**可选：前端 AI 功能**
+**前端构建可选项**
 - 部署：在根 `.env` 写 `VITE_API_KEY=你的_Gemini_API_Key`，再 `docker compose build frontend && docker compose up -d frontend`
-- 本地开发：在 `web/.env` 写 `VITE_API_KEY`（可选 `VITE_API_URL=http://localhost:8080/api/v1`），`npm run dev`
+- 部署：在根 `.env` 写 `VITE_DEFAULT_HOMEPAGE=blog`，然后重建前端镜像
+- 本地开发：在 `web/.env` 写 `VITE_API_KEY` / `VITE_DEFAULT_HOMEPAGE`（可选 `VITE_API_URL=http://localhost:8080/api/v1`），`npm run dev`
 
 **配置机制：**
 - 根目录 `.env.example`：部署环境变量模板（提交）
@@ -288,6 +290,7 @@ npm install
 # 配置前端环境变量（本地开发需要）
 cp .env.example .env
 # 编辑 .env，配置 VITE_API_URL=http://localhost:8080/api/v1
+# 可选：VITE_DEFAULT_HOMEPAGE=blog
 
 npm run dev
 ```
