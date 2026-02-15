@@ -21,7 +21,7 @@ interface AnimatedNavWidgetProps {
 const navItems: NavItem[] = [
     { icon: '📄', label: 'Posts', labelCn: '近期文章', path: '/posts' },
     { icon: '🔲', label: 'Projects', labelCn: '我的项目', path: '/projects' },
-    { icon: '💬', label: 'About', labelCn: '关于网站', path: '/about' },
+    { icon: 'ⓘ', label: 'About', labelCn: '关于网站', path: '/about' },
     { icon: '☆', label: 'Favorites', labelCn: '推荐分享', path: '/favorites' },
     { icon: '🌐', label: 'Blog', labelCn: '优秀博客', path: '/blogs' },
 ];

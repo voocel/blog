@@ -1,201 +1,395 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IconSparkles, IconBrain, IconMessage, IconSend } from '@/components/Icons';
+import { motion } from 'framer-motion';
 import AnimatedNavWidget from '@/components/AnimatedNavWidget';
+import SEO from '@/components/SEO';
+import { IconSparkles, IconBrain, IconMessage, IconGithub, IconMail } from '@/components/Icons';
+import { useTranslation } from '@/hooks/useTranslation';
 
-
-// --- Reusable Reveal Component (Same as HomePage) ---
-interface RevealProps {
-    children: React.ReactNode;
-    className?: string;
-    delay?: number;
-    threshold?: number;
+interface Pillar {
+  title: string;
+  desc: string;
+  icon: React.FC<{ className?: string }>;
+  tag: string;
 }
 
-const Reveal: React.FC<RevealProps> = ({ children, className = "", delay = 0, threshold = 0.1 }) => {
-    const ref = useRef<HTMLDivElement>(null);
-    const [isVisible, setIsVisible] = useState(false);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setIsVisible(true);
-                    observer.disconnect();
-                }
-            },
-            { threshold }
-        );
-
-        if (ref.current) {
-            observer.observe(ref.current);
-        }
-
-        return () => observer.disconnect();
-    }, [threshold]);
-
-    return (
-        <div
-            ref={ref}
-            className={`${isVisible ? 'animate-blur-in' : 'opacity-0'} ${className}`}
-            style={{ animationDelay: `${delay}ms`, animationFillMode: 'both' }}
-        >
-            {children}
-        </div>
-    );
-};
+interface AIProject {
+  name: string;
+  path: string;
+  desc: string;
+  topic: string;
+}
 
 const AboutPage: React.FC = () => {
-    const navigate = useNavigate();
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+  const navigate = useNavigate();
+  const { locale } = useTranslation();
 
-    return (
-        <div className="min-h-screen pt-20 pb-32 bg-[var(--color-base)] text-ink">
-            <div className="fixed top-8 left-8 z-50">
-                <AnimatedNavWidget
-                    isCompact={true}
-                    disableFixed={true}
-                    showBackButton={true}
-                    onBackClick={() => navigate('/')}
-                />
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const isZh = locale === 'zh';
+
+  const copy = isZh
+    ? {
+        seoTitle: '关于 - Voocel',
+        badge: 'VOOCEL / ABOUT',
+        title: '把 AI 工程实践写成可读、可复用的长期资产',
+        subtitle: 'AI + Engineering Journal',
+        intro:
+          '这不是个人简历页，而是一个持续迭代的 AI 工程现场。围绕大模型应用、Agent 系统和基础设施实现，记录真实问题与真实解法。',
+        highlights: [
+          { value: 'LLM 应用', label: '主题方向' },
+          { value: 'MCP / Agent', label: '系统方向' },
+          { value: 'GitHub 52+ Repos', label: '开源积累' },
+        ],
+        pillarTitle: '写作与开发原则',
+        aiTitle: 'GitHub AI 方向',
+        aiIntro: '基于 GitHub（voocel）当前公开项目，核心方向集中在 LLM 中间层、MCP 生态和 Agent 工程化。',
+        stackTitle: '当前技术栈',
+        notesTitle: '构建方式',
+        notes: [
+          'AI 落地优先：先解决真实场景，再追求抽象优雅。',
+          '结构稳定：模型调用、业务逻辑、基础设施三层解耦。',
+          '持续迭代：每次改动都可验证、可回滚、可解释。',
+        ],
+        ctaTitle: '保持联系',
+        ctaDesc: '欢迎交流 LLM 应用、Agent 工程化、MCP 生态相关问题，或对文章提出改进建议。',
+      }
+    : {
+        seoTitle: 'About - Voocel',
+        badge: 'VOOCEL / ABOUT',
+        title: 'Turning AI engineering practice into reusable long-term knowledge',
+        subtitle: 'AI + Engineering Journal',
+        intro:
+          'This is not a resume page. It is an evolving AI engineering workspace documenting LLM applications, agent systems, and real implementation trade-offs.',
+        highlights: [
+          { value: 'LLM Apps', label: 'Main Focus' },
+          { value: 'MCP / Agent', label: 'System Track' },
+          { value: 'GitHub 52+ Repos', label: 'Open Source Base' },
+        ],
+        pillarTitle: 'Writing & Engineering Principles',
+        aiTitle: 'GitHub AI Focus',
+        aiIntro: 'Based on public projects in voocel, the current focus is LLM middleware, MCP ecosystem tooling, and production-oriented agent systems.',
+        stackTitle: 'Current Stack',
+        notesTitle: 'How It Is Built',
+        notes: [
+          'AI delivery first: solve concrete production cases before abstraction.',
+          'Stable structure: model access, business logic, and infra are decoupled.',
+          'Continuous iteration: each change should be testable and explainable.',
+        ],
+        ctaTitle: 'Let’s Connect',
+        ctaDesc: 'Open to discussions on LLM apps, agent engineering, MCP tooling, and collaboration.',
+      };
+
+  const pillars: Pillar[] = isZh
+    ? [
+        {
+          title: '表达要清楚',
+          desc: '每篇内容都尽量给出背景、问题和可执行结论，降低读者理解成本。',
+          icon: IconMessage,
+          tag: 'Clarity',
+        },
+        {
+          title: '技术要落地',
+          desc: '优先分享真实场景里的方案，不追热点堆概念，强调可复现。',
+          icon: IconBrain,
+          tag: 'Practical',
+        },
+        {
+          title: '体验要克制',
+          desc: '界面和交互保持简洁，视觉服务内容，不让样式喧宾夺主。',
+          icon: IconSparkles,
+          tag: 'Intentional',
+        },
+      ]
+    : [
+        {
+          title: 'Clarity First',
+          desc: 'Every article aims to provide context, concrete problems, and actionable takeaways.',
+          icon: IconMessage,
+          tag: 'Clarity',
+        },
+        {
+          title: 'Practical Depth',
+          desc: 'Real-world solutions over hype, with reproducible patterns and tradeoffs.',
+          icon: IconBrain,
+          tag: 'Practical',
+        },
+        {
+          title: 'Intentional UX',
+          desc: 'A restrained visual system where design supports reading, not distraction.',
+          icon: IconSparkles,
+          tag: 'Intentional',
+        },
+      ];
+
+  const techStack = [
+    'LLM Orchestration',
+    'MCP',
+    'Agent Workflow',
+    'Go 1.25',
+    'Gin',
+    'PostgreSQL',
+    'GORM',
+    'React 19',
+    'Vite',
+    'TypeScript',
+    'Tailwind CSS',
+    'Docker Compose',
+    'Nginx',
+  ];
+
+  const aiProjects: AIProject[] = isZh
+    ? [
+        {
+          name: 'openclaw-mini',
+          path: 'https://github.com/voocel/openclaw-mini',
+          topic: 'Agent 应用',
+          desc: '轻量化的 AI Agent 实践项目，聚焦最小可用闭环和快速验证工作流。',
+        },
+        {
+          name: 'litellm',
+          path: 'https://github.com/voocel/litellm',
+          topic: 'LLM 网关',
+          desc: '统一多模型调用与路由策略，降低不同模型接口差异带来的接入复杂度。',
+        },
+        {
+          name: 'mcp-sdk-go',
+          path: 'https://github.com/voocel/mcp-sdk-go',
+          topic: 'MCP 工具链',
+          desc: '围绕 Model Context Protocol 的 Go SDK 能力，服务模型与工具之间的标准化交互。',
+        },
+        {
+          name: 'agentcore',
+          path: 'https://github.com/voocel/agentcore',
+          topic: 'Agent 框架',
+          desc: '面向生产场景的 Agent 组织方式，聚焦可观测、可维护和流程化执行。',
+        },
+      ]
+    : [
+        {
+          name: 'openclaw-mini',
+          path: 'https://github.com/voocel/openclaw-mini',
+          topic: 'Agent App',
+          desc: 'A lightweight AI agent project focused on minimal viable loops and fast workflow validation.',
+        },
+        {
+          name: 'litellm',
+          path: 'https://github.com/voocel/litellm',
+          topic: 'LLM Gateway',
+          desc: 'A unified layer for multi-model routing and access, reducing provider integration complexity.',
+        },
+        {
+          name: 'mcp-sdk-go',
+          path: 'https://github.com/voocel/mcp-sdk-go',
+          topic: 'MCP Tooling',
+          desc: 'Go SDK work around Model Context Protocol for standardized model-tool interaction.',
+        },
+        {
+          name: 'agentcore',
+          path: 'https://github.com/voocel/agentcore',
+          topic: 'Agent Framework',
+          desc: 'Production-oriented agent architecture with focus on observability and maintainable workflow execution.',
+        },
+      ];
+
+  return (
+    <div className="relative min-h-screen bg-[var(--color-base)] text-ink pt-20 pb-24 overflow-hidden">
+      <SEO title={copy.seoTitle} />
+
+      <div className="pointer-events-none absolute -top-24 -left-20 w-[28rem] h-[28rem] rounded-full bg-amber-200/30 blur-3xl" />
+      <div className="pointer-events-none absolute top-64 -right-24 w-[24rem] h-[24rem] rounded-full bg-orange-200/30 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 opacity-[0.035] [background-image:linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [background-size:42px_42px]" />
+
+      <div className="fixed top-8 left-8 z-50">
+        <AnimatedNavWidget
+          isCompact={true}
+          disableFixed={true}
+          showBackButton={true}
+          onBackClick={() => navigate('/')}
+        />
+      </div>
+
+      <main className="relative z-10 max-w-6xl mx-auto px-6">
+        <motion.section
+          className="grid grid-cols-1 lg:grid-cols-[1.25fr_0.75fr] gap-8 items-end mb-16"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
+        >
+          <div>
+            <p className="text-xs uppercase tracking-[0.26em] text-gold-600 font-bold mb-5">{copy.badge}</p>
+            <h1 className="text-4xl md:text-6xl font-serif font-bold leading-[1.06] mb-5 max-w-4xl">{copy.title}</h1>
+            <p className="text-sm uppercase tracking-[0.2em] text-[var(--color-text-muted)] mb-6">{copy.subtitle}</p>
+            <p className="text-base md:text-xl text-[var(--color-text-secondary)] leading-relaxed max-w-3xl">{copy.intro}</p>
+          </div>
+
+          <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-elevated)]/80 backdrop-blur-xl p-7 shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <img src="/logo.svg" alt="Voocel Logo" className="w-9 h-9 rounded-lg" />
+              <div>
+                <p className="font-bold text-base">Voocel</p>
+                <p className="text-xs uppercase tracking-[0.16em] text-[var(--color-text-muted)]">Journal System</p>
+              </div>
             </div>
-            {/* Hero Section */}
-            <section className="relative py-20 md:py-32 px-6 overflow-hidden">
-                <div className="max-w-4xl mx-auto text-center relative z-10">
-                    <Reveal>
-                        <p className="text-xs uppercase tracking-[0.3em] text-gold-600 mb-6 font-bold">The Philosophy</p>
-                    </Reveal>
-                    <Reveal delay={200}>
-                        <h1 className="text-5xl md:text-7xl font-serif font-bold mb-8 leading-tight">
-                            Curating the <span className="italic text-gold-600">Digital</span> Soul.
-                        </h1>
-                    </Reveal>
-                    <Reveal delay={400}>
-                        <p className="text-xl md:text-2xl text-[var(--color-text-secondary)] font-serif italic max-w-2xl mx-auto leading-relaxed">
-                            "We believe that code is poetry, and design is the silent language of connection. Voocel is a sanctuary for those who seek beauty in the binary."
-                        </p>
-                    </Reveal>
-                </div>
+            <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+              {isZh
+                ? '站点持续围绕工程深度与表达质量更新。所有设计选择都服务于阅读体验与知识沉淀。'
+                : 'The site evolves around engineering depth and editorial quality. Every design choice serves reading and knowledge retention.'}
+            </p>
+          </div>
+        </motion.section>
 
-                {/* Background Elements */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gold-100/30 rounded-full blur-3xl -z-10 opacity-50 pointer-events-none" />
-            </section>
+        <motion.section
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-20"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08, duration: 0.45, ease: 'easeOut' }}
+        >
+          {copy.highlights.map((item) => (
+            <div
+              key={item.label}
+              className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]/90 backdrop-blur px-5 py-6"
+            >
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)] mb-2">{item.label}</p>
+              <p className="text-2xl font-serif font-bold text-ink">{item.value}</p>
+            </div>
+          ))}
+        </motion.section>
 
-            {/* The Author Section */}
-            <section className="max-w-6xl mx-auto px-6 mb-32">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 items-center">
-                    <Reveal delay={200} className="relative group">
-                        <div className="aspect-[4/5] rounded-2xl overflow-hidden relative z-10">
-                            <img
-                                src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?fit=crop&w=800&q=80"
-                                alt="Alex Chen"
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-stone-900/40 to-transparent opacity-60" />
-                        </div>
-                        {/* Decorative Frame */}
-                        <div className="absolute -inset-4 border border-gold-200 rounded-2xl -z-10 translate-x-4 translate-y-4 transition-transform duration-500 group-hover:translate-x-2 group-hover:translate-y-2" />
-                    </Reveal>
-
-                    <div className="space-y-8">
-                        <Reveal delay={300}>
-                            <h2 className="text-3xl md:text-4xl font-serif font-bold mb-2">Alex Chen</h2>
-                            <p className="text-xs uppercase tracking-widest text-gold-600">Founder & Lead Editor</p>
-                        </Reveal>
-
-                        <Reveal delay={400}>
-                            <p className="text-[var(--color-text-secondary)] leading-relaxed mb-6">
-                                With over a decade of experience in both software engineering and visual arts, Alex founded Voocel to bridge the gap between technical precision and aesthetic emotion.
-                            </p>
-                            <p className="text-[var(--color-text-secondary)] leading-relaxed">
-                                "I wanted to create a space where technology doesn't feel cold. Every line of code should serve a human purpose, and every pixel should tell a story. This journal is my exploration of that intersection."
-                            </p>
-                        </Reveal>
-
-                        <Reveal delay={500}>
-                            <div className="flex gap-8 pt-4">
-                                <div>
-                                    <div className="text-3xl font-serif font-bold text-ink">12+</div>
-                                    <div className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] mt-1">Years Exp.</div>
-                                </div>
-                                <div>
-                                    <div className="text-3xl font-serif font-bold text-ink">150+</div>
-                                    <div className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] mt-1">Articles</div>
-                                </div>
-                                <div>
-                                    <div className="text-3xl font-serif font-bold text-ink">10k</div>
-                                    <div className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] mt-1">Readers</div>
-                                </div>
-                            </div>
-                        </Reveal>
+        <motion.section
+          className="mb-20"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.16, duration: 0.45, ease: 'easeOut' }}
+        >
+          <h2 className="text-2xl md:text-3xl font-serif font-bold mb-8">{copy.pillarTitle}</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            {pillars.map((item) => {
+              const Icon = item.icon;
+              return (
+                <article
+                  key={item.title}
+                  className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-7 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-11 h-11 rounded-xl bg-[var(--color-surface-alt)] flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-gold-600" />
                     </div>
+                    <span className="text-[10px] uppercase tracking-[0.18em] text-[var(--color-text-muted)]">{item.tag}</span>
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">{item.title}</h3>
+                  <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{item.desc}</p>
+                </article>
+              );
+            })}
+          </div>
+        </motion.section>
+
+        <motion.section
+          className="mb-20"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.45, ease: 'easeOut' }}
+        >
+          <div className="flex items-end justify-between mb-7 gap-4">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-serif font-bold mb-2">{copy.aiTitle}</h2>
+              <p className="text-sm text-[var(--color-text-secondary)] max-w-3xl">{copy.aiIntro}</p>
+            </div>
+            <a
+              href="https://github.com/voocel"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 text-xs uppercase tracking-[0.16em] text-[var(--color-text-muted)] hover:text-ink transition-colors"
+            >
+              github.com/voocel
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            {aiProjects.map((repo) => (
+              <a
+                key={repo.name}
+                href={repo.path}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-6 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300"
+              >
+                <p className="text-[10px] uppercase tracking-[0.2em] text-gold-600 font-bold mb-2">{repo.topic}</p>
+                <h3 className="text-lg font-bold mb-3 group-hover:text-orange-600 transition-colors">{repo.name}</h3>
+                <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{repo.desc}</p>
+              </a>
+            ))}
+          </div>
+        </motion.section>
+
+        <motion.section
+          className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-10 mb-20"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.24, duration: 0.45, ease: 'easeOut' }}
+        >
+          <div>
+            <h2 className="text-2xl md:text-3xl font-serif font-bold mb-6">{copy.stackTitle}</h2>
+            <div className="flex flex-wrap gap-2.5">
+              {techStack.map((item) => (
+                <span
+                  key={item}
+                  className="px-3 py-1.5 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] text-sm text-[var(--color-text-secondary)]"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-2xl md:text-3xl font-serif font-bold mb-6">{copy.notesTitle}</h2>
+            <div className="relative pl-6 space-y-5">
+              <div className="absolute left-1 top-1 bottom-1 w-px bg-[var(--color-border)]" />
+              {copy.notes.map((note, idx) => (
+                <div key={note} className="relative">
+                  <span className="absolute -left-[22px] top-[5px] w-2.5 h-2.5 rounded-full bg-gold-500" />
+                  <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{note}</p>
+                  {idx < copy.notes.length - 1 && <div className="mt-5 border-b border-[var(--color-border-subtle)]" />}
                 </div>
-            </section>
+              ))}
+            </div>
+          </div>
+        </motion.section>
 
-            {/* Values Grid */}
-            <section className="bg-[var(--color-surface)] py-24 border-y border-[var(--color-border-subtle)]">
-                <div className="max-w-6xl mx-auto px-6">
-                    <Reveal className="text-center mb-16">
-                        <h2 className="text-3xl font-serif font-bold">Our Core Values</h2>
-                    </Reveal>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                        <Reveal delay={100} className="text-center group cursor-default">
-                            <div className="w-16 h-16 mx-auto bg-[var(--color-surface-alt)] rounded-full flex items-center justify-center mb-6 group-hover:bg-gold-50 transition-colors duration-500">
-                                <IconSparkles className="w-8 h-8 text-[var(--color-text-muted)] group-hover:text-gold-600 transition-colors" />
-                            </div>
-                            <h3 className="text-lg font-bold mb-3 font-serif">Aesthetic First</h3>
-                            <p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
-                                Beauty is not an afterthought. It is the foundation of functionality and the key to user engagement.
-                            </p>
-                        </Reveal>
-
-                        <Reveal delay={200} className="text-center group cursor-default">
-                            <div className="w-16 h-16 mx-auto bg-[var(--color-surface-alt)] rounded-full flex items-center justify-center mb-6 group-hover:bg-gold-50 transition-colors duration-500">
-                                <IconBrain className="w-8 h-8 text-[var(--color-text-muted)] group-hover:text-gold-600 transition-colors" />
-                            </div>
-                            <h3 className="text-lg font-bold mb-3 font-serif">Intelligent Design</h3>
-                            <p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
-                                Leveraging AI and modern algorithms to enhance human creativity, not replace it.
-                            </p>
-                        </Reveal>
-
-                        <Reveal delay={300} className="text-center group cursor-default">
-                            <div className="w-16 h-16 mx-auto bg-[var(--color-surface-alt)] rounded-full flex items-center justify-center mb-6 group-hover:bg-gold-50 transition-colors duration-500">
-                                <IconMessage className="w-8 h-8 text-[var(--color-text-muted)] group-hover:text-gold-600 transition-colors" />
-                            </div>
-                            <h3 className="text-lg font-bold mb-3 font-serif">Open Dialogue</h3>
-                            <p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
-                                Fostering a community where ideas flow freely and diverse perspectives are celebrated.
-                            </p>
-                        </Reveal>
-                    </div>
-                </div>
-            </section>
-
-            {/* Contact Section */}
-            <section className="max-w-4xl mx-auto px-6 py-32 text-center">
-                <Reveal>
-                    <h2 className="text-4xl font-serif font-bold mb-6">Let's Create Together</h2>
-                    <p className="text-[var(--color-text-secondary)] mb-10 max-w-lg mx-auto">
-                        Whether you have a project in mind or just want to discuss the future of digital design, we'd love to hear from you.
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                        <button className="px-8 py-4 bg-ink text-[var(--color-base)] rounded-full font-medium tracking-wide hover:bg-gold-600 transition-colors shadow-lg hover:shadow-xl flex items-center gap-3 group cursor-pointer">
-                            <span>Start a Project</span>
-                            <IconSend className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </button>
-                        <button className="px-8 py-4 bg-[var(--color-surface)] border border-[var(--color-border)] text-ink rounded-full font-medium tracking-wide hover:border-gold-400 transition-colors flex items-center gap-3 cursor-pointer">
-                            <span>hello@voocel.com</span>
-                        </button>
-                    </div>
-                </Reveal>
-            </section>
-        </div>
-    );
+        <motion.section
+          className="rounded-3xl border border-[var(--color-border)] bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-surface-alt)] p-8 md:p-10"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.45, ease: 'easeOut' }}
+        >
+          <h2 className="text-2xl md:text-3xl font-serif font-bold mb-4">{copy.ctaTitle}</h2>
+          <p className="text-[var(--color-text-secondary)] mb-8 max-w-2xl">{copy.ctaDesc}</p>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="https://github.com/voocel"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-ink text-[var(--color-base)] font-medium hover:opacity-90 transition-opacity"
+            >
+              <IconGithub className="w-4 h-4" />
+              GitHub
+            </a>
+            <a
+              href="mailto:hello@voocel.com"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-base)]/70 text-ink font-medium hover:border-gold-500 transition-colors"
+            >
+              <IconMail className="w-4 h-4" />
+              hello@voocel.com
+            </a>
+          </div>
+        </motion.section>
+      </main>
+    </div>
+  );
 };
 
 export default AboutPage;

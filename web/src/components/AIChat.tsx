@@ -17,8 +17,7 @@ const AIChat: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // Artistic Avatar URL - Beautiful/Ethereal style
-  const AETHER_AVATAR_URL = "https://images.unsplash.com/photo-1524638431109-93d95c968f03?q=80&w=200&auto=format&fit=crop";
+  const AETHER_AVATAR_URL = '/images/avatar.jpg';
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
