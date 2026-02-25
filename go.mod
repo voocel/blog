@@ -10,6 +10,7 @@ require (
 	github.com/oschwald/maxminddb-golang v1.13.1
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/viper v1.21.0
+	github.com/yuin/goldmark v1.7.16
 	go.uber.org/zap v1.27.1
 	golang.org/x/crypto v0.45.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1

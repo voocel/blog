@@ -5,6 +5,8 @@ log_level_addr: :4245
 log_level_pattern: /log/level
 
 app:
+  site_url: https://voocel.com          # Site base URL (no trailing slash)
+  frontend_dist_path: /app/frontend     # Path to frontend build output (Docker volume mount)
   # JWT Configuration
   jwt_secret: change-this-in-production
   jwt_access_duration: 15   # Access token duration in minutes

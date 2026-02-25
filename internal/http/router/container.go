@@ -1,6 +1,9 @@
 package router
 
 import (
+	"path/filepath"
+
+	"blog/config"
 	"blog/internal/http/handler"
 	"blog/internal/usecase"
 	"blog/internal/usecase/repo"
@@ -46,6 +49,7 @@ type Container struct {
 	CommentHandler     *handler.CommentHandler
 	LikeHandler        *handler.LikeHandler
 	SitemapHandler     *handler.SitemapHandler
+	SEOHandler         *handler.SEOHandler
 }
 
 // NewContainer creates and initializes all application dependencies
@@ -88,6 +92,10 @@ func NewContainer(db *gorm.DB) *Container {
 	c.CommentHandler = handler.NewCommentHandler(c.CommentUseCase, c.PostUseCase)
 	c.LikeHandler = handler.NewLikeHandler(c.LikeUseCase)
 	c.SitemapHandler = handler.NewSitemapHandler(c.PostRepo)
+	c.SEOHandler = handler.NewSEOHandler(
+		c.PostUseCase,
+		filepath.Join(config.GetConf().App.FrontendDistPath, "index.html"),
+	)
 
 	return c
 }

@@ -35,10 +35,11 @@ type config struct {
 }
 
 type AppConfig struct {
-	SiteURL            string `mapstructure:"site_url"`             // Site base URL for sitemap generation
-	JwtSecret          string `mapstructure:"jwt_secret"`           // JWT signing secret key
-	JwtAccessDuration  int    `mapstructure:"jwt_access_duration"`  // Access token duration in minutes (default: 15)
-	JwtRefreshDuration int    `mapstructure:"jwt_refresh_duration"` // Refresh token duration in days (default: 7)
+	SiteURL            string `mapstructure:"site_url"`              // Site base URL for sitemap generation
+	FrontendDistPath   string `mapstructure:"frontend_dist_path"`    // Path to frontend dist directory (default: /app/frontend)
+	JwtSecret          string `mapstructure:"jwt_secret"`            // JWT signing secret key
+	JwtAccessDuration  int    `mapstructure:"jwt_access_duration"`   // Access token duration in minutes (default: 15)
+	JwtRefreshDuration int    `mapstructure:"jwt_refresh_duration"`  // Refresh token duration in days (default: 7)
 	UploadPath         string `mapstructure:"upload_path"`
 	GeoIPDBPath        string `mapstructure:"geoip_db_path"`
 }
@@ -104,7 +105,8 @@ func LoadConfig(paths ...string) {
 	viper.SetDefault("app.jwt_secret", "change-this-secret-in-production")
 	viper.SetDefault("app.jwt_access_duration", 15) // 15 minutes
 	viper.SetDefault("app.jwt_refresh_duration", 7) // 7 days
-	viper.SetDefault("app.site_url", "https://www.voocel.com")
+	viper.SetDefault("app.site_url", "https://voocel.com")
+	viper.SetDefault("app.frontend_dist_path", "/app/frontend")
 
 	// Read config.yaml (required)
 	viper.SetConfigName("config")

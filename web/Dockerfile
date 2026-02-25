@@ -18,8 +18,9 @@ RUN npm run build
 # Stage 2: Production with Nginx
 FROM docker.1ms.run/nginx:alpine
 
-# Copy built files from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Store build output in a source directory; on startup, sync to the volume mount point.
+# This ensures the shared volume always has the latest build when the container restarts.
+COPY --from=builder /app/dist /app/dist-source
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
@@ -31,5 +32,5 @@ EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --quiet --tries=1 --spider http://localhost/health || exit 1
 
-# Run nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Sync build output to volume, then start nginx
+CMD cp -r /app/dist-source/* /usr/share/nginx/html/ && nginx -g "daemon off;"

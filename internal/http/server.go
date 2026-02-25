@@ -1,13 +1,15 @@
 package http
 
 import (
+	"context"
+	"errors"
+	"net/http"
+	"strings"
+
 	"blog/config"
 	"blog/internal/http/middleware"
 	"blog/internal/http/router"
 	"blog/internal/repository/postgres"
-	"context"
-	"errors"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,7 +43,12 @@ func (s *Server) Run() {
 	)
 
 	g.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "404 not found"})
+		if strings.HasPrefix(c.Request.URL.Path, "/api/") {
+			c.JSON(http.StatusNotFound, gin.H{"error": "404 not found"})
+			return
+		}
+		// Non-API routes: serve index.html so the SPA router can handle them (e.g. /admin/*).
+		container.SEOHandler.ServeFallback(c)
 	})
 
 	// Static file service

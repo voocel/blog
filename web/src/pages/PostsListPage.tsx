@@ -13,6 +13,8 @@ interface PostGroup {
     posts: BlogPost[];
 }
 
+const PAGE_SIZE = 20;
+
 // Animation variants
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -44,12 +46,21 @@ const PostsListPage: React.FC = () => {
     const navigate = useNavigate();
     const [posts, setPosts] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
     const [activeFilter, setActiveFilter] = useState<'day' | 'week' | 'month' | 'year' | 'category'>('year');
 
     useEffect(() => {
-        postService.getPosts({ page: 1, limit: 100 })
+        postService.getPosts({ page: 1, limit: PAGE_SIZE })
             .then(res => {
                 setPosts(res.data);
+                if (res.pagination) {
+                    setHasMore(res.pagination.page < res.pagination.totalPages);
+                } else {
+                    // 兼容旧接口返回：无分页字段时用数量推断是否可能还有下一页
+                    setHasMore(res.data.length === PAGE_SIZE);
+                }
             })
             .catch(err => {
                 console.error('Failed to fetch posts:', err);
@@ -58,6 +69,29 @@ const PostsListPage: React.FC = () => {
                 setLoading(false);
             });
     }, []);
+
+    const handleLoadMore = async () => {
+        if (loadingMore || !hasMore) {
+            return;
+        }
+
+        const nextPage = page + 1;
+        setLoadingMore(true);
+        try {
+            const res = await postService.getPosts({ page: nextPage, limit: PAGE_SIZE });
+            setPosts(prev => [...prev, ...res.data]);
+            setPage(nextPage);
+            if (res.pagination) {
+                setHasMore(res.pagination.page < res.pagination.totalPages);
+            } else {
+                setHasMore(res.data.length === PAGE_SIZE);
+            }
+        } catch (err) {
+            console.error('Failed to load more posts:', err);
+        } finally {
+            setLoadingMore(false);
+        }
+    };
 
     // Group posts based on active filter
     const groupedPosts: PostGroup[] = React.useMemo(() => {
@@ -257,6 +291,23 @@ const PostsListPage: React.FC = () => {
                         transition={{ delay: 0.5 }}
                     >
                         No posts yet...
+                    </motion.div>
+                )}
+
+                {/* Load More */}
+                {!loading && posts.length > 0 && hasMore && (
+                    <motion.div
+                        className="mt-10 flex justify-center"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                    >
+                        <button
+                            onClick={handleLoadMore}
+                            disabled={loadingMore}
+                            className="text-sm text-[var(--color-text-secondary)] hover:text-orange-600 transition-colors font-medium cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                            {loadingMore ? '加载中...' : <>加载更多 &rarr;</>}
+                        </button>
                     </motion.div>
                 )}
             </motion.div>

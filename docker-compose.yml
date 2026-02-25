@@ -39,6 +39,7 @@ services:
       - ./static/uploads:/app/static/uploads
       - ./static/avatar:/app/static/avatar
       - ./config/GeoLite2-City.mmdb:/app/config/GeoLite2-City.mmdb:ro
+      - frontend_dist:/app/frontend:ro
     networks:
       - blog-network
     healthcheck:
@@ -57,6 +58,8 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+    volumes:
+      - frontend_dist:/usr/share/nginx/html
     networks:
       - blog-network
     healthcheck:
@@ -95,4 +98,6 @@ networks:
 
 volumes:
   postgres_data:
+    driver: local
+  frontend_dist:
     driver: local

@@ -13,6 +13,14 @@ func SetupRoutes(r *gin.Engine, c *Container) {
 	r.GET("/sitemap.xml", c.SitemapHandler.GenerateSitemap)
 	r.GET("/robots.txt", c.SitemapHandler.RobotsTxt)
 
+	// Page routes — backend injects meta tags into index.html for SEO
+	r.GET("/", c.SEOHandler.ServeHome)
+	r.GET("/posts", c.SEOHandler.ServePosts)
+	r.GET("/post/:slug", c.SEOHandler.ServePost)
+	r.GET("/about", c.SEOHandler.ServeAbout)
+	r.GET("/clock", c.SEOHandler.ServeFallback)
+	r.GET("/settings", c.SEOHandler.ServeFallback)
+
 	v1 := r.Group("/api/v1")
 	{
 		v1.GET("/health", handler.HealthCheck)
