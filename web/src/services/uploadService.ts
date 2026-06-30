@@ -27,3 +27,20 @@ export const uploadImage = async (file: File): Promise<UploadResult> => {
         type: response.data.type
     };
 };
+
+export const uploadAvatar = async (file: File): Promise<UploadResult> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await apiClient.post('/users/avatar', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+
+    return {
+        url: response.data.url,
+        filename: response.data.name,
+        type: response.data.type
+    };
+};

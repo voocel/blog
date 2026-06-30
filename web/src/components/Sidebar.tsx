@@ -3,6 +3,7 @@ import React from 'react';
 import { IconHome, IconGrid, IconLayers, IconTag, IconImage, IconLogOut, IconArrowLeft, IconSparkles, IconUserCircle, IconActivity, IconUser, IconMessageSquare } from '@/components/Icons';
 import type { AdminSection } from '@/types';
 import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
     currentSection: AdminSection;
@@ -12,6 +13,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ currentSection, setSection, onExit }) => {
     const { logout, user } = useAuth();
+    const navigate = useNavigate();
 
     const menuItems: { id: AdminSection; label: string; icon: React.FC<{ className?: string }> }[] = [
         { id: 'overview', label: 'Command Center', icon: IconHome },
@@ -65,7 +67,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentSection, setSection, onExit })
             {/* User & Footer */}
             <div className="p-4 border-t border-[var(--color-border)] bg-[var(--color-surface-alt)]/50">
                 {/* User Mini Profile */}
-                <div className="flex items-center gap-3 mb-6 px-2 group">
+                <button
+                    onClick={() => navigate('/settings')}
+                    className="w-full flex items-center gap-3 mb-6 px-2 py-2 rounded-xl text-left group hover:bg-[var(--color-surface)] transition-colors cursor-pointer"
+                    title="Edit profile"
+                >
                     <div className="w-10 h-10 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] overflow-hidden shadow-sm transition-transform duration-[600ms] ease-in-out group-hover:rotate-[360deg] cursor-pointer">
                         {user?.avatar ? (
                             <img src={user.avatar} alt="User" className="w-full h-full object-cover" />
@@ -82,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentSection, setSection, onExit })
                             <p className="text-[10px] text-[var(--color-text-secondary)] uppercase tracking-wider">Online</p>
                         </div>
                     </div>
-                </div>
+                </button>
 
                 <div className="grid grid-cols-2 gap-2">
                     <button

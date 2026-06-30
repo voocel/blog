@@ -3,12 +3,15 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAuth } from '@/context/AuthContext';
+import { IconUser } from '@/components/Icons';
 
 interface NavItem {
-    icon: string;
+    icon: string | React.FC<{ className?: string }>;
     label: string;
     labelCn: string;
     path: string;
+    requiresAuth?: boolean;
 }
 
 interface AnimatedNavWidgetProps {
@@ -24,23 +27,36 @@ const navItems: NavItem[] = [
     { icon: 'ⓘ', label: 'About', labelCn: '关于网站', path: '/about' },
     { icon: '☆', label: 'Favorites', labelCn: '推荐分享', path: '/favorites' },
     { icon: '🌐', label: 'Blog', labelCn: '优秀博客', path: '/blogs' },
+    { icon: IconUser, label: 'Profile', labelCn: '个人资料', path: '/settings', requiresAuth: true },
 ];
 
 const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false, disableFixed = false, showBackButton = false, onBackClick }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { locale } = useTranslation();
+    const { user, setAuthModalOpen } = useAuth();
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const [lastHoveredIndex, setLastHoveredIndex] = useState<number>(0);
 
     const isActive = (path: string) => location.pathname === path;
     const activeIndex = navItems.findIndex(item => isActive(item.path));
 
-    const handleNavClick = (path: string) => {
-        navigate(path);
+    const handleNavClick = (item: NavItem) => {
+        if (item.requiresAuth && !user) {
+            setAuthModalOpen(true);
+            return;
+        }
+        navigate(item.path);
     };
 
     const getLabel = (item: NavItem) => locale === 'zh' ? item.labelCn : item.label;
+    const renderIcon = (item: NavItem, className: string) => {
+        if (typeof item.icon === 'string') {
+            return <span className={className}>{item.icon}</span>;
+        }
+        const Icon = item.icon;
+        return <Icon className={className} />;
+    };
 
     const indicatorIndex = hoveredIndex !== null
         ? hoveredIndex
@@ -105,7 +121,7 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                         <motion.button
                             key={item.path}
                             layoutId={`nav-item-${index}`}
-                            onClick={() => handleNavClick(item.path)}
+                            onClick={() => handleNavClick(item)}
                             onMouseEnter={() => {
                                 setHoveredIndex(index);
                                 setLastHoveredIndex(index);
@@ -120,7 +136,7 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                             aria-label={getLabel(item)}
                             title={getLabel(item)}
                         >
-                            {item.icon}
+                            {renderIcon(item, typeof item.icon === 'string' ? 'text-lg leading-none' : 'w-5 h-5')}
                         </motion.button>
                     ))}
                 </div>
@@ -176,7 +192,7 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                     <motion.button
                         key={item.path}
                         layoutId={`nav-item-${index}`}
-                        onClick={() => handleNavClick(item.path)}
+                        onClick={() => handleNavClick(item)}
                         onMouseEnter={() => {
                             setHoveredIndex(index);
                             setLastHoveredIndex(index);
@@ -191,7 +207,7 @@ const AnimatedNavWidget: React.FC<AnimatedNavWidgetProps> = ({ isCompact = false
                                 : 'bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)]'
                                 }`}
                         >
-                            <span className="text-base">{item.icon}</span>
+                            {renderIcon(item, typeof item.icon === 'string' ? 'text-base leading-none' : 'w-4 h-4')}
                         </div>
                         <span
                             className={`text-base font-medium transition-colors duration-200 ${isActive(item.path) || hoveredIndex === index

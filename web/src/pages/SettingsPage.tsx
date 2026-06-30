@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useSettings } from '@/context/SettingsContext';
 import { IconUser, IconMail, IconCamera, IconArrowLeft, IconCheck, IconSparkles, IconMoon, IconGlobe } from '@/components/Icons';
-import { uploadImage } from '@/services/uploadService';
+import { useToast } from '@/components/Toast';
+import { uploadAvatar } from '@/services/uploadService';
 import type { ThemeMode } from '@/config/settings';
+import { localeNames } from '@/locales';
 
 interface SettingsPageProps {
     onExit: () => void;
@@ -18,11 +20,13 @@ const themeLabels: Record<ThemeMode, string> = {
 const SettingsPage: React.FC<SettingsPageProps> = ({ onExit }) => {
     const { user, updateUser } = useAuth();
     const { settings, updateTheme, effectiveTheme } = useSettings();
+    const { showToast } = useToast();
     const currentTheme = settings.appearance.theme;
+    const currentLocaleName = localeNames[settings.language.locale];
 
     const [username, setUsername] = useState(user?.username || '');
     const [avatar, setAvatar] = useState(user?.avatar || '');
-    const [bio, setBio] = useState('Digital explorer and creator.');
+    const [bio, setBio] = useState(user?.bio || '');
     const [isSaving, setIsSaving] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
@@ -30,6 +34,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onExit }) => {
         if (user) {
             setUsername(user.username);
             setAvatar(user.avatar || '');
+            setBio(user.bio || '');
         }
     }, [user]);
 
@@ -41,25 +46,32 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onExit }) => {
         if (file) {
             try {
                 setIsUploading(true);
-                const result = await uploadImage(file);
+                const result = await uploadAvatar(file);
                 setAvatar(result.url);
+                showToast('Profile image uploaded', 'success');
             } catch (error) {
                 console.error("Upload failed:", error);
+                showToast('Failed to upload profile image', 'error');
             } finally {
                 setIsUploading(false);
             }
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!user) return;
         setIsSaving(true);
-        setTimeout(() => {
-            updateUser({ ...user, username, avatar });
-            setIsSaving(false);
+        try {
+            await updateUser({ username, avatar, bio });
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
-        }, 800);
+            showToast('Profile updated', 'success');
+        } catch (error) {
+            console.error("Update profile failed:", error);
+            showToast('Failed to update profile', 'error');
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const cycleTheme = () => {
@@ -217,17 +229,16 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onExit }) => {
                                 </div>
                             </div>
 
-                            <div className="p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)]/50 flex items-center justify-between group hover:border-gold-200 dark:hover:border-gold-700 transition-colors cursor-pointer">
+                            <div className="p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)]/50 flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 bg-[var(--color-surface)] rounded-xl shadow-sm text-[var(--color-text-secondary)]">
                                         <IconGlobe className="w-5 h-5" />
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-ink">Language</h3>
-                                        <p className="text-xs text-[var(--color-text-secondary)]">English (US)</p>
+                                        <p className="text-xs text-[var(--color-text-secondary)]">{currentLocaleName}</p>
                                     </div>
                                 </div>
-                                <span className="text-xs font-bold text-[var(--color-text-muted)] uppercase">Change</span>
                             </div>
                         </div>
                     </section>

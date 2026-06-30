@@ -71,6 +71,7 @@ export interface User {
   status?: 'active' | 'banned';
   provider?: 'email' | 'google' | 'github';
   avatar?: string;
+  bio?: string;
 }
 
 export const Theme = {

@@ -3,6 +3,7 @@ package handler
 import (
 	"blog/internal/entity"
 	"blog/internal/usecase"
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -39,6 +40,10 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	}
 
 	if err := h.userUseCase.UpdateProfile(c.Request.Context(), userIDInt, req); err != nil {
+		if errors.Is(err, usecase.ErrInvalidArgument) {
+			JSONError(c, http.StatusBadRequest, err.Error(), err)
+			return
+		}
 		JSONError(c, http.StatusInternalServerError, "Internal server error", err)
 		return
 	}

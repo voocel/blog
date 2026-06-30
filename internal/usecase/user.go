@@ -4,6 +4,8 @@ import (
 	"blog/internal/entity"
 	"context"
 	"errors"
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -21,12 +23,8 @@ func (uc *UserUseCase) GetByID(ctx context.Context, id int64) (*entity.UserRespo
 		return nil, err
 	}
 
-	return &entity.UserResponse{
-		Username: user.Username,
-		Email:    user.Email,
-		Role:     user.Role,
-		Avatar:   user.Avatar,
-	}, nil
+	resp := entity.NewUserResponse(user)
+	return &resp, nil
 }
 
 func (uc *UserUseCase) UpdateProfile(ctx context.Context, id int64, req entity.UpdateProfileRequest) error {
@@ -35,14 +33,18 @@ func (uc *UserUseCase) UpdateProfile(ctx context.Context, id int64, req entity.U
 		return err
 	}
 
-	if req.Username != "" {
-		user.Username = req.Username
+	if req.Username != nil {
+		username := strings.TrimSpace(*req.Username)
+		if username == "" {
+			return fmt.Errorf("%w: username cannot be empty", ErrInvalidArgument)
+		}
+		user.Username = username
 	}
-	if req.Bio != "" {
-		user.Bio = req.Bio
+	if req.Bio != nil {
+		user.Bio = *req.Bio
 	}
-	if req.Avatar != "" {
-		user.Avatar = req.Avatar
+	if req.Avatar != nil {
+		user.Avatar = *req.Avatar
 	}
 
 	return uc.userRepo.Update(ctx, user)

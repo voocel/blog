@@ -14,7 +14,7 @@ interface AuthContextType {
     login: (email: string, password?: string) => Promise<boolean>;
     register: (email: string, password: string) => Promise<boolean>;
     logout: () => void;
-    updateUser: (user: User) => Promise<void>;
+    updateUser: (user: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -73,13 +73,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(null);
     };
 
-    const updateUser = async (updatedUser: User) => {
-        try {
-            const user = await authService.updateProfile(updatedUser);
-            setUser(user);
-        } catch (err) {
-            console.error("Update profile failed", err);
-        }
+    const updateUser = async (updatedUser: Partial<User>) => {
+        const user = await authService.updateProfile(updatedUser);
+        setUser(user);
     };
 
     return (

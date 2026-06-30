@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { BlogProvider } from '@/context/BlogContext';
@@ -10,6 +10,7 @@ import Sidebar from '@/components/Sidebar';
 import AuthModal from '@/components/AuthModal';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { ToastProvider } from '@/components/Toast';
+import { useAuth } from '@/context/AuthContext';
 
 // Lazy Load AIChat (large deps: @uiw/react-md-editor, @google/genai)
 const AIChat = React.lazy(() => import('./components/AIChat'));
@@ -27,6 +28,30 @@ const ClockPage = React.lazy(() => import('./pages/ClockPage'));
 const HomeRouter: React.FC = () => {
   const { settings } = useSettings();
   return settings.appearance.homepage === 'blog' ? <BlogHomePage /> : <HomePage />;
+};
+
+const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isLoading, setAuthModalOpen } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      setAuthModalOpen(true);
+    }
+  }, [isLoading, setAuthModalOpen, user]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-transparent text-[var(--color-text-muted)]">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 const AppContent: React.FC = () => {
@@ -73,7 +98,14 @@ const AppContent: React.FC = () => {
           <Route path="/post/:slug" element={<PostPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/clock" element={<ClockPage />} />
-          <Route path="/settings" element={<SettingsPage onExit={() => window.location.href = '/'} />} />
+          <Route
+            path="/settings"
+            element={
+              <RequireAuth>
+                <SettingsPage onExit={() => window.location.href = '/'} />
+              </RequireAuth>
+            }
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

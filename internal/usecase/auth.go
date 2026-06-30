@@ -40,12 +40,7 @@ func (uc *AuthUseCase) Login(ctx context.Context, req entity.LoginRequest) (*ent
 		AccessToken:  tokenPair.AccessToken,
 		RefreshToken: tokenPair.RefreshToken,
 		ExpiresIn:    tokenPair.ExpiresIn,
-		User: entity.UserResponse{
-			Username: user.Username,
-			Email:    user.Email,
-			Role:     user.Role,
-			Avatar:   user.Avatar,
-		},
+		User:         entity.NewUserResponse(user),
 	}, nil
 }
 
@@ -56,12 +51,8 @@ func (uc *AuthUseCase) GetCurrentUser(ctx context.Context, userID int64) (*entit
 		return nil, err
 	}
 
-	return &entity.UserResponse{
-		Username: user.Username,
-		Email:    user.Email,
-		Role:     user.Role,
-		Avatar:   user.Avatar,
-	}, nil
+	resp := entity.NewUserResponse(user)
+	return &resp, nil
 }
 
 // Register creates new user account and returns tokens
@@ -114,12 +105,7 @@ func (uc *AuthUseCase) Register(ctx context.Context, req entity.RegisterRequest)
 		AccessToken:  tokenPair.AccessToken,
 		RefreshToken: tokenPair.RefreshToken,
 		ExpiresIn:    tokenPair.ExpiresIn,
-		User: entity.UserResponse{
-			Username: user.Username,
-			Email:    user.Email,
-			Role:     user.Role,
-			Avatar:   user.Avatar,
-		},
+		User:         entity.NewUserResponse(user),
 	}, nil
 }
 

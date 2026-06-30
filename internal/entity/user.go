@@ -35,10 +35,26 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 }
 
 type UserResponse struct {
+	ID       int64  `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Role     string `json:"role"`
 	Avatar   string `json:"avatar,omitempty"`
+	Bio      string `json:"bio,omitempty"`
+}
+
+func NewUserResponse(user *User) UserResponse {
+	if user == nil {
+		return UserResponse{}
+	}
+	return UserResponse{
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
+		Role:     user.Role,
+		Avatar:   user.Avatar,
+		Bio:      user.Bio,
+	}
 }
 
 // AdminUserResponse is returned in admin user listing/status endpoints.
@@ -82,7 +98,7 @@ type RefreshTokenResponse struct {
 }
 
 type UpdateProfileRequest struct {
-	Username string `json:"username,omitempty"`
-	Bio      string `json:"bio,omitempty"`
-	Avatar   string `json:"avatar,omitempty"`
+	Username *string `json:"username,omitempty"`
+	Bio      *string `json:"bio,omitempty"`
+	Avatar   *string `json:"avatar,omitempty"`
 }
