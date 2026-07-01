@@ -47,8 +47,8 @@ func (s *Server) Run() {
 			c.JSON(http.StatusNotFound, gin.H{"error": "404 not found"})
 			return
 		}
-		// Non-API routes: serve index.html so the SPA router can handle them (e.g. /admin/*).
-		container.SEOHandler.ServeFallback(c)
+		// Non-API unknown routes should be real 404s, not crawlable soft 404 pages.
+		container.SEOHandler.ServeNotFound(c)
 	})
 
 	// Static file service

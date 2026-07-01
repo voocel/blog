@@ -3,6 +3,8 @@ package handler
 import (
 	"encoding/xml"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
 	"blog/config"
@@ -13,8 +15,8 @@ import (
 
 // XML sitemap structures
 type urlset struct {
-	XMLName xml.Name    `xml:"urlset"`
-	Xmlns   string      `xml:"xmlns,attr"`
+	XMLName xml.Name     `xml:"urlset"`
+	Xmlns   string       `xml:"xmlns,attr"`
 	URLs    []sitemapURL `xml:"url"`
 }
 
@@ -35,7 +37,7 @@ func NewSitemapHandler(postRepo usecase.PostRepo) *SitemapHandler {
 
 func (h *SitemapHandler) GenerateSitemap(c *gin.Context) {
 	ctx := c.Request.Context()
-	siteURL := config.GetConf().App.SiteURL
+	siteURL := strings.TrimRight(config.GetConf().App.SiteURL, "/")
 
 	sitemap := urlset{
 		Xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9",
@@ -55,6 +57,12 @@ func (h *SitemapHandler) GenerateSitemap(c *gin.Context) {
 		Priority:   0.9,
 	})
 
+	sitemap.URLs = append(sitemap.URLs, sitemapURL{
+		Loc:        siteURL + "/about",
+		Changefreq: "monthly",
+		Priority:   0.6,
+	})
+
 	// All published posts
 	filters := map[string]any{"status": "published"}
 	posts, _, err := h.postRepo.List(ctx, filters, 1, 1000)
@@ -66,7 +74,7 @@ func (h *SitemapHandler) GenerateSitemap(c *gin.Context) {
 			}
 
 			sitemap.URLs = append(sitemap.URLs, sitemapURL{
-				Loc:        siteURL + "/post/" + post.Slug,
+				Loc:        siteURL + "/post/" + url.PathEscape(post.Slug),
 				Lastmod:    lastmod.Format(time.RFC3339),
 				Changefreq: "weekly",
 				Priority:   0.8,
@@ -79,10 +87,13 @@ func (h *SitemapHandler) GenerateSitemap(c *gin.Context) {
 }
 
 func (h *SitemapHandler) RobotsTxt(c *gin.Context) {
-	siteURL := config.GetConf().App.SiteURL
+	siteURL := strings.TrimRight(config.GetConf().App.SiteURL, "/")
 
 	robots := `User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /settings
+Disallow: /api/
 
 Sitemap: ` + siteURL + `/sitemap.xml
 `

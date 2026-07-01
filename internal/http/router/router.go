@@ -20,6 +20,8 @@ func SetupRoutes(r *gin.Engine, c *Container) {
 	r.GET("/about", c.SEOHandler.ServeAbout)
 	r.GET("/clock", c.SEOHandler.ServeFallback)
 	r.GET("/settings", c.SEOHandler.ServeFallback)
+	r.GET("/admin", c.SEOHandler.ServeFallback)
+	r.GET("/admin/*path", c.SEOHandler.ServeFallback)
 
 	v1 := r.Group("/api/v1")
 	{

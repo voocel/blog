@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"html"
 	"net/http"
+	"net/url"
 	"os"
+	"regexp"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -40,6 +42,8 @@ type pageMeta struct {
 	URL         string
 	JSONLD      string // JSON-LD script content
 	Noscript    string // HTML content for crawlers
+	NoIndex     bool
+	StatusCode  int
 }
 
 // SEOHandler serves frontend pages with dynamically injected meta tags,
@@ -48,7 +52,7 @@ type SEOHandler struct {
 	postUseCase   *usecase.PostUseCase
 	indexHTML     atomic.Value // stores string
 	indexHTMLPath string
-	siteURL      string
+	siteURL       string
 }
 
 func NewSEOHandler(postUseCase *usecase.PostUseCase, indexHTMLPath string) *SEOHandler {
@@ -111,8 +115,7 @@ func (h *SEOHandler) ServePost(c *gin.Context) {
 	slug := c.Param("slug")
 	post, err := h.postUseCase.GetBySlug(c.Request.Context(), slug)
 	if err != nil || post == nil || post.Status != "published" {
-		// Post not found or unpublished: serve default page, let SPA handle 404.
-		h.ServeFallback(c)
+		h.ServeNotFound(c)
 		return
 	}
 
@@ -120,13 +123,14 @@ func (h *SEOHandler) ServePost(c *gin.Context) {
 	if ogImage != "" && !strings.HasPrefix(ogImage, "http") {
 		ogImage = h.siteURL + ogImage
 	}
+	postURL := h.siteURL + "/post/" + url.PathEscape(post.Slug)
 
 	meta := pageMeta{
 		Title:       post.Title + " | Voocel Journal",
-		Description: post.Excerpt,
+		Description: cleanMetaDescription(firstNonEmpty(post.Excerpt, post.Content), 160),
 		OGType:      "article",
 		OGImage:     ogImage,
-		URL:         h.siteURL + "/post/" + post.Slug,
+		URL:         postURL,
 		JSONLD:      h.buildArticleJSONLD(post),
 		Noscript:    "<h1>" + html.EscapeString(post.Title) + "</h1>" + markdown.ToHTML(post.Content),
 	}
@@ -143,13 +147,24 @@ func (h *SEOHandler) ServeAbout(c *gin.Context) {
 	})
 }
 
-// ServeFallback serves the unmodified index.html with default meta for any unmatched route.
+// ServeFallback serves known SPA routes that should not be indexed, such as admin/settings.
 func (h *SEOHandler) ServeFallback(c *gin.Context) {
 	h.servePage(c, pageMeta{
 		Title:       "Voocel Journal",
 		Description: "Voocel's personal blog exploring technology, design, and life.",
 		OGType:      "website",
-		URL:         h.siteURL + c.Request.URL.Path,
+		NoIndex:     true,
+	})
+}
+
+// ServeNotFound returns a real 404 page so crawlers do not index soft 404 URLs.
+func (h *SEOHandler) ServeNotFound(c *gin.Context) {
+	h.servePage(c, pageMeta{
+		Title:       "Page Not Found | Voocel Journal",
+		Description: "The requested page could not be found.",
+		OGType:      "website",
+		NoIndex:     true,
+		StatusCode:  http.StatusNotFound,
 	})
 }
 
@@ -164,6 +179,11 @@ func (h *SEOHandler) servePage(c *gin.Context, meta pageMeta) {
 	tpl = removeMeta(tpl, `<meta property="og:type"`)
 	tpl = removeMeta(tpl, `<meta property="og:image"`)
 	tpl = removeMeta(tpl, `<meta property="og:url"`)
+	tpl = removeMeta(tpl, `<meta name="robots"`)
+	tpl = removeMeta(tpl, `<meta name="twitter:card"`)
+	tpl = removeMeta(tpl, `<meta name="twitter:title"`)
+	tpl = removeMeta(tpl, `<meta name="twitter:description"`)
+	tpl = removeMeta(tpl, `<meta name="twitter:image"`)
 
 	// Replace <title> content.
 	if meta.Title != "" {
@@ -176,6 +196,9 @@ func (h *SEOHandler) servePage(c *gin.Context, meta pageMeta) {
 	inject.WriteString(`<meta property="og:title" content="` + html.EscapeString(meta.Title) + `"/>` + "\n")
 	inject.WriteString(`<meta property="og:description" content="` + html.EscapeString(meta.Description) + `"/>` + "\n")
 	inject.WriteString(`<meta property="og:type" content="` + meta.OGType + `"/>` + "\n")
+	if meta.NoIndex {
+		inject.WriteString(`<meta name="robots" content="noindex,nofollow"/>` + "\n")
+	}
 	if meta.OGImage != "" {
 		inject.WriteString(`<meta property="og:image" content="` + html.EscapeString(meta.OGImage) + `"/>` + "\n")
 	}
@@ -202,25 +225,31 @@ func (h *SEOHandler) servePage(c *gin.Context, meta pageMeta) {
 	}
 
 	c.Header("Content-Type", "text/html; charset=utf-8")
-	c.String(http.StatusOK, tpl)
+	status := meta.StatusCode
+	if status == 0 {
+		status = http.StatusOK
+	}
+	c.String(status, tpl)
 }
 
 // buildArticleJSONLD generates JSON-LD structured data for a blog post.
 func (h *SEOHandler) buildArticleJSONLD(post *entity.PostResponse) string {
+	description := cleanMetaDescription(firstNonEmpty(post.Excerpt, post.Content), 160)
+	postURL := h.siteURL + "/post/" + url.PathEscape(post.Slug)
 	data := map[string]any{
 		"@context":    "https://schema.org",
 		"@type":       "BlogPosting",
 		"headline":    post.Title,
-		"description": post.Excerpt,
+		"description": description,
 		"author": map[string]string{
 			"@type": "Person",
-			"name":  post.Author,
+			"name":  "Voocel",
 		},
 		"datePublished": post.PublishAt.Format(time.RFC3339),
-		"url":           h.siteURL + "/post/" + post.Slug,
+		"url":           postURL,
 		"mainEntityOfPage": map[string]string{
 			"@type": "WebPage",
-			"@id":   h.siteURL + "/post/" + post.Slug,
+			"@id":   postURL,
 		},
 	}
 	if post.Cover != "" {
@@ -232,6 +261,39 @@ func (h *SEOHandler) buildArticleJSONLD(post *entity.PostResponse) string {
 	}
 	b, _ := json.Marshal(data)
 	return string(b)
+}
+
+func firstNonEmpty(values ...string) string {
+	for _, value := range values {
+		if strings.TrimSpace(value) != "" {
+			return value
+		}
+	}
+	return ""
+}
+
+var (
+	htmlTagRE       = regexp.MustCompile(`(?s)<[^>]+>`)
+	markdownImageRE = regexp.MustCompile(`!\[[^\]]*]\([^)]+\)`)
+	markdownLinkRE  = regexp.MustCompile(`\[([^\]]+)]\([^)]+\)`)
+	markdownMarkRE  = regexp.MustCompile(`[#>*_` + "`" + `~\[\]()-]+`)
+)
+
+func cleanMetaDescription(source string, maxRunes int) string {
+	s := html.UnescapeString(source)
+	s = htmlTagRE.ReplaceAllString(s, " ")
+	s = markdownImageRE.ReplaceAllString(s, " ")
+	s = markdownLinkRE.ReplaceAllString(s, "$1")
+	s = markdownMarkRE.ReplaceAllString(s, " ")
+	s = strings.Join(strings.Fields(s), " ")
+	if maxRunes <= 0 {
+		return s
+	}
+	runes := []rune(s)
+	if len(runes) <= maxRunes {
+		return s
+	}
+	return strings.TrimSpace(string(runes[:maxRunes])) + "…"
 }
 
 // removeMeta removes a <meta> tag line that starts with the given prefix.
