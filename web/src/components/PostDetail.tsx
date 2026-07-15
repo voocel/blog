@@ -11,6 +11,7 @@ import { useSettings } from '@/context/SettingsContext';
 import SEO from '@/components/SEO';
 import AnimatedNavWidget from '@/components/AnimatedNavWidget';
 import LikeButton from '@/components/LikeButton';
+import MermaidCode from '@/components/MermaidCode';
 
 interface PostDetailProps {
     post: BlogPost;
@@ -165,6 +166,7 @@ const PostDetail: React.FC<PropsWithChildren<PostDetailProps>> = ({ post, childr
                             <MDEditor.Markdown
                                 source={post.content}
                                 style={{ backgroundColor: 'transparent', color: 'inherit', fontFamily: 'inherit' }}
+                                components={{ code: MermaidCode }}
                             />
                         </div>
 

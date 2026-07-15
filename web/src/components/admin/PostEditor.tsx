@@ -4,6 +4,7 @@ import { IconX, IconGrid, IconClock } from '@/components/Icons';
 import { useDraftAutoSave } from '@/hooks/useDraftAutoSave';
 import { useSettings } from '@/context/SettingsContext';
 import ConfirmModal from '@/components/ConfirmModal';
+import MermaidCode from '@/components/MermaidCode';
 import type { EditingPost, Category, Tag } from '@/types';
 
 interface PostEditorProps {
@@ -299,7 +300,7 @@ const PostEditor: React.FC<PostEditorProps> = ({
 
                 {/* Writing Canvas */}
                 <div className="flex-1 overflow-y-auto bg-[var(--color-base)]">
-                    <div className="max-w-4xl mx-auto py-20 px-12 h-full flex flex-col">
+                    <div className="max-w-6xl mx-auto py-20 px-12 h-full flex flex-col">
                         <input
                             className="w-full text-3xl md:text-5xl font-serif font-bold text-ink bg-transparent border-none focus:outline-none focus:ring-0 placeholder-[var(--color-text-muted)] leading-tight mb-8 tracking-tight caret-gold-500"
                             placeholder="Untitled Entry"
@@ -307,14 +308,15 @@ const PostEditor: React.FC<PostEditorProps> = ({
                             onChange={e => setEditingPost({ ...editingPost, title: e.target.value })}
                         />
 
-                        <div className="flex-1" data-color-mode={effectiveTheme}>
+                        <div className="flex-1 min-h-0 bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] shadow-sm p-4" data-color-mode={effectiveTheme}>
                             <MDEditor
                                 value={editingPost.content}
                                 onChange={(val) => setEditingPost({ ...editingPost, content: val || '' })}
                                 preview="edit"
-                                height={600}
+                                height="100%"
                                 visibleDragbar={false}
                                 highlightEnable={false}
+                                previewOptions={{ components: { code: MermaidCode } }}
                                 textareaProps={{
                                     placeholder: "Start writing your thoughts..."
                                 }}
