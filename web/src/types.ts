@@ -104,7 +104,7 @@ export interface DashboardOverview {
   recentPosts: BlogPost[];
   systemStatus: {
     storageUsage: number;
-    aiQuota: number;
+    memoryUsage: number;
   };
 }
 

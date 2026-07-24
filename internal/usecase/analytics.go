@@ -1,9 +1,11 @@
 package usecase
 
 import (
+	"blog/config"
 	"blog/internal/entity"
 	"blog/pkg/geoip"
 	"blog/pkg/log"
+	"blog/pkg/sysstat"
 	"context"
 	"time"
 )
@@ -131,8 +133,8 @@ func (uc *AnalyticsUseCase) GetDashboardOverview(ctx context.Context) (*entity.D
 	}
 
 	systemStatus := entity.DashboardSystemStatus{
-		StorageUsage: 45, // todo
-		AIQuota:      60, // todo
+		StorageUsage: sysstat.DiskUsagePercent(config.GetConf().App.UploadPath),
+		MemoryUsage:  sysstat.MemoryUsagePercent(),
 	}
 
 	return &entity.DashboardOverviewResponse{

@@ -47,8 +47,8 @@ type DashboardCounts struct {
 }
 
 type DashboardSystemStatus struct {
-	StorageUsage int `json:"storageUsage"` // Storage usage percentage 0-100
-	AIQuota      int `json:"aiQuota"`      // AI token usage percentage 0-100
+	StorageUsage int `json:"storageUsage"` // Disk usage percentage 0-100
+	MemoryUsage  int `json:"memoryUsage"`  // Memory usage percentage 0-100
 }
 
 func (Analytics) TableName() string {

@@ -100,11 +100,11 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({ user, dashboardStats, onE
                         </div>
                         <div>
                             <div className="flex justify-between text-sm mb-2">
-                                <span className="text-[var(--color-text-secondary)] font-medium">AI Quota (Gemini)</span>
-                                <span className="text-ink font-bold">{dashboardStats?.systemStatus.aiQuota || 0}%</span>
+                                <span className="text-[var(--color-text-secondary)] font-medium">Memory Usage</span>
+                                <span className="text-ink font-bold">{dashboardStats?.systemStatus.memoryUsage || 0}%</span>
                             </div>
                             <div className="w-full h-2.5 bg-[var(--color-surface-alt)] rounded-full overflow-hidden">
-                                <div className="h-full bg-gradient-to-r from-teal-400 to-teal-600 rounded-full" style={{ width: `${dashboardStats?.systemStatus.aiQuota || 0}%` }}></div>
+                                <div className="h-full bg-gradient-to-r from-teal-400 to-teal-600 rounded-full" style={{ width: `${dashboardStats?.systemStatus.memoryUsage || 0}%` }}></div>
                             </div>
                         </div>
 
@@ -114,7 +114,7 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({ user, dashboardStats, onE
                                 <span className="text-xs font-bold uppercase tracking-wider">Operational</span>
                             </div>
                             <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-                                System is operating normally. Next automated backup scheduled for 02:00 AM.
+                                All services are responding normally.
                             </p>
                         </div>
                     </div>
